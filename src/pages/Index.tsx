@@ -9,28 +9,26 @@ import { AddCompanyDialog } from "@/components/AddCompanyDialog";
 interface Company {
   name: string;
   sector: string;
-  stage: string;
+  subSector: string;
+  fundingType: string;
+  fundingDate: string;
+  fundingAmount: string;
+  websiteUrl: string;
+  headquarterLocation: string;
   description: string;
 }
 
 const initialCompanies = [
   {
-    name: "TechForward",
-    sector: "Tech",
-    stage: "Series A",
-    description: "AI-powered productivity tools for remote teams.",
-  },
-  {
-    name: "HealthPlus",
-    sector: "Healthcare",
-    stage: "Seed",
-    description: "Revolutionary telehealth platform for personalized care.",
-  },
-  {
-    name: "FinanceFlow",
-    sector: "Finance",
-    stage: "Series B",
-    description: "Next-generation payment processing solutions.",
+    name: "interviewing.io",
+    sector: "AI",
+    subSector: "HR Tech",
+    fundingType: "Series A",
+    fundingDate: "02/2024",
+    fundingAmount: "16,000,000",
+    websiteUrl: "https://interviewing.io",
+    headquarterLocation: "San Francisco",
+    description: "interviewing.io is a platform that helps engineers practice technical interviews anonymously and connect with top tech companies for real job opportunities.",
   },
 ];
 
@@ -46,7 +44,7 @@ const Index = () => {
 
   const filteredCompanies = companies.filter((company) => {
     const matchesSector = selectedSector === "All" || company.sector === selectedSector;
-    const matchesStage = selectedStage === "All" || company.stage === selectedStage;
+    const matchesStage = selectedStage === "All" || company.fundingType === selectedStage;
     const matchesSearch = company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          company.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSector && matchesStage && matchesSearch;
@@ -59,7 +57,7 @@ const Index = () => {
           <div className="space-y-2">
             <h1 className="text-4xl font-bold tracking-tight">Company Tracker</h1>
             <p className="text-muted-foreground">
-              Track and filter companies by sector and fundraising stage.
+              Track and filter companies by sector and funding stage.
             </p>
           </div>
           <AddCompanyDialog onAddCompany={handleAddCompany} />
