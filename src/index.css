@@ -48,7 +48,5 @@ input:focus-visible {
   @apply outline-none ring-2 ring-ring ring-offset-2;
 }
 
-/* Smooth transitions */
-.transition-all {
-  @apply transition-all duration-200;
-}
+/* Instead of creating a custom transition-all class, use Tailwind's built-in utilities directly in your components */
+
