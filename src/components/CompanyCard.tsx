@@ -1,7 +1,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Target, ChartBar, Globe, MapPin, Calendar, DollarSign, Building2 } from "lucide-react";
+import { Target, ChartBar, Globe, MapPin, Calendar, DollarSign, ArrowRight } from "lucide-react";
 
 interface CompanyCardProps {
   name: string;
@@ -42,13 +42,12 @@ export const CompanyCard = ({
               {new URL(websiteUrl).hostname}
             </a>
           </div>
-          <div className="flex flex-col gap-2 items-end">
+          <div className="flex items-center gap-2">
             <Badge variant="outline" className="bg-primary/5 text-primary">
-              <Target className="mr-1 h-3 w-3" />
               {sector}
             </Badge>
+            <ArrowRight className="h-3 w-3 text-muted-foreground" />
             <Badge variant="outline" className="bg-muted/50">
-              <Building2 className="mr-1 h-3 w-3" />
               {subSector}
             </Badge>
           </div>
