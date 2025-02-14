@@ -4,8 +4,16 @@ import { CompanyCard } from "@/components/CompanyCard";
 import { Filters } from "@/components/Filters";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { AddCompanyDialog } from "@/components/AddCompanyDialog";
 
-const companies = [
+interface Company {
+  name: string;
+  sector: string;
+  stage: string;
+  description: string;
+}
+
+const initialCompanies = [
   {
     name: "TechForward",
     sector: "Tech",
@@ -24,13 +32,17 @@ const companies = [
     stage: "Series B",
     description: "Next-generation payment processing solutions.",
   },
-  // Add more companies as needed
 ];
 
 const Index = () => {
+  const [companies, setCompanies] = useState<Company[]>(initialCompanies);
   const [selectedSector, setSelectedSector] = useState("All");
   const [selectedStage, setSelectedStage] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const handleAddCompany = (newCompany: Company) => {
+    setCompanies((prev) => [...prev, newCompany]);
+  };
 
   const filteredCompanies = companies.filter((company) => {
     const matchesSector = selectedSector === "All" || company.sector === selectedSector;
@@ -43,11 +55,14 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-soft-gray">
       <div className="container py-8 space-y-8">
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight">Company Tracker</h1>
-          <p className="text-muted-foreground">
-            Track and filter companies by sector and fundraising stage.
-          </p>
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold tracking-tight">Company Tracker</h1>
+            <p className="text-muted-foreground">
+              Track and filter companies by sector and fundraising stage.
+            </p>
+          </div>
+          <AddCompanyDialog onAddCompany={handleAddCompany} />
         </div>
         
         <div className="relative">
