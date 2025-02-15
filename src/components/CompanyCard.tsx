@@ -2,8 +2,10 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Target, ChartBar, Globe, MapPin, Calendar, DollarSign, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface CompanyCardProps {
+  id?: string;
   name: string;
   sector: string;
   subSector: string;
@@ -16,6 +18,7 @@ interface CompanyCardProps {
 }
 
 export const CompanyCard = ({ 
+  id,
   name, 
   sector, 
   subSector,
@@ -31,7 +34,13 @@ export const CompanyCard = ({
       <CardHeader className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-xl font-semibold tracking-tight">{name}</h3>
+            {id ? (
+              <Link to={`/company/${id}`} className="hover:text-primary transition-colors">
+                <h3 className="text-xl font-semibold tracking-tight">{name}</h3>
+              </Link>
+            ) : (
+              <h3 className="text-xl font-semibold tracking-tight">{name}</h3>
+            )}
             <a 
               href={websiteUrl}
               target="_blank"

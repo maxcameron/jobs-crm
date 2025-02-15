@@ -51,6 +51,79 @@ export type Database = {
         }
         Relationships: []
       }
+      company_contacts: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+          title: string
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          title: string
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_contacts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_postings: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          description: string
+          id: string
+          location: string
+          title: string
+          type: string
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          location: string
+          title: string
+          type: string
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          location?: string
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_postings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

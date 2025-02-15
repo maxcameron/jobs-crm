@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { CompanyCard } from "@/components/CompanyCard";
 import { Filters } from "@/components/Filters";
@@ -23,6 +22,7 @@ interface Company {
 }
 
 interface CompanyDisplay {
+  id: string;
   name: string;
   sector: string;
   subSector: string;
@@ -50,7 +50,6 @@ const Index = () => {
 
   useEffect(() => {
     if (companies.length > 0) {
-      // Extract unique sectors and stages from companies
       const sectors = Array.from(new Set(companies.map(company => company.sector)));
       const stages = Array.from(new Set(companies.map(company => company.funding_type)));
       setUniqueSectors(sectors);
@@ -81,7 +80,6 @@ const Index = () => {
   };
 
   const handleAddCompany = (newCompany: CompanyDisplay) => {
-    // Map the display names to database column names
     const dbCompany: Partial<Company> = {
       name: newCompany.name,
       sector: newCompany.sector,
@@ -96,7 +94,8 @@ const Index = () => {
     setCompanies((prev) => [{ ...dbCompany, id: '', created_at: new Date().toISOString() } as Company, ...prev]);
   };
 
-  const mapToDisplayCompany = (company: Company): CompanyDisplay => ({
+  const mapToDisplayCompany = (company: Company): CompanyDisplay & { id: string } => ({
+    id: company.id,
     name: company.name,
     sector: company.sector,
     subSector: company.sub_sector,
