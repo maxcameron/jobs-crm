@@ -9,6 +9,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 interface Company {
+  id: string;
+  created_at: string;
+  name: string;
+  sector: string;
+  sub_sector: string;
+  funding_type: string;
+  funding_date: string;
+  funding_amount: string;
+  website_url: string;
+  headquarter_location: string;
+  description: string;
+}
+
+interface CompanyDisplay {
   name: string;
   sector: string;
   subSector: string;
@@ -54,13 +68,36 @@ const Index = () => {
     }
   };
 
-  const handleAddCompany = (newCompany: Company) => {
-    setCompanies((prev) => [newCompany, ...prev]);
+  const handleAddCompany = (newCompany: CompanyDisplay) => {
+    const dbCompany: Partial<Company> = {
+      name: newCompany.name,
+      sector: newCompany.sector,
+      sub_sector: newCompany.subSector,
+      funding_type: newCompany.fundingType,
+      funding_date: newCompany.fundingDate,
+      funding_amount: newCompany.fundingAmount,
+      website_url: newCompany.websiteUrl,
+      headquarter_location: newCompany.headquarterLocation,
+      description: newCompany.description,
+    };
+    setCompanies((prev) => [{ ...dbCompany, id: '', created_at: new Date().toISOString() } as Company, ...prev]);
   };
+
+  const mapToDisplayCompany = (company: Company): CompanyDisplay => ({
+    name: company.name,
+    sector: company.sector,
+    subSector: company.sub_sector,
+    fundingType: company.funding_type,
+    fundingDate: company.funding_date,
+    fundingAmount: company.funding_amount,
+    websiteUrl: company.website_url,
+    headquarterLocation: company.headquarter_location,
+    description: company.description,
+  });
 
   const filteredCompanies = companies.filter((company) => {
     const matchesSector = selectedSector === "All" || company.sector === selectedSector;
-    const matchesStage = selectedStage === "All" || company.fundingType === selectedStage;
+    const matchesStage = selectedStage === "All" || company.funding_type === selectedStage;
     const matchesSearch = company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          company.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSector && matchesStage && matchesSearch;
@@ -107,7 +144,7 @@ const Index = () => {
             ) : (
               <div className="grid gap-4">
                 {filteredCompanies.map((company) => (
-                  <CompanyCard key={company.name} {...company} />
+                  <CompanyCard key={company.id} {...mapToDisplayCompany(company)} />
                 ))}
                 {filteredCompanies.length === 0 && (
                   <div className="text-center py-8 text-muted-foreground">
