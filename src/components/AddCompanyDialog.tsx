@@ -51,10 +51,20 @@ export const AddCompanyDialog = ({ onAddCompany }: AddCompanyDialogProps) => {
 
       if (error) throw error;
 
-      // Add company to the database
+      // Add company to the database with correct column names
       const { error: insertError } = await supabase
         .from('companies')
-        .insert([data]);
+        .insert([{
+          name: data.name,
+          sector: data.sector,
+          sub_sector: data.subSector,
+          funding_type: data.fundingType,
+          funding_date: data.fundingDate,
+          funding_amount: data.fundingAmount,
+          website_url: data.websiteUrl,
+          headquarter_location: data.headquarterLocation,
+          description: data.description
+        }]);
 
       if (insertError) throw insertError;
 

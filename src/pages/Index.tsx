@@ -69,6 +69,7 @@ const Index = () => {
   };
 
   const handleAddCompany = (newCompany: CompanyDisplay) => {
+    // Map the display names to database column names
     const dbCompany: Partial<Company> = {
       name: newCompany.name,
       sector: newCompany.sector,
