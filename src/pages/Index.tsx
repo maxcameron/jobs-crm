@@ -40,11 +40,23 @@ const Index = () => {
   const [selectedSector, setSelectedSector] = useState("All");
   const [selectedStage, setSelectedStage] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [uniqueSectors, setUniqueSectors] = useState<string[]>([]);
+  const [uniqueStages, setUniqueStages] = useState<string[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchCompanies();
   }, []);
+
+  useEffect(() => {
+    if (companies.length > 0) {
+      // Extract unique sectors and stages from companies
+      const sectors = Array.from(new Set(companies.map(company => company.sector)));
+      const stages = Array.from(new Set(companies.map(company => company.funding_type)));
+      setUniqueSectors(sectors);
+      setUniqueStages(stages);
+    }
+  }, [companies]);
 
   const fetchCompanies = async () => {
     try {
@@ -134,6 +146,8 @@ const Index = () => {
               selectedStage={selectedStage}
               onSectorChange={setSelectedSector}
               onStageChange={setSelectedStage}
+              availableSectors={uniqueSectors}
+              availableStages={uniqueStages}
             />
           </aside>
           

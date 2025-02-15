@@ -8,6 +8,8 @@ interface FiltersProps {
   selectedStage: string;
   onSectorChange: (sector: string) => void;
   onStageChange: (stage: string) => void;
+  availableSectors: string[];
+  availableStages: string[];
 }
 
 export const Filters = ({
@@ -15,9 +17,11 @@ export const Filters = ({
   selectedStage,
   onSectorChange,
   onStageChange,
+  availableSectors,
+  availableStages,
 }: FiltersProps) => {
-  const sectors = ["Tech", "Finance", "Healthcare", "All"];
-  const stages = ["Seed", "Series A", "Series B", "All"];
+  const sectors = ["All", ...availableSectors];
+  const stages = ["All", ...availableStages];
 
   return (
     <div className="space-y-4 animate-slideIn">
