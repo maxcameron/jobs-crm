@@ -1,10 +1,12 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CompanyCard } from "@/components/CompanyCard";
 import { Filters } from "@/components/Filters";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { AddCompanyDialog } from "@/components/AddCompanyDialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface Company {
   name: string;
@@ -18,28 +20,42 @@ interface Company {
   description: string;
 }
 
-const initialCompanies = [
-  {
-    name: "interviewing.io",
-    sector: "AI",
-    subSector: "HR Tech",
-    fundingType: "Series A",
-    fundingDate: "02/2024",
-    fundingAmount: "16,000,000",
-    websiteUrl: "https://interviewing.io",
-    headquarterLocation: "San Francisco",
-    description: "interviewing.io is a platform that helps engineers practice technical interviews anonymously and connect with top tech companies for real job opportunities.",
-  },
-];
-
 const Index = () => {
-  const [companies, setCompanies] = useState<Company[]>(initialCompanies);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedSector, setSelectedSector] = useState("All");
   const [selectedStage, setSelectedStage] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchCompanies();
+  }, []);
+
+  const fetchCompanies = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('companies')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setCompanies(data);
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch companies. Please refresh the page.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleAddCompany = (newCompany: Company) => {
-    setCompanies((prev) => [...prev, newCompany]);
+    setCompanies((prev) => [newCompany, ...prev]);
   };
 
   const filteredCompanies = companies.filter((company) => {
@@ -84,16 +100,22 @@ const Index = () => {
           </aside>
           
           <main className="md:col-span-3">
-            <div className="grid gap-4">
-              {filteredCompanies.map((company) => (
-                <CompanyCard key={company.name} {...company} />
-              ))}
-              {filteredCompanies.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">
-                  No companies found matching your criteria.
-                </div>
-              )}
-            </div>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {filteredCompanies.map((company) => (
+                  <CompanyCard key={company.name} {...company} />
+                ))}
+                {filteredCompanies.length === 0 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No companies found matching your criteria.
+                  </div>
+                )}
+              </div>
+            )}
           </main>
         </div>
       </div>

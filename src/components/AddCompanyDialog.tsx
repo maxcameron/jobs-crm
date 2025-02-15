@@ -3,10 +3,9 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AddCompanyDialogProps {
   onAddCompany: (company: {
@@ -24,36 +23,16 @@ interface AddCompanyDialogProps {
 
 export const AddCompanyDialog = ({ onAddCompany }: AddCompanyDialogProps) => {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    sector: "",
-    subSector: "",
-    fundingType: "",
-    fundingDate: "",
-    fundingAmount: "",
-    websiteUrl: "",
-    headquarterLocation: "",
-    description: "",
-  });
-
+  const [url, setUrl] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Check if all fields are filled
-    if (Object.values(formData).some(value => !value)) {
-      toast({
-        title: "Missing Fields",
-        description: "Please fill in all fields before submitting.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     // Validate URL format
     try {
-      new URL(formData.websiteUrl);
+      new URL(url);
     } catch {
       toast({
         title: "Invalid URL",
@@ -63,61 +42,41 @@ export const AddCompanyDialog = ({ onAddCompany }: AddCompanyDialogProps) => {
       return;
     }
 
-    // Validate date format (MM/YYYY)
-    const dateRegex = /^(0[1-9]|1[0-2])\/20\d{2}$/;
-    if (!dateRegex.test(formData.fundingDate)) {
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('research-company', {
+        body: { url }
+      });
+
+      if (error) throw error;
+
+      // Add company to the database
+      const { error: insertError } = await supabase
+        .from('companies')
+        .insert([data]);
+
+      if (insertError) throw insertError;
+
+      onAddCompany(data);
+      setUrl("");
+      setOpen(false);
+
       toast({
-        title: "Invalid Date",
-        description: "Please enter the date in MM/YYYY format (e.g., 02/2024).",
+        title: "Company Added",
+        description: "The company has been successfully added to your tracker.",
+      });
+    } catch (error) {
+      console.error('Error adding company:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add company. Please try again.",
         variant: "destructive",
       });
-      return;
+    } finally {
+      setIsLoading(false);
     }
-
-    onAddCompany(formData);
-    setFormData({
-      name: "",
-      sector: "",
-      subSector: "",
-      fundingType: "",
-      fundingDate: "",
-      fundingAmount: "",
-      websiteUrl: "",
-      headquarterLocation: "",
-      description: "",
-    });
-    setOpen(false);
-
-    toast({
-      title: "Company Added",
-      description: "The company has been successfully added to your tracker.",
-    });
   };
-
-  const sectors = [
-    "Fintech",
-    "Marketplace",
-    "Procurement & Supply Chain",
-    "Sales Tech",
-    "AI",
-  ];
-
-  const subSectors = [
-    "SMB",
-    "Insurance",
-    "HR Tech",
-    "Enterprise",
-    "Consumer",
-  ];
-
-  const fundingTypes = [
-    "Pre-Seed",
-    "Seed",
-    "Series A",
-    "Series B",
-    "Series C",
-    "Venture",
-  ];
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -127,151 +86,33 @@ export const AddCompanyDialog = ({ onAddCompany }: AddCompanyDialogProps) => {
           Add Company
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add New Company</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="name">
-                Company Name
-              </label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="e.g., Walmart"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Sector
-              </label>
-              <Select 
-                value={formData.sector} 
-                onValueChange={(value) => setFormData(prev => ({ ...prev, sector: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select sector" />
-                </SelectTrigger>
-                <SelectContent>
-                  {sectors.map((sector) => (
-                    <SelectItem key={sector} value={sector}>
-                      {sector}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Sub-Sector
-              </label>
-              <Select 
-                value={formData.subSector}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, subSector: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select sub-sector" />
-                </SelectTrigger>
-                <SelectContent>
-                  {subSectors.map((subSector) => (
-                    <SelectItem key={subSector} value={subSector}>
-                      {subSector}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Funding Type
-              </label>
-              <Select 
-                value={formData.fundingType}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, fundingType: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select funding type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {fundingTypes.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="fundingDate">
-                Funding Date
-              </label>
-              <Input
-                id="fundingDate"
-                value={formData.fundingDate}
-                onChange={(e) => setFormData(prev => ({ ...prev, fundingDate: e.target.value }))}
-                placeholder="MM/YYYY (e.g., 02/2024)"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="fundingAmount">
-                Funding Amount (USD)
-              </label>
-              <Input
-                id="fundingAmount"
-                value={formData.fundingAmount}
-                onChange={(e) => setFormData(prev => ({ ...prev, fundingAmount: e.target.value }))}
-                placeholder="e.g., 16,000,000"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="websiteUrl">
-                Website URL
-              </label>
-              <Input
-                id="websiteUrl"
-                value={formData.websiteUrl}
-                onChange={(e) => setFormData(prev => ({ ...prev, websiteUrl: e.target.value }))}
-                placeholder="e.g., https://google.com"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="headquarterLocation">
-                Headquarter Location
-              </label>
-              <Input
-                id="headquarterLocation"
-                value={formData.headquarterLocation}
-                onChange={(e) => setFormData(prev => ({ ...prev, headquarterLocation: e.target.value }))}
-                placeholder="e.g., San Francisco"
-              />
-            </div>
-          </div>
-          
           <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="description">
-              Description
+            <label className="text-sm font-medium" htmlFor="url">
+              Company Website URL
             </label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="Enter company description"
-              rows={3}
+            <Input
+              id="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="e.g., https://example.com"
+              disabled={isLoading}
             />
           </div>
           
-          <Button type="submit" className="w-full">
-            Add Company
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Researching Company...
+              </>
+            ) : (
+              'Add Company'
+            )}
           </Button>
         </form>
       </DialogContent>
