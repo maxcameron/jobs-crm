@@ -124,6 +124,36 @@ export type Database = {
           },
         ]
       }
+      user_tracking_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          locations: string[]
+          office_preferences: Database["public"]["Enums"]["office_preference"][]
+          sectors: Database["public"]["Enums"]["company_sector"][]
+          stages: Database["public"]["Enums"]["company_stage"][]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          locations?: string[]
+          office_preferences?: Database["public"]["Enums"]["office_preference"][]
+          sectors?: Database["public"]["Enums"]["company_sector"][]
+          stages?: Database["public"]["Enums"]["company_stage"][]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          locations?: string[]
+          office_preferences?: Database["public"]["Enums"]["office_preference"][]
+          sectors?: Database["public"]["Enums"]["company_sector"][]
+          stages?: Database["public"]["Enums"]["company_stage"][]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -132,7 +162,35 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      company_sector:
+        | "Artificial Intelligence (AI)"
+        | "Fintech"
+        | "HealthTech"
+        | "E-commerce & RetailTech"
+        | "Sales Tech & RevOps"
+        | "HR Tech & WorkTech"
+        | "PropTech (Real Estate Tech)"
+        | "LegalTech"
+        | "EdTech"
+        | "Cybersecurity"
+        | "Logistics & Supply Chain Tech"
+        | "Developer Tools & Web Infrastructure"
+        | "SaaS & Enterprise Software"
+        | "Marketing Tech (MarTech)"
+        | "InsurTech"
+        | "GovTech"
+        | "Marketplace Platforms"
+        | "Construction Tech & Fintech"
+        | "Mobility & Transportation Tech"
+        | "CleanTech & ClimateTech"
+      company_stage:
+        | "Seed"
+        | "Series A"
+        | "Series B"
+        | "Series C"
+        | "Series D"
+        | "Series E and above"
+      office_preference: "Full-time Office" | "Hybrid" | "Remote"
     }
     CompositeTypes: {
       [_ in never]: never
