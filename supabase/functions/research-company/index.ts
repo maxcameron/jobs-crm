@@ -56,6 +56,11 @@ Format your response as a JSON object with these exact keys:
   "description": "string"
 }`;
 
+    if (!openAIApiKey) {
+      throw new Error('OpenAI API key is not configured');
+    }
+
+    console.log('Making request to OpenAI API...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -63,7 +68,7 @@ Format your response as a JSON object with these exact keys:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4',
         messages: [
           { 
             role: 'system', 
@@ -79,13 +84,34 @@ Format your response as a JSON object with these exact keys:
     });
 
     const data = await response.json();
+    console.log('OpenAI API response:', JSON.stringify(data));
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${data.error?.message || 'Unknown error'}`);
+    }
+
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      throw new Error('Unexpected response format from OpenAI API');
+    }
+
     let companyData;
-    
     try {
       companyData = JSON.parse(data.choices[0].message.content);
     } catch (e) {
       console.error('Failed to parse GPT response:', data.choices[0].message.content);
       throw new Error('Failed to parse company data');
+    }
+
+    // Validate the required fields
+    const requiredFields = [
+      'name', 'sector', 'subSector', 'fundingType', 'fundingDate',
+      'fundingAmount', 'websiteUrl', 'headquarterLocation', 'description'
+    ];
+
+    for (const field of requiredFields) {
+      if (!companyData[field]) {
+        throw new Error(`Missing required field: ${field}`);
+      }
     }
 
     return new Response(JSON.stringify(companyData), {
