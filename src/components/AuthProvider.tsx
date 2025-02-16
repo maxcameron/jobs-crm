@@ -1,7 +1,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Session, User } from "@supabase/supabase-js";
+import { Session, AuthChangeEvent } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
@@ -89,16 +89,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log("Auth state changed:", event, session?.user?.email);
       
       // Handle auth error events
-      if (event === 'USER_DELETED' || event === 'SIGNED_OUT') {
-        await handleSignOut();
+      if (!session) {
+        navigate('/auth');
         return;
       }
 
       setSession(session);
       
-      if (!session) {
-        navigate('/auth');
-      } else if (!preferences?.has_completed_onboarding) {
+      if (!preferences?.has_completed_onboarding) {
         navigate('/onboarding');
       } else {
         navigate('/');
