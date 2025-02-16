@@ -46,47 +46,35 @@ export function Navigation() {
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
-                {onboardingComplete ? (
-                  <Link 
-                    to="/" 
-                    className={cn(
-                      "flex items-center justify-center rounded-md p-2 hover:bg-accent",
-                      location.pathname === "/" && "bg-accent"
-                    )}
-                  >
-                    <Building2 className="h-5 w-5" />
-                  </Link>
-                ) : (
-                  <div className="flex items-center justify-center rounded-md p-2 opacity-50 cursor-not-allowed">
-                    <Building2 className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                )}
+                <Link 
+                  to="/" 
+                  className={cn(
+                    "flex items-center justify-center rounded-md p-2 hover:bg-accent",
+                    location.pathname === "/" && "bg-accent"
+                  )}
+                >
+                  <Building2 className="h-5 w-5" />
+                </Link>
               </TooltipTrigger>
               <TooltipContent side="right" sideOffset={10} className="z-[110]">
-                {onboardingComplete ? "Companies" : "Complete onboarding to access companies"}
+                Companies
               </TooltipContent>
             </Tooltip>
 
             <Tooltip>
               <TooltipTrigger asChild>
-                {onboardingComplete ? (
-                  <Link
-                    to="/preferences"
-                    className={cn(
-                      "flex items-center justify-center rounded-md p-2 hover:bg-accent",
-                      location.pathname === "/preferences" && "bg-accent"
-                    )}
-                  >
-                    <Target className="h-5 w-5" />
-                  </Link>
-                ) : (
-                  <div className="flex items-center justify-center rounded-md p-2 opacity-50 cursor-not-allowed">
-                    <Target className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                )}
+                <Link
+                  to="/preferences"
+                  className={cn(
+                    "flex items-center justify-center rounded-md p-2 hover:bg-accent",
+                    location.pathname === "/preferences" && "bg-accent"
+                  )}
+                >
+                  <Target className="h-5 w-5" />
+                </Link>
               </TooltipTrigger>
               <TooltipContent side="right" sideOffset={10} className="z-[110]">
-                {onboardingComplete ? "Target Profile" : "Complete onboarding to access preferences"}
+                Target Profile
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
