@@ -26,7 +26,7 @@ const Auth = () => {
   const navigate = useNavigate();
 
   if (session) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/onboarding" replace />;
   }
 
   const handleSignIn = async (e: React.FormEvent) => {

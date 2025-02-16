@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -87,7 +88,7 @@ export function TrackingPreferences() {
       const { data, error } = await supabase
         .from('user_tracking_preferences')
         .select('*')
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -96,6 +97,11 @@ export function TrackingPreferences() {
       }
     } catch (error: any) {
       console.error('Error fetching preferences:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch preferences. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }

@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 interface AuthContextType {
   session: Session | null;
@@ -29,14 +30,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
+  const { data: preferences } = useQuery({
+    queryKey: ['preferences', session?.user.id],
+    queryFn: async () => {
+      if (!session?.user.id) return null;
+      const { data, error } = await supabase
+        .from('user_tracking_preferences')
+        .select('has_completed_onboarding')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!session?.user.id,
+  });
+
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log("Initial session check:", session?.user?.email || "No session");
       setSession(session);
-      if (session) {
-        navigate('/');
-      } else {
+      if (!session) {
         navigate('/auth');
       }
       setIsLoading(false);
@@ -52,15 +67,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       console.log("Auth state changed:", _event, session?.user?.email);
       setSession(session);
-      if (session) {
-        navigate('/');
-      } else {
+      
+      if (!session) {
         navigate('/auth');
+      } else if (!preferences?.has_completed_onboarding) {
+        navigate('/onboarding');
+      } else {
+        navigate('/');
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, preferences?.has_completed_onboarding]);
 
   return (
     <AuthContext.Provider value={{ session, isLoading, supabase }}>
