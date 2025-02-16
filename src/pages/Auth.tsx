@@ -28,10 +28,11 @@ const Auth = () => {
   const signInWithGoogle = async () => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      console.log("Starting Google sign in...");
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth`,
+          redirectTo: window.location.origin,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -46,12 +47,14 @@ const Auth = () => {
           description: error.message,
           variant: "destructive",
         });
+      } else {
+        console.log("Sign in successful:", data);
       }
     } catch (error: any) {
       console.error('Auth error:', error);
       toast({
         title: "Error",
-        description: error.message,
+        description: "Failed to sign in with Google. Please try again.",
         variant: "destructive",
       });
     } finally {
