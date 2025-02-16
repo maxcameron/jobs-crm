@@ -30,6 +30,9 @@ const TopNav = () => {
           </Link>
         </div>
         <div className="flex items-center gap-4">
+          <span className="text-sm text-muted-foreground">
+            {session.user.email}
+          </span>
           <a 
             href="mailto:maxecameron@gmail.com"
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
