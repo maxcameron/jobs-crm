@@ -53,9 +53,9 @@ export function StepContent({
     case "office":
       return (
         <OfficePreferences
-          selectedPreference={preferences.office_preferences[0]}
-          onChange={(preference) => 
-            setPreferences(prev => ({ ...prev, office_preferences: [preference] }))
+          selectedPreference={preferences.office_preferences}
+          onChange={(office_preferences) => 
+            setPreferences(prev => ({ ...prev, office_preferences }))
           }
         />
       );
