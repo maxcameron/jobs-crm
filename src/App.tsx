@@ -21,28 +21,30 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <div className="min-h-screen flex flex-col">
+          <div className="min-h-screen flex">
             <Navigation />
-            <Routes>
-              <Route path="/auth" element={<Auth />} />
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <Index />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/company/:id"
-                element={
-                  <ProtectedRoute>
-                    <CompanyDetails />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <div className="flex-1 pl-[64px]">
+              <Routes>
+                <Route path="/auth" element={<Auth />} />
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <Index />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/company/:id"
+                  element={
+                    <ProtectedRoute>
+                      <CompanyDetails />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
           </div>
         </AuthProvider>
       </BrowserRouter>
