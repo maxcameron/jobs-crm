@@ -8,9 +8,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useAuth } from "./AuthProvider";
 
 export function Navigation() {
   const location = useLocation();
+  const { session } = useAuth();
+  
+  if (!session) {
+    return null;
+  }
   
   return (
     <nav className="fixed left-0 top-0 z-30 h-screen w-[64px] border-r bg-background px-2 py-4">
