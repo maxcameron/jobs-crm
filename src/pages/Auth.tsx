@@ -39,8 +39,16 @@ const Auth = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Auth error:', error);
+        toast({
+          title: "Error signing in",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     } catch (error: any) {
+      console.error('Auth error:', error);
       toast({
         title: "Error",
         description: error.message,
