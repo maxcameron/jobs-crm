@@ -40,11 +40,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .eq('user_id', session.user.id)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        // If we get a 403 error, the user might not exist anymore
+        if (error.status === 403) {
+          console.error("User authentication error:", error);
+          await handleSignOut();
+          return null;
+        }
+        throw error;
+      }
       return data;
     },
     enabled: !!session?.user.id,
   });
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      setSession(null);
+      navigate('/auth');
+    } catch (error) {
+      console.error("Error signing out:", error);
+      // Force clear the session even if the signOut fails
+      setSession(null);
+      navigate('/auth');
+    }
+  };
 
   useEffect(() => {
     // Get initial session
@@ -64,8 +85,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       console.log("Auth state changed:", _event, session?.user?.email);
+      
+      // Handle auth error events
+      if (_event === 'USER_DELETED' || _event === 'SIGNED_OUT') {
+        await handleSignOut();
+        return;
+      }
+
       setSession(session);
       
       if (!session) {
