@@ -7,13 +7,13 @@ import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import type { Database } from "@/integrations/supabase/types";
 
 type CompanyStage = Database["public"]["Enums"]["company_stage"];
 type CompanySector = Database["public"]["Enums"]["company_sector"];
+type CompanyLocation = Database["public"]["Enums"]["company_location"];
 type OfficePreference = Database["public"]["Enums"]["office_preference"];
 
 const COMPANY_STAGES: CompanyStage[] = [
@@ -43,12 +43,35 @@ const COMPANY_SECTORS: CompanySector[] = [
   "CleanTech & ClimateTech"
 ];
 
+const COMPANY_LOCATIONS: CompanyLocation[] = [
+  "New York",
+  "San Francisco",
+  "London",
+  "Berlin",
+  "Paris",
+  "Toronto",
+  "Amsterdam",
+  "Singapore",
+  "Sydney",
+  "Tel Aviv",
+  "Boston",
+  "Austin",
+  "Seattle",
+  "Chicago",
+  "Los Angeles",
+  "Miami",
+  "Vancouver",
+  "Dublin",
+  "Stockholm",
+  "Tokyo"
+];
+
 const OFFICE_PREFERENCES: OfficePreference[] = ["Full-time Office", "Hybrid", "Remote"];
 
 interface TrackingPreferences {
   stages: CompanyStage[];
   sectors: CompanySector[];
-  locations: string[];
+  locations: CompanyLocation[];
   office_preferences: OfficePreference[];
 }
 
@@ -61,7 +84,6 @@ export function TrackingPreferences() {
     locations: [],
     office_preferences: []
   });
-  const [location, setLocation] = useState("");
   const { session } = useAuth();
   const { toast } = useToast();
 
@@ -119,23 +141,6 @@ export function TrackingPreferences() {
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const addLocation = () => {
-    if (location && !preferences.locations.includes(location)) {
-      setPreferences(prev => ({
-        ...prev,
-        locations: [...prev.locations, location]
-      }));
-      setLocation("");
-    }
-  };
-
-  const removeLocation = (locationToRemove: string) => {
-    setPreferences(prev => ({
-      ...prev,
-      locations: prev.locations.filter(loc => loc !== locationToRemove)
-    }));
   };
 
   if (isLoading) {
@@ -208,40 +213,27 @@ export function TrackingPreferences() {
         <CardHeader>
           <CardTitle>Company Locations</CardTitle>
           <CardDescription>
-            Add the locations you're interested in tracking
+            Select the locations you're interested in tracking
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex gap-2">
-            <Input
-              placeholder="Enter a location (e.g., New York, London)"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  addLocation();
-                }
-              }}
-            />
-            <Button onClick={addLocation}>Add</Button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {preferences.locations.map((loc) => (
-              <div
-                key={loc}
-                className="flex items-center gap-2 bg-secondary px-3 py-1 rounded-full"
-              >
-                <span>{loc}</span>
-                <button
-                  onClick={() => removeLocation(loc)}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
+        <CardContent className="grid gap-4">
+          {COMPANY_LOCATIONS.map((location) => (
+            <div key={location} className="flex items-center space-x-2">
+              <Checkbox
+                id={`location-${location}`}
+                checked={preferences.locations.includes(location)}
+                onCheckedChange={(checked) => {
+                  setPreferences(prev => ({
+                    ...prev,
+                    locations: checked
+                      ? [...prev.locations, location]
+                      : prev.locations.filter(loc => loc !== location)
+                  }));
+                }}
+              />
+              <Label htmlFor={`location-${location}`}>{location}</Label>
+            </div>
+          ))}
         </CardContent>
       </Card>
 

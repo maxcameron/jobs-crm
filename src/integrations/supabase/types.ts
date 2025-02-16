@@ -128,7 +128,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          locations: string[]
+          locations: Database["public"]["Enums"]["company_location"][]
           office_preferences: Database["public"]["Enums"]["office_preference"][]
           sectors: Database["public"]["Enums"]["company_sector"][]
           stages: Database["public"]["Enums"]["company_stage"][]
@@ -137,7 +137,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          locations?: string[]
+          locations?: Database["public"]["Enums"]["company_location"][]
           office_preferences?: Database["public"]["Enums"]["office_preference"][]
           sectors?: Database["public"]["Enums"]["company_sector"][]
           stages?: Database["public"]["Enums"]["company_stage"][]
@@ -146,7 +146,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          locations?: string[]
+          locations?: Database["public"]["Enums"]["company_location"][]
           office_preferences?: Database["public"]["Enums"]["office_preference"][]
           sectors?: Database["public"]["Enums"]["company_sector"][]
           stages?: Database["public"]["Enums"]["company_stage"][]
@@ -162,6 +162,27 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      company_location:
+        | "New York"
+        | "San Francisco"
+        | "London"
+        | "Berlin"
+        | "Paris"
+        | "Toronto"
+        | "Amsterdam"
+        | "Singapore"
+        | "Sydney"
+        | "Tel Aviv"
+        | "Boston"
+        | "Austin"
+        | "Seattle"
+        | "Chicago"
+        | "Los Angeles"
+        | "Miami"
+        | "Vancouver"
+        | "Dublin"
+        | "Stockholm"
+        | "Tokyo"
       company_sector:
         | "Artificial Intelligence (AI)"
         | "Fintech"
