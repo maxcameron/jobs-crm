@@ -88,8 +88,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session) => {
       console.log("Auth state changed:", event, session?.user?.email);
       
-      // Handle auth error events using type assertion to ensure type safety
-      if ((event as AuthChangeEvent) === "USER_DELETED" || (event as AuthChangeEvent) === "SIGNED_OUT") {
+      // Handle auth error events
+      if (event === "USER_DELETED" || event === "SIGNED_OUT") {
         await handleSignOut();
         return;
       }
