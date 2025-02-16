@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
@@ -7,35 +8,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { StagePreferences } from "@/components/preferences/StagePreferences";
-import { SectorPreferences } from "@/components/preferences/SectorPreferences";
-import { LocationPreferences } from "@/components/preferences/LocationPreferences";
-import { OfficePreferences } from "@/components/preferences/OfficePreferences";
 import { CompanyStage, CompanySector, CompanyLocation, OfficePreference } from "@/components/preferences/types";
-
-const STEPS = [
-  {
-    title: "Company Stage",
-    description: "What stage companies are you interested in?",
-    component: "stages"
-  },
-  {
-    title: "Industry Sectors",
-    description: "Which sectors interest you the most?",
-    component: "sectors"
-  },
-  {
-    title: "Locations",
-    description: "Where would you like to work?",
-    component: "locations"
-  },
-  {
-    title: "Work Arrangement",
-    description: "What's your preferred work arrangement?",
-    component: "office"
-  }
-];
+import { StepContent } from "./onboarding/StepContent";
+import { ProgressIndicator } from "./onboarding/ProgressIndicator";
+import { STEPS } from "./onboarding/types";
 
 const Onboarding = () => {
   const { session } = useAuth();
@@ -48,8 +24,6 @@ const Onboarding = () => {
     locations: [] as CompanyLocation[],
     office_preferences: [] as OfficePreference[]
   });
-
-  const progress = ((currentStep + 1) / STEPS.length) * 100;
 
   const isCurrentStepValid = () => {
     switch (STEPS[currentStep].component) {
@@ -148,64 +122,27 @@ const Onboarding = () => {
     );
   }
 
-  const renderStep = () => {
-    const step = STEPS[currentStep];
-
-    switch (step.component) {
-      case "stages":
-        return (
-          <StagePreferences
-            selectedStages={preferences.stages}
-            onChange={(stages) => setPreferences(prev => ({ ...prev, stages }))}
-          />
-        );
-      case "sectors":
-        return (
-          <SectorPreferences
-            availableSectors={availableData?.sectors || []}
-            selectedSectors={preferences.sectors}
-            onChange={(sectors) => setPreferences(prev => ({ ...prev, sectors }))}
-          />
-        );
-      case "locations":
-        return (
-          <LocationPreferences
-            availableLocations={availableData?.locations || []}
-            selectedLocations={preferences.locations}
-            onChange={(locations) => setPreferences(prev => ({ ...prev, locations }))}
-          />
-        );
-      case "office":
-        return (
-          <OfficePreferences
-            selectedPreference={preferences.office_preferences[0]}
-            onChange={(preference) => 
-              setPreferences(prev => ({ ...prev, office_preferences: [preference] }))
-            }
-          />
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
     <div className="container max-w-2xl py-8">
       <Card>
         <CardHeader>
-          <div className="space-y-2">
-            <Progress value={progress} className="w-full" />
-            <div className="text-sm text-muted-foreground">
-              Step {currentStep + 1} of {STEPS.length}
-            </div>
-          </div>
+          <ProgressIndicator 
+            currentStep={currentStep} 
+            totalSteps={STEPS.length} 
+          />
           <CardTitle>{STEPS[currentStep].title}</CardTitle>
           <CardDescription>
             {STEPS[currentStep].description}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {renderStep()}
+          <StepContent
+            step={STEPS[currentStep]}
+            preferences={preferences}
+            setPreferences={setPreferences}
+            availableSectors={availableData?.sectors}
+            availableLocations={availableData?.locations}
+          />
           <div className="flex justify-between pt-4">
             <Button
               variant="outline"
