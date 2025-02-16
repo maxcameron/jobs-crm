@@ -127,6 +127,7 @@ export type Database = {
       user_tracking_preferences: {
         Row: {
           created_at: string
+          has_completed_onboarding: boolean | null
           id: string
           locations: Database["public"]["Enums"]["company_location"][]
           office_preferences: Database["public"]["Enums"]["office_preference"][]
@@ -136,6 +137,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          has_completed_onboarding?: boolean | null
           id?: string
           locations?: Database["public"]["Enums"]["company_location"][]
           office_preferences?: Database["public"]["Enums"]["office_preference"][]
@@ -145,6 +147,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          has_completed_onboarding?: boolean | null
           id?: string
           locations?: Database["public"]["Enums"]["company_location"][]
           office_preferences?: Database["public"]["Enums"]["office_preference"][]
