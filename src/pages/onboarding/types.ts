@@ -17,8 +17,8 @@ export const STEPS: OnboardingStep[] = [
     component: "sectors"
   },
   {
-    title: "Locations",
-    description: "Where would you like to work?",
+    title: "Company Headquarters",
+    description: "Which companies would you like to track based on their headquarters location? Consider timezone differences and remote work policies.",
     component: "locations"
   },
   {
