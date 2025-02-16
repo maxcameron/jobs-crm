@@ -43,29 +43,6 @@ const COMPANY_SECTORS: CompanySector[] = [
   "CleanTech & ClimateTech"
 ];
 
-const COMPANY_LOCATIONS: CompanyLocation[] = [
-  "New York",
-  "San Francisco",
-  "London",
-  "Berlin",
-  "Paris",
-  "Toronto",
-  "Amsterdam",
-  "Singapore",
-  "Sydney",
-  "Tel Aviv",
-  "Boston",
-  "Austin",
-  "Seattle",
-  "Chicago",
-  "Los Angeles",
-  "Miami",
-  "Vancouver",
-  "Dublin",
-  "Stockholm",
-  "Tokyo"
-];
-
 const OFFICE_PREFERENCES: OfficePreference[] = ["Full-time Office", "Hybrid", "Remote"];
 
 interface TrackingPreferences {
@@ -78,6 +55,7 @@ interface TrackingPreferences {
 export function TrackingPreferences() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [availableLocations, setAvailableLocations] = useState<CompanyLocation[]>([]);
   const [preferences, setPreferences] = useState<TrackingPreferences>({
     stages: [],
     sectors: [],
@@ -89,7 +67,35 @@ export function TrackingPreferences() {
 
   useEffect(() => {
     fetchPreferences();
+    fetchAvailableLocations();
   }, []);
+
+  const fetchAvailableLocations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('companies')
+        .select('headquarter_location')
+        .order('headquarter_location');
+
+      if (error) throw error;
+
+      // Remove duplicates and filter out any null values
+      const uniqueLocations = Array.from(new Set(
+        data
+          .map(company => company.headquarter_location)
+          .filter((location): location is CompanyLocation => !!location)
+      ));
+
+      setAvailableLocations(uniqueLocations);
+    } catch (error: any) {
+      console.error('Error fetching available locations:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch available locations.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const fetchPreferences = async () => {
     try {
@@ -213,11 +219,11 @@ export function TrackingPreferences() {
         <CardHeader>
           <CardTitle>Company Locations</CardTitle>
           <CardDescription>
-            Select the locations you're interested in tracking
+            Select the locations where companies are based
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-          {COMPANY_LOCATIONS.map((location) => (
+          {availableLocations.map((location) => (
             <div key={location} className="flex items-center space-x-2">
               <Checkbox
                 id={`location-${location}`}
