@@ -32,11 +32,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Initial session check:", session?.user?.email || "No session");
       setSession(session);
-      if (session) {
-        navigate('/');
+      if (!session) {
+        navigate('/auth');
       }
       setIsLoading(false);
+    }).catch(error => {
+      console.error("Error getting initial session:", error);
+      setIsLoading(false);
+      navigate('/auth');
     });
 
     // Listen for auth changes
