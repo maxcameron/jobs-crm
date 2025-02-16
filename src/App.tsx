@@ -38,7 +38,7 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <div className="container py-8">
-                  <h1 className="text-4xl font-bold tracking-tight mb-8">Preferences</h1>
+                  <h1 className="text-4xl font-bold tracking-tight mb-8">Target Profile</h1>
                   <TrackingPreferences />
                 </div>
               </ProtectedRoute>

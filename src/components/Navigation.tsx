@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Building2, Settings } from "lucide-react";
+import { Building2, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -49,11 +49,11 @@ export function Navigation() {
                     location.pathname === "/preferences" && "bg-accent"
                   )}
                 >
-                  <Settings className="h-5 w-5" />
+                  <Target className="h-5 w-5" />
                 </Link>
               </TooltipTrigger>
               <TooltipContent side="right" sideOffset={10}>
-                Preferences
+                Target Profile
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
