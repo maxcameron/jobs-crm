@@ -33,6 +33,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      if (session) {
+        navigate('/');
+      }
       setIsLoading(false);
     });
 
@@ -40,9 +43,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("Auth state changed:", _event, session?.user?.email);
       setSession(session);
-      if (!session) {
-        navigate("/auth");
+      if (session) {
+        navigate('/');
+      } else {
+        navigate('/auth');
       }
     });
 
@@ -51,7 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{ session, isLoading, supabase }}>
-      {children}
+      {!isLoading && children}
     </AuthContext.Provider>
   );
 };
