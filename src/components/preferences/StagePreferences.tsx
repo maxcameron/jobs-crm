@@ -1,8 +1,8 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { COMPANY_STAGES, CompanyStage } from "./types";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { CompanyStage, COMPANY_STAGES } from "./types";
 
 interface StagePreferencesProps {
   selectedStages: CompanyStage[];
@@ -10,31 +10,30 @@ interface StagePreferencesProps {
 }
 
 export function StagePreferences({ selectedStages, onChange }: StagePreferencesProps) {
+  const handleStageChange = (stage: CompanyStage) => {
+    if (selectedStages.includes(stage)) {
+      onChange(selectedStages.filter((s) => s !== stage));
+    } else {
+      onChange([...selectedStages, stage]);
+    }
+  };
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Company Stage</CardTitle>
-        <CardDescription>
-          Select the funding stages you're interested in tracking
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="grid gap-4">
-        {COMPANY_STAGES.map((stage) => (
-          <div key={stage} className="flex items-center space-x-2">
-            <Checkbox
-              id={`stage-${stage}`}
-              checked={selectedStages.includes(stage)}
-              onCheckedChange={(checked) => {
-                onChange(
-                  checked
-                    ? [...selectedStages, stage]
-                    : selectedStages.filter(s => s !== stage)
-                );
-              }}
-            />
-            <Label htmlFor={`stage-${stage}`}>{stage}</Label>
-          </div>
-        ))}
+      <CardContent className="pt-6">
+        <div className="space-y-4">
+          {COMPANY_STAGES.map((stage) => (
+            <div key={stage} className="flex items-center space-x-2">
+              <RadioGroupItem
+                id={stage}
+                value={stage}
+                checked={selectedStages.includes(stage)}
+                onClick={() => handleStageChange(stage)}
+              />
+              <Label htmlFor={stage}>{stage}</Label>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );
