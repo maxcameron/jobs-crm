@@ -19,7 +19,7 @@ export function Navigation() {
   }
   
   return (
-    <nav className="fixed left-0 top-0 z-30 h-screen w-[64px] border-r bg-background px-2 py-4">
+    <nav className="fixed left-0 top-0 z-[100] h-screen w-[64px] border-r bg-background px-2 py-4">
       <div className="flex h-full flex-col items-center gap-4">
         <div className="flex flex-col items-center gap-2">
           <TooltipProvider delayDuration={0}>
@@ -35,7 +35,7 @@ export function Navigation() {
                   <Building2 className="h-5 w-5" />
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right" sideOffset={10} className="z-50">
+              <TooltipContent side="right" sideOffset={10} className="z-[110]">
                 Companies
               </TooltipContent>
             </Tooltip>
@@ -52,7 +52,7 @@ export function Navigation() {
                   <Target className="h-5 w-5" />
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right" sideOffset={10} className="z-50">
+              <TooltipContent side="right" sideOffset={10} className="z-[110]">
                 Target Profile
               </TooltipContent>
             </Tooltip>
