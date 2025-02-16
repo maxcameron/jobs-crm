@@ -22,9 +22,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <div className="min-h-screen flex">
+          <div className="relative min-h-screen">
             <Navigation />
-            <div className="flex-1 pl-[64px]">
+            <main className="pl-[64px]">
               <Routes>
                 <Route path="/auth" element={<Auth />} />
                 <Route
@@ -56,7 +56,7 @@ const App = () => (
                 />
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </div>
+            </main>
           </div>
         </AuthProvider>
       </BrowserRouter>
