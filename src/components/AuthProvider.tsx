@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log("Auth state changed:", event, session?.user?.email);
       
       // Handle auth error events
-      if (event === AuthChangeEvent.USER_DELETED || event === AuthChangeEvent.SIGNED_OUT) {
+      if (event === 'USER_DELETED' || event === 'SIGNED_OUT') {
         await handleSignOut();
         return;
       }
