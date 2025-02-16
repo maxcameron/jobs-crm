@@ -21,14 +21,53 @@ export function LocationPreferences({ availableLocations, selectedLocations, onC
     return groups;
   }, {} as Record<string, CompanyLocation[]>);
 
+  const handleRegionChange = (region: string, checked: boolean) => {
+    const regionLocations = groupedLocations[region];
+    if (checked) {
+      // Add all locations from the region that aren't already selected
+      const newLocations = [
+        ...selectedLocations,
+        ...regionLocations.filter(loc => !selectedLocations.includes(loc))
+      ];
+      onChange(newLocations);
+    } else {
+      // Remove all locations from this region
+      const newLocations = selectedLocations.filter(
+        loc => !regionLocations.includes(loc)
+      );
+      onChange(newLocations);
+    }
+  };
+
+  const isRegionFullySelected = (region: string) => {
+    const regionLocations = groupedLocations[region];
+    return regionLocations.every(loc => selectedLocations.includes(loc));
+  };
+
+  const isRegionPartiallySelected = (region: string) => {
+    const regionLocations = groupedLocations[region];
+    const selectedCount = regionLocations.filter(loc => 
+      selectedLocations.includes(loc)
+    ).length;
+    return selectedCount > 0 && selectedCount < regionLocations.length;
+  };
+
   return (
     <Card>
       <CardContent className="pt-6">
         <div className="space-y-6">
           {Object.entries(groupedLocations).map(([region, locations]) => (
             <div key={region} className="space-y-3">
-              <div className="font-medium text-sm text-muted-foreground">{region}</div>
-              <div className="grid gap-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id={`region-${region}`}
+                  checked={isRegionFullySelected(region)}
+                  className={isRegionPartiallySelected(region) ? "bg-primary/50" : ""}
+                  onCheckedChange={(checked) => handleRegionChange(region, checked as boolean)}
+                />
+                <Label htmlFor={`region-${region}`} className="font-medium text-sm">{region}</Label>
+              </div>
+              <div className="grid gap-4 ml-6">
                 {locations.map((location) => (
                   <div key={location} className="flex items-center space-x-2">
                     <Checkbox
