@@ -10,12 +10,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import type { Database } from "@/integrations/supabase/types";
 
-const COMPANY_STAGES = [
+type CompanyStage = Database["public"]["Enums"]["company_stage"];
+type CompanySector = Database["public"]["Enums"]["company_sector"];
+type OfficePreference = Database["public"]["Enums"]["office_preference"];
+
+const COMPANY_STAGES: CompanyStage[] = [
   "Seed", "Series A", "Series B", "Series C", "Series D", "Series E and above"
 ];
 
-const COMPANY_SECTORS = [
+const COMPANY_SECTORS: CompanySector[] = [
   "Artificial Intelligence (AI)",
   "Fintech",
   "HealthTech",
@@ -38,13 +43,13 @@ const COMPANY_SECTORS = [
   "CleanTech & ClimateTech"
 ];
 
-const OFFICE_PREFERENCES = ["Full-time Office", "Hybrid", "Remote"];
+const OFFICE_PREFERENCES: OfficePreference[] = ["Full-time Office", "Hybrid", "Remote"];
 
 interface TrackingPreferences {
-  stages: string[];
-  sectors: string[];
+  stages: CompanyStage[];
+  sectors: CompanySector[];
   locations: string[];
-  office_preferences: string[];
+  office_preferences: OfficePreference[];
 }
 
 export function TrackingPreferences() {
@@ -92,7 +97,10 @@ export function TrackingPreferences() {
         .from('user_tracking_preferences')
         .upsert({
           user_id: session.user.id,
-          ...preferences
+          stages: preferences.stages,
+          sectors: preferences.sectors,
+          locations: preferences.locations,
+          office_preferences: preferences.office_preferences
         });
 
       if (error) throw error;
@@ -247,7 +255,7 @@ export function TrackingPreferences() {
         <CardContent>
           <RadioGroup
             value={preferences.office_preferences[0] || ""}
-            onValueChange={(value) => {
+            onValueChange={(value: OfficePreference) => {
               setPreferences(prev => ({
                 ...prev,
                 office_preferences: [value]
