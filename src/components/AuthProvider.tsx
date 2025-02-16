@@ -1,6 +1,6 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { data: preferences } = useQuery({
     queryKey: ['preferences', session?.user.id],
@@ -72,9 +73,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSession(session);
       if (!session) {
         navigate('/auth');
-      } else if (session && preferences === null) {
+      } else if (session && preferences === null && location.pathname !== '/onboarding') {
         navigate('/onboarding');
-      } else if (session && preferences?.has_completed_onboarding) {
+      } else if (session && preferences?.has_completed_onboarding && location.pathname === '/auth') {
         navigate('/');
       }
       setIsLoading(false);
@@ -90,23 +91,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session?.user?.email);
       
+      setSession(session);
+      
       if (!session) {
         navigate('/auth');
         return;
       }
-
-      setSession(session);
       
-      // Don't redirect if we're already on the onboarding page and preferences haven't been loaded yet
-      if (preferences === null && window.location.pathname !== '/onboarding') {
-        navigate('/onboarding');
-      } else if (preferences?.has_completed_onboarding) {
-        navigate('/');
+      // Only redirect if we're on auth page or need onboarding
+      if (location.pathname === '/auth') {
+        if (preferences === null) {
+          navigate('/onboarding');
+        } else if (preferences?.has_completed_onboarding) {
+          navigate('/');
+        }
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, preferences]);
+  }, [navigate, preferences, location.pathname]);
 
   return (
     <AuthContext.Provider value={{ session, isLoading, supabase }}>
