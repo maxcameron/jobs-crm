@@ -2,14 +2,15 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { COMPANY_SECTORS, CompanySector } from "./types";
+import { CompanySector } from "./types";
 
 interface SectorPreferencesProps {
+  availableSectors: CompanySector[];
   selectedSectors: CompanySector[];
   onChange: (sectors: CompanySector[]) => void;
 }
 
-export function SectorPreferences({ selectedSectors, onChange }: SectorPreferencesProps) {
+export function SectorPreferences({ availableSectors, selectedSectors, onChange }: SectorPreferencesProps) {
   return (
     <Card>
       <CardHeader>
@@ -19,7 +20,7 @@ export function SectorPreferences({ selectedSectors, onChange }: SectorPreferenc
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
-        {COMPANY_SECTORS.map((sector) => (
+        {availableSectors.map((sector) => (
           <div key={sector} className="flex items-center space-x-2">
             <Checkbox
               id={`sector-${sector}`}

@@ -17,27 +17,4 @@ export const COMPANY_STAGES: CompanyStage[] = [
   "Seed", "Series A", "Series B", "Series C", "Series D", "Series E and above"
 ];
 
-export const COMPANY_SECTORS: CompanySector[] = [
-  "Artificial Intelligence (AI)",
-  "Fintech",
-  "HealthTech",
-  "E-commerce & RetailTech",
-  "Sales Tech & RevOps",
-  "HR Tech & WorkTech",
-  "PropTech (Real Estate Tech)",
-  "LegalTech",
-  "EdTech",
-  "Cybersecurity",
-  "Logistics & Supply Chain Tech",
-  "Developer Tools & Web Infrastructure",
-  "SaaS & Enterprise Software",
-  "Marketing Tech (MarTech)",
-  "InsurTech",
-  "GovTech",
-  "Marketplace Platforms",
-  "Construction Tech & Fintech",
-  "Mobility & Transportation Tech",
-  "CleanTech & ClimateTech"
-];
-
 export const OFFICE_PREFERENCES: OfficePreference[] = ["Full-time Office", "Hybrid", "Remote"];

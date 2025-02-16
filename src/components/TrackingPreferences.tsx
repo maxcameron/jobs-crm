@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -9,12 +8,13 @@ import { StagePreferences } from "./preferences/StagePreferences";
 import { SectorPreferences } from "./preferences/SectorPreferences";
 import { LocationPreferences } from "./preferences/LocationPreferences";
 import { OfficePreferences } from "./preferences/OfficePreferences";
-import { TrackingPreferences as TrackingPreferencesType, CompanyLocation, OfficePreference } from "./preferences/types";
+import { TrackingPreferences as TrackingPreferencesType, CompanyLocation, CompanySector, OfficePreference } from "./preferences/types";
 
 export function TrackingPreferences() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [availableLocations, setAvailableLocations] = useState<CompanyLocation[]>([]);
+  const [availableSectors, setAvailableSectors] = useState<CompanySector[]>([]);
   const [preferences, setPreferences] = useState<TrackingPreferencesType>({
     stages: [],
     sectors: [],
@@ -27,7 +27,34 @@ export function TrackingPreferences() {
   useEffect(() => {
     fetchPreferences();
     fetchAvailableLocations();
+    fetchAvailableSectors();
   }, []);
+
+  const fetchAvailableSectors = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('companies')
+        .select('sector')
+        .order('sector');
+
+      if (error) throw error;
+
+      const uniqueSectors = Array.from(new Set(
+        data
+          .map(company => company.sector)
+          .filter((sector): sector is CompanySector => !!sector)
+      ));
+
+      setAvailableSectors(uniqueSectors);
+    } catch (error: any) {
+      console.error('Error fetching available sectors:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch available sectors.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const fetchAvailableLocations = async () => {
     try {
@@ -123,6 +150,7 @@ export function TrackingPreferences() {
       />
 
       <SectorPreferences
+        availableSectors={availableSectors}
         selectedSectors={preferences.sectors}
         onChange={(sectors) => setPreferences(prev => ({ ...prev, sectors }))}
       />
