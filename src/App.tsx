@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import CompanyDetails from "./pages/CompanyDetails";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import { TrackingPreferences } from "./components/TrackingPreferences";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,17 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <Index />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/preferences"
+                  element={
+                    <ProtectedRoute>
+                      <div className="container py-8">
+                        <h1 className="text-4xl font-bold tracking-tight mb-8">Preferences</h1>
+                        <TrackingPreferences />
+                      </div>
                     </ProtectedRoute>
                   }
                 />
