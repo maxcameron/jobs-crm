@@ -121,7 +121,7 @@ const Index = () => {
       <div className="container py-8 space-y-8">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
-            <h1 className="text-4xl font-bold tracking-tight">Company Tracker</h1>
+            <h1 className="text-4xl font-bold tracking-tight">Companies</h1>
             <p className="text-muted-foreground">
               Track and filter companies by sector and funding stage.
             </p>
