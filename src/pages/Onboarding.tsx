@@ -155,7 +155,7 @@ const Onboarding = () => {
               onClick={handleNext}
               disabled={!isCurrentStepValid()}
             >
-              {currentStep === STEPS.length - 1 ? "Complete Setup" : "Next"}
+              {currentStep === STEPS.length - 1 ? "Get Started" : "Next"}
             </Button>
           </div>
         </CardContent>
