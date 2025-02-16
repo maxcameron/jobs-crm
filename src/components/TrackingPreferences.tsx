@@ -1,62 +1,21 @@
 
 import { useState, useEffect } from "react";
-import { Check, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import type { Database } from "@/integrations/supabase/types";
-
-type CompanyStage = Database["public"]["Enums"]["company_stage"];
-type CompanySector = Database["public"]["Enums"]["company_sector"];
-type CompanyLocation = Database["public"]["Enums"]["company_location"];
-type OfficePreference = Database["public"]["Enums"]["office_preference"];
-
-const COMPANY_STAGES: CompanyStage[] = [
-  "Seed", "Series A", "Series B", "Series C", "Series D", "Series E and above"
-];
-
-const COMPANY_SECTORS: CompanySector[] = [
-  "Artificial Intelligence (AI)",
-  "Fintech",
-  "HealthTech",
-  "E-commerce & RetailTech",
-  "Sales Tech & RevOps",
-  "HR Tech & WorkTech",
-  "PropTech (Real Estate Tech)",
-  "LegalTech",
-  "EdTech",
-  "Cybersecurity",
-  "Logistics & Supply Chain Tech",
-  "Developer Tools & Web Infrastructure",
-  "SaaS & Enterprise Software",
-  "Marketing Tech (MarTech)",
-  "InsurTech",
-  "GovTech",
-  "Marketplace Platforms",
-  "Construction Tech & Fintech",
-  "Mobility & Transportation Tech",
-  "CleanTech & ClimateTech"
-];
-
-const OFFICE_PREFERENCES: OfficePreference[] = ["Full-time Office", "Hybrid", "Remote"];
-
-interface TrackingPreferences {
-  stages: CompanyStage[];
-  sectors: CompanySector[];
-  locations: CompanyLocation[];
-  office_preferences: OfficePreference[];
-}
+import { StagePreferences } from "./preferences/StagePreferences";
+import { SectorPreferences } from "./preferences/SectorPreferences";
+import { LocationPreferences } from "./preferences/LocationPreferences";
+import { OfficePreferences } from "./preferences/OfficePreferences";
+import { TrackingPreferences as TrackingPreferencesType, CompanyLocation, OfficePreference } from "./preferences/types";
 
 export function TrackingPreferences() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [availableLocations, setAvailableLocations] = useState<CompanyLocation[]>([]);
-  const [preferences, setPreferences] = useState<TrackingPreferences>({
+  const [preferences, setPreferences] = useState<TrackingPreferencesType>({
     stages: [],
     sectors: [],
     locations: [],
@@ -79,7 +38,6 @@ export function TrackingPreferences() {
 
       if (error) throw error;
 
-      // Remove duplicates and filter out any null values
       const uniqueLocations = Array.from(new Set(
         data
           .map(company => company.headquarter_location)
@@ -159,116 +117,28 @@ export function TrackingPreferences() {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Company Stage</CardTitle>
-          <CardDescription>
-            Select the funding stages you're interested in tracking
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          {COMPANY_STAGES.map((stage) => (
-            <div key={stage} className="flex items-center space-x-2">
-              <Checkbox
-                id={`stage-${stage}`}
-                checked={preferences.stages.includes(stage)}
-                onCheckedChange={(checked) => {
-                  setPreferences(prev => ({
-                    ...prev,
-                    stages: checked
-                      ? [...prev.stages, stage]
-                      : prev.stages.filter(s => s !== stage)
-                  }));
-                }}
-              />
-              <Label htmlFor={`stage-${stage}`}>{stage}</Label>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+      <StagePreferences 
+        selectedStages={preferences.stages}
+        onChange={(stages) => setPreferences(prev => ({ ...prev, stages }))}
+      />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Company Sector</CardTitle>
-          <CardDescription>
-            Select the sectors you're interested in tracking
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          {COMPANY_SECTORS.map((sector) => (
-            <div key={sector} className="flex items-center space-x-2">
-              <Checkbox
-                id={`sector-${sector}`}
-                checked={preferences.sectors.includes(sector)}
-                onCheckedChange={(checked) => {
-                  setPreferences(prev => ({
-                    ...prev,
-                    sectors: checked
-                      ? [...prev.sectors, sector]
-                      : prev.sectors.filter(s => s !== sector)
-                  }));
-                }}
-              />
-              <Label htmlFor={`sector-${sector}`}>{sector}</Label>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+      <SectorPreferences
+        selectedSectors={preferences.sectors}
+        onChange={(sectors) => setPreferences(prev => ({ ...prev, sectors }))}
+      />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Company Locations</CardTitle>
-          <CardDescription>
-            Select the locations where companies are based
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          {availableLocations.map((location) => (
-            <div key={location} className="flex items-center space-x-2">
-              <Checkbox
-                id={`location-${location}`}
-                checked={preferences.locations.includes(location)}
-                onCheckedChange={(checked) => {
-                  setPreferences(prev => ({
-                    ...prev,
-                    locations: checked
-                      ? [...prev.locations, location]
-                      : prev.locations.filter(loc => loc !== location)
-                  }));
-                }}
-              />
-              <Label htmlFor={`location-${location}`}>{location}</Label>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+      <LocationPreferences
+        availableLocations={availableLocations}
+        selectedLocations={preferences.locations}
+        onChange={(locations) => setPreferences(prev => ({ ...prev, locations }))}
+      />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Office Preference</CardTitle>
-          <CardDescription>
-            Select your preferred work arrangements
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <RadioGroup
-            value={preferences.office_preferences[0] || ""}
-            onValueChange={(value: OfficePreference) => {
-              setPreferences(prev => ({
-                ...prev,
-                office_preferences: [value]
-              }));
-            }}
-          >
-            {OFFICE_PREFERENCES.map((preference) => (
-              <div key={preference} className="flex items-center space-x-2">
-                <RadioGroupItem value={preference} id={`office-${preference}`} />
-                <Label htmlFor={`office-${preference}`}>{preference}</Label>
-              </div>
-            ))}
-          </RadioGroup>
-        </CardContent>
-      </Card>
+      <OfficePreferences
+        selectedPreference={preferences.office_preferences[0]}
+        onChange={(preference: OfficePreference) => 
+          setPreferences(prev => ({ ...prev, office_preferences: [preference] }))
+        }
+      />
 
       <div className="flex justify-end">
         <Button onClick={savePreferences} disabled={isSaving}>
