@@ -1,5 +1,5 @@
 
-import { Link, useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { Building2, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -46,15 +46,17 @@ export function Navigation() {
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link
+                <NavLink
                   to="/"
-                  className={cn(
-                    "flex items-center justify-center rounded-md p-2 hover:bg-accent",
-                    location.pathname === "/" && "bg-accent"
-                  )}
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center justify-center rounded-md p-2 hover:bg-accent",
+                      isActive && "bg-accent"
+                    )
+                  }
                 >
                   <Building2 className="h-5 w-5" />
-                </Link>
+                </NavLink>
               </TooltipTrigger>
               <TooltipContent side="right" sideOffset={10} className="z-[110]">
                 Companies
@@ -63,15 +65,17 @@ export function Navigation() {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link
+                <NavLink
                   to="/preferences"
-                  className={cn(
-                    "flex items-center justify-center rounded-md p-2 hover:bg-accent",
-                    location.pathname === "/preferences" && "bg-accent"
-                  )}
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center justify-center rounded-md p-2 hover:bg-accent",
+                      isActive && "bg-accent"
+                    )
+                  }
                 >
                   <Target className="h-5 w-5" />
-                </Link>
+                </NavLink>
               </TooltipTrigger>
               <TooltipContent side="right" sideOffset={10} className="z-[110]">
                 Target Profile
