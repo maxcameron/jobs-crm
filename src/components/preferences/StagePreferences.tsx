@@ -21,7 +21,7 @@ export function StagePreferences({ selectedStages, onChange }: StagePreferencesP
   return (
     <Card>
       <CardContent className="pt-6">
-        <div className="space-y-4">
+        <RadioGroup className="space-y-4">
           {COMPANY_STAGES.map((stage) => (
             <div key={stage} className="flex items-center space-x-2">
               <RadioGroupItem
@@ -33,7 +33,7 @@ export function StagePreferences({ selectedStages, onChange }: StagePreferencesP
               <Label htmlFor={stage}>{stage}</Label>
             </div>
           ))}
-        </div>
+        </RadioGroup>
       </CardContent>
     </Card>
   );
