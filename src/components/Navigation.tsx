@@ -9,14 +9,35 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useAuth } from "./AuthProvider";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export function Navigation() {
   const location = useLocation();
   const { session } = useAuth();
   
+  const { data: preferences } = useQuery({
+    queryKey: ['preferences', session?.user.id],
+    queryFn: async () => {
+      if (!session?.user.id) return null;
+      const { data, error } = await supabase
+        .from('user_tracking_preferences')
+        .select('has_completed_onboarding')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!session?.user.id,
+  });
+  
   if (!session) {
     return null;
   }
+
+  const isOnboarding = location.pathname === '/onboarding';
+  const onboardingComplete = preferences?.has_completed_onboarding;
   
   return (
     <nav className="fixed left-0 top-0 z-[100] h-screen w-[64px] border-r bg-background px-2 py-4">
@@ -25,35 +46,47 @@ export function Navigation() {
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link 
-                  to="/" 
-                  className={cn(
-                    "flex items-center justify-center rounded-md p-2 hover:bg-accent",
-                    location.pathname === "/" && "bg-accent"
-                  )}
-                >
-                  <Building2 className="h-5 w-5" />
-                </Link>
+                {onboardingComplete ? (
+                  <Link 
+                    to="/" 
+                    className={cn(
+                      "flex items-center justify-center rounded-md p-2 hover:bg-accent",
+                      location.pathname === "/" && "bg-accent"
+                    )}
+                  >
+                    <Building2 className="h-5 w-5" />
+                  </Link>
+                ) : (
+                  <div className="flex items-center justify-center rounded-md p-2 opacity-50 cursor-not-allowed">
+                    <Building2 className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                )}
               </TooltipTrigger>
               <TooltipContent side="right" sideOffset={10} className="z-[110]">
-                Companies
+                {onboardingComplete ? "Companies" : "Complete onboarding to access companies"}
               </TooltipContent>
             </Tooltip>
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link
-                  to="/preferences"
-                  className={cn(
-                    "flex items-center justify-center rounded-md p-2 hover:bg-accent",
-                    location.pathname === "/preferences" && "bg-accent"
-                  )}
-                >
-                  <Target className="h-5 w-5" />
-                </Link>
+                {onboardingComplete ? (
+                  <Link
+                    to="/preferences"
+                    className={cn(
+                      "flex items-center justify-center rounded-md p-2 hover:bg-accent",
+                      location.pathname === "/preferences" && "bg-accent"
+                    )}
+                  >
+                    <Target className="h-5 w-5" />
+                  </Link>
+                ) : (
+                  <div className="flex items-center justify-center rounded-md p-2 opacity-50 cursor-not-allowed">
+                    <Target className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                )}
               </TooltipTrigger>
               <TooltipContent side="right" sideOffset={10} className="z-[110]">
-                Target Profile
+                {onboardingComplete ? "Target Profile" : "Complete onboarding to access preferences"}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
