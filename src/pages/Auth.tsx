@@ -13,9 +13,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
   const { session } = useAuth();
@@ -25,36 +30,28 @@ const Auth = () => {
     return <Navigate to="/" replace />;
   }
 
-  const signInWithGoogle = async () => {
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
     try {
-      console.log("Starting Google sign in...");
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        }
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
 
       if (error) {
-        console.error('Auth error:', error);
+        console.error('Sign in error:', error);
         toast({
           title: "Error signing in",
           description: error.message,
           variant: "destructive",
         });
-      } else {
-        console.log("Sign in successful:", data);
       }
     } catch (error: any) {
       console.error('Auth error:', error);
       toast({
         title: "Error",
-        description: "Failed to sign in with Google. Please try again.",
+        description: "Failed to sign in. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -62,30 +59,94 @@ const Auth = () => {
     }
   };
 
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) {
+        console.error('Sign up error:', error);
+        toast({
+          title: "Error signing up",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "Check your email to confirm your account.",
+        });
+      }
+    } catch (error: any) {
+      console.error('Auth error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to sign up. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const AuthForm = ({ onSubmit, buttonText }: { onSubmit: (e: React.FormEvent) => Promise<void>, buttonText: string }) => (
+    <form onSubmit={onSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="password">Password</Label>
+        <Input
+          id="password"
+          type="password"
+          placeholder="Enter your password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+      </div>
+      <Button type="submit" className="w-full" disabled={isLoading}>
+        {isLoading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : buttonText}
+      </Button>
+    </form>
+  );
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/50 px-4">
       <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle>Welcome to Jobs CRM</CardTitle>
           <CardDescription>
-            Sign in with your Google account to get started
+            Sign in or create an account to get started
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button
-            onClick={signInWithGoogle}
-            className="w-full"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
-                <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path>
-              </svg>
-            )}
-            Sign in with Google
-          </Button>
+          <Tabs defaultValue="signin" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="signin">Sign In</TabsTrigger>
+              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            </TabsList>
+            <TabsContent value="signin">
+              <AuthForm onSubmit={handleSignIn} buttonText="Sign In" />
+            </TabsContent>
+            <TabsContent value="signup">
+              <AuthForm onSubmit={handleSignUp} buttonText="Sign Up" />
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>
