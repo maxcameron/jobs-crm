@@ -52,6 +52,13 @@ export function Navigation() {
                     "flex items-center justify-center rounded-md p-2 hover:bg-accent",
                     location.pathname === "/" && "bg-accent"
                   )}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (location.pathname !== "/") {
+                      window.history.pushState({}, "", "/");
+                      window.dispatchEvent(new PopStateEvent("popstate"));
+                    }
+                  }}
                 >
                   <Building2 className="h-5 w-5" />
                 </Link>
@@ -69,6 +76,13 @@ export function Navigation() {
                     "flex items-center justify-center rounded-md p-2 hover:bg-accent",
                     location.pathname === "/preferences" && "bg-accent"
                   )}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (location.pathname !== "/preferences") {
+                      window.history.pushState({}, "", "/preferences");
+                      window.dispatchEvent(new PopStateEvent("popstate"));
+                    }
+                  }}
                 >
                   <Target className="h-5 w-5" />
                 </Link>
