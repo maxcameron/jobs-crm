@@ -35,7 +35,7 @@ export function Navigation() {
                   <Building2 className="h-5 w-5" />
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right" sideOffset={10}>
+              <TooltipContent side="right" sideOffset={10} className="z-50">
                 Companies
               </TooltipContent>
             </Tooltip>
@@ -52,7 +52,7 @@ export function Navigation() {
                   <Target className="h-5 w-5" />
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right" sideOffset={10}>
+              <TooltipContent side="right" sideOffset={10} className="z-50">
                 Target Profile
               </TooltipContent>
             </Tooltip>
