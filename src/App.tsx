@@ -10,6 +10,7 @@ import { Navigation } from "./components/Navigation";
 import Index from "./pages/Index";
 import CompanyDetails from "./pages/CompanyDetails";
 import Auth from "./pages/Auth";
+import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 import { TrackingPreferences } from "./components/TrackingPreferences";
 import { useAuth } from "./components/AuthProvider";
@@ -62,6 +63,14 @@ const AppContent = () => {
         <Routes>
           <Route path="/auth" element={<Auth />} />
           <Route
+            path="/onboarding"
+            element={
+              <ProtectedRoute>
+                <Onboarding />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/"
             element={
               <ProtectedRoute>
@@ -110,3 +119,4 @@ const App = () => (
 );
 
 export default App;
+
