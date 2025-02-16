@@ -1,7 +1,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Session } from "@supabase/supabase-js";
+import { Session, AuthChangeEvent } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
@@ -41,8 +41,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .maybeSingle();
 
       if (error) {
-        // If we get a 403 error, the user might not exist anymore
-        if (error.status === 403) {
+        // For PostgrestError, we should check the code instead of status
+        if (error.code === '403') {
           console.error("User authentication error:", error);
           await handleSignOut();
           return null;
@@ -85,11 +85,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      console.log("Auth state changed:", _event, session?.user?.email);
+    } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session) => {
+      console.log("Auth state changed:", event, session?.user?.email);
       
       // Handle auth error events
-      if (_event === 'USER_DELETED' || _event === 'SIGNED_OUT') {
+      if (event === AuthChangeEvent.USER_DELETED || event === AuthChangeEvent.SIGNED_OUT) {
         await handleSignOut();
         return;
       }
