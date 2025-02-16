@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { CompanyCard } from "@/components/CompanyCard";
 import { Filters } from "@/components/Filters";
@@ -8,7 +7,6 @@ import { AddCompanyDialog } from "@/components/AddCompanyDialog";
 import { TrackingPreferences } from "@/components/TrackingPreferences";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Company {
   id: string;
@@ -131,58 +129,49 @@ const Index = () => {
           <AddCompanyDialog onAddCompany={handleAddCompany} />
         </div>
 
-        <Tabs defaultValue="companies">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="companies">Companies</TabsTrigger>
-            <TabsTrigger value="preferences">Tracking Preferences</TabsTrigger>
-          </TabsList>
-          <TabsContent value="companies" className="space-y-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search companies..."
-                className="pl-10"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
+        <div className="space-y-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search companies..."
+              className="pl-10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-              <aside className="md:col-span-1">
-                <Filters
-                  selectedSector={selectedSector}
-                  selectedStage={selectedStage}
-                  onSectorChange={setSelectedSector}
-                  onStageChange={setSelectedStage}
-                  availableSectors={uniqueSectors}
-                  availableStages={uniqueStages}
-                />
-              </aside>
-              
-              <main className="md:col-span-3">
-                {isLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                  </div>
-                ) : (
-                  <div className="grid gap-4">
-                    {filteredCompanies.map((company) => (
-                      <CompanyCard key={company.id} {...mapToDisplayCompany(company)} />
-                    ))}
-                    {filteredCompanies.length === 0 && (
-                      <div className="text-center py-8 text-muted-foreground">
-                        No companies found matching your criteria.
-                      </div>
-                    )}
-                  </div>
-                )}
-              </main>
-            </div>
-          </TabsContent>
-          <TabsContent value="preferences">
-            <TrackingPreferences />
-          </TabsContent>
-        </Tabs>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <aside className="md:col-span-1">
+              <Filters
+                selectedSector={selectedSector}
+                selectedStage={selectedStage}
+                onSectorChange={setSelectedSector}
+                onStageChange={setSelectedStage}
+                availableSectors={uniqueSectors}
+                availableStages={uniqueStages}
+              />
+            </aside>
+            
+            <main className="md:col-span-3">
+              {isLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+              ) : (
+                <div className="grid gap-4">
+                  {filteredCompanies.map((company) => (
+                    <CompanyCard key={company.id} {...mapToDisplayCompany(company)} />
+                  ))}
+                  {filteredCompanies.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No companies found matching your criteria.
+                    </div>
+                  )}
+                </div>
+              )}
+            </main>
+          </div>
+        </div>
       </div>
     </div>
   );
