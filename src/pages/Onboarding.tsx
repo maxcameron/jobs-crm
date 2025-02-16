@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { useToast } from "@/hooks/use-toast";
@@ -6,50 +7,119 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
-import { TrackingPreferences } from "@/components/TrackingPreferences";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { StagePreferences } from "@/components/preferences/StagePreferences";
+import { SectorPreferences } from "@/components/preferences/SectorPreferences";
+import { LocationPreferences } from "@/components/preferences/LocationPreferences";
+import { OfficePreferences } from "@/components/preferences/OfficePreferences";
+import { CompanyStage, CompanySector, CompanyLocation, OfficePreference } from "@/components/preferences/types";
+
+const STEPS = [
+  {
+    title: "Company Stage",
+    description: "What stage companies are you interested in?",
+    component: "stages"
+  },
+  {
+    title: "Industry Sectors",
+    description: "Which sectors interest you the most?",
+    component: "sectors"
+  },
+  {
+    title: "Locations",
+    description: "Where would you like to work?",
+    component: "locations"
+  },
+  {
+    title: "Work Arrangement",
+    description: "What's your preferred work arrangement?",
+    component: "office"
+  }
+];
 
 const Onboarding = () => {
   const { session } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  const { data: preferences, isLoading } = useQuery({
-    queryKey: ['preferences'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('user_tracking_preferences')
-        .select('*')
-        .maybeSingle();
-
-      if (error) throw error;
-      return data;
-    },
+  const [currentStep, setCurrentStep] = useState(0);
+  const [preferences, setPreferences] = useState({
+    stages: [] as CompanyStage[],
+    sectors: [] as CompanySector[],
+    locations: [] as CompanyLocation[],
+    office_preferences: [] as OfficePreference[]
   });
 
-  const completeOnboarding = async () => {
-    try {
-      const { error } = await supabase
-        .from('user_tracking_preferences')
-        .update({ has_completed_onboarding: true })
-        .eq('user_id', session?.user.id);
+  const progress = ((currentStep + 1) / STEPS.length) * 100;
 
-      if (error) throw error;
+  const { data: availableData, isLoading } = useQuery({
+    queryKey: ['preferences-data'],
+    queryFn: async () => {
+      const { data: sectorsData, error: sectorsError } = await supabase
+        .from('companies')
+        .select('sector')
+        .order('sector');
 
-      toast({
-        title: "Welcome aboard! 🎉",
-        description: "Your preferences have been saved. Let's get started!",
-      });
+      const { data: locationsData, error: locationsError } = await supabase
+        .from('companies')
+        .select('headquarter_location')
+        .order('headquarter_location');
 
-      navigate('/');
-    } catch (error: any) {
-      console.error('Error completing onboarding:', error);
-      toast({
-        title: "Error",
-        description: "Failed to complete onboarding. Please try again.",
-        variant: "destructive",
-      });
+      if (sectorsError || locationsError) throw sectorsError || locationsError;
+
+      const uniqueSectors = Array.from(new Set(
+        sectorsData
+          .map(company => company.sector)
+          .filter((sector): sector is CompanySector => !!sector)
+      ));
+
+      const uniqueLocations = Array.from(new Set(
+        locationsData
+          .map(company => company.headquarter_location)
+          .filter((location): location is CompanyLocation => !!location)
+      ));
+
+      return {
+        sectors: uniqueSectors,
+        locations: uniqueLocations
+      };
     }
+  });
+
+  const handleNext = async () => {
+    if (currentStep === STEPS.length - 1) {
+      try {
+        const { error } = await supabase
+          .from('user_tracking_preferences')
+          .upsert({
+            user_id: session?.user.id,
+            ...preferences,
+            has_completed_onboarding: true
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Welcome aboard! 🎉",
+          description: "Your preferences have been saved. Let's get started!",
+        });
+
+        navigate('/');
+      } catch (error: any) {
+        console.error('Error completing onboarding:', error);
+        toast({
+          title: "Error",
+          description: "Failed to complete onboarding. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      setCurrentStep(prev => prev + 1);
+    }
+  };
+
+  const handleBack = () => {
+    setCurrentStep(prev => prev - 1);
   };
 
   if (!session) {
@@ -64,23 +134,75 @@ const Onboarding = () => {
     );
   }
 
-  if (preferences?.has_completed_onboarding) {
-    return <Navigate to="/" replace />;
-  }
+  const renderStep = () => {
+    const step = STEPS[currentStep];
+
+    switch (step.component) {
+      case "stages":
+        return (
+          <StagePreferences
+            selectedStages={preferences.stages}
+            onChange={(stages) => setPreferences(prev => ({ ...prev, stages }))}
+          />
+        );
+      case "sectors":
+        return (
+          <SectorPreferences
+            availableSectors={availableData?.sectors || []}
+            selectedSectors={preferences.sectors}
+            onChange={(sectors) => setPreferences(prev => ({ ...prev, sectors }))}
+          />
+        );
+      case "locations":
+        return (
+          <LocationPreferences
+            availableLocations={availableData?.locations || []}
+            selectedLocations={preferences.locations}
+            onChange={(locations) => setPreferences(prev => ({ ...prev, locations }))}
+          />
+        );
+      case "office":
+        return (
+          <OfficePreferences
+            selectedPreference={preferences.office_preferences[0]}
+            onChange={(preference) => 
+              setPreferences(prev => ({ ...prev, office_preferences: [preference] }))
+            }
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="container max-w-4xl py-8">
+    <div className="container max-w-2xl py-8">
       <Card>
         <CardHeader>
-          <CardTitle>Welcome to Jobs CRM! 👋</CardTitle>
+          <div className="space-y-2">
+            <Progress value={progress} className="w-full" />
+            <div className="text-sm text-muted-foreground">
+              Step {currentStep + 1} of {STEPS.length}
+            </div>
+          </div>
+          <CardTitle>{STEPS[currentStep].title}</CardTitle>
           <CardDescription>
-            Let's set up your preferences to help you track the opportunities that matter most to you.
+            {STEPS[currentStep].description}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <TrackingPreferences />
-          <div className="flex justify-end">
-            <Button onClick={completeOnboarding}>Complete Setup</Button>
+          {renderStep()}
+          <div className="flex justify-between pt-4">
+            <Button
+              variant="outline"
+              onClick={handleBack}
+              disabled={currentStep === 0}
+            >
+              Back
+            </Button>
+            <Button onClick={handleNext}>
+              {currentStep === STEPS.length - 1 ? "Complete Setup" : "Next"}
+            </Button>
           </div>
         </CardContent>
       </Card>
