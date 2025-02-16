@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -83,10 +84,14 @@ export function TrackingPreferences() {
   };
 
   const fetchPreferences = async () => {
+    if (!session?.user.id) return;
+    
     try {
       const { data, error } = await supabase
         .from('user_tracking_preferences')
         .select('*')
+        .eq('user_id', session.user.id)
+        .limit(1)
         .maybeSingle();
 
       if (error) throw error;
