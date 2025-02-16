@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
@@ -51,6 +50,21 @@ const Onboarding = () => {
   });
 
   const progress = ((currentStep + 1) / STEPS.length) * 100;
+
+  const isCurrentStepValid = () => {
+    switch (STEPS[currentStep].component) {
+      case "stages":
+        return preferences.stages.length > 0;
+      case "sectors":
+        return preferences.sectors.length > 0;
+      case "locations":
+        return preferences.locations.length > 0;
+      case "office":
+        return preferences.office_preferences.length > 0;
+      default:
+        return false;
+    }
+  };
 
   const { data: availableData, isLoading } = useQuery({
     queryKey: ['preferences-data'],
@@ -200,7 +214,10 @@ const Onboarding = () => {
             >
               Back
             </Button>
-            <Button onClick={handleNext}>
+            <Button 
+              onClick={handleNext}
+              disabled={!isCurrentStepValid()}
+            >
               {currentStep === STEPS.length - 1 ? "Complete Setup" : "Next"}
             </Button>
           </div>
