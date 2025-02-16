@@ -34,7 +34,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log("Initial session check:", session?.user?.email || "No session");
       setSession(session);
-      if (!session) {
+      if (session) {
+        navigate('/');
+      } else {
         navigate('/auth');
       }
       setIsLoading(false);
