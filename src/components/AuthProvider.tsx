@@ -7,11 +7,13 @@ import { supabase } from "@/integrations/supabase/client";
 interface AuthContextType {
   session: Session | null;
   isLoading: boolean;
+  supabase: typeof supabase;
 }
 
 const AuthContext = createContext<AuthContextType>({
   session: null,
   isLoading: true,
+  supabase,
 });
 
 export const useAuth = () => {
@@ -48,7 +50,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [navigate]);
 
   return (
-    <AuthContext.Provider value={{ session, isLoading }}>
+    <AuthContext.Provider value={{ session, isLoading, supabase }}>
       {children}
     </AuthContext.Provider>
   );

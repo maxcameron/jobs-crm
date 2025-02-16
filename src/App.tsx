@@ -16,13 +16,46 @@ import { useAuth } from "./components/AuthProvider";
 
 const queryClient = new QueryClient();
 
+const TopNav = () => {
+  const { session, supabase } = useAuth();
+  
+  if (!session) return null;
+  
+  return (
+    <div className="fixed top-0 left-[64px] right-0 h-[64px] border-b bg-background z-40 px-6">
+      <div className="flex h-full items-center justify-between">
+        <div>
+          <Link to="/" className="text-xl font-bold">
+            Jobs CRM
+          </Link>
+        </div>
+        <div className="flex items-center gap-4">
+          <a 
+            href="mailto:maxecameron@gmail.com"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Feedback
+          </a>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Sign out
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AppContent = () => {
   const { session } = useAuth();
   
   return (
     <div className="relative min-h-screen">
       <Navigation />
-      <main className={session ? "pl-[64px]" : ""}>
+      <TopNav />
+      <main className={session ? "pl-[64px] pt-[64px]" : ""}>
         <Routes>
           <Route path="/auth" element={<Auth />} />
           <Route
