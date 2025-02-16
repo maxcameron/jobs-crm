@@ -1,7 +1,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Session, AuthChangeEvent } from "@supabase/supabase-js";
+import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
@@ -41,7 +41,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .maybeSingle();
 
       if (error) {
-        // For PostgrestError, we should check the code instead of status
         if (error.code === '403') {
           console.error("User authentication error:", error);
           await handleSignOut();
@@ -61,7 +60,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       navigate('/auth');
     } catch (error) {
       console.error("Error signing out:", error);
-      // Force clear the session even if the signOut fails
       setSession(null);
       navigate('/auth');
     }
@@ -74,6 +72,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSession(session);
       if (!session) {
         navigate('/auth');
+      } else if (session && preferences === null) {
+        navigate('/onboarding');
+      } else if (session && preferences?.has_completed_onboarding) {
+        navigate('/');
       }
       setIsLoading(false);
     }).catch(error => {
@@ -88,7 +90,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session?.user?.email);
       
-      // Handle auth error events
       if (!session) {
         navigate('/auth');
         return;
@@ -96,15 +97,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       setSession(session);
       
-      if (!preferences?.has_completed_onboarding) {
+      // Don't redirect if we're already on the onboarding page and preferences haven't been loaded yet
+      if (preferences === null && window.location.pathname !== '/onboarding') {
         navigate('/onboarding');
-      } else {
+      } else if (preferences?.has_completed_onboarding) {
         navigate('/');
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, preferences?.has_completed_onboarding]);
+  }, [navigate, preferences]);
 
   return (
     <AuthContext.Provider value={{ session, isLoading, supabase }}>
