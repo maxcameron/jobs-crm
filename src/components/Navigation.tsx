@@ -1,5 +1,5 @@
 
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Building2, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export function Navigation() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { session } = useAuth();
   
   const { data: preferences } = useQuery({
@@ -46,22 +47,15 @@ export function Navigation() {
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link 
-                  to="/" 
+                <button
+                  onClick={() => navigate("/")}
                   className={cn(
                     "flex items-center justify-center rounded-md p-2 hover:bg-accent",
                     location.pathname === "/" && "bg-accent"
                   )}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (location.pathname !== "/") {
-                      window.history.pushState({}, "", "/");
-                      window.dispatchEvent(new PopStateEvent("popstate"));
-                    }
-                  }}
                 >
                   <Building2 className="h-5 w-5" />
-                </Link>
+                </button>
               </TooltipTrigger>
               <TooltipContent side="right" sideOffset={10} className="z-[110]">
                 Companies
@@ -70,22 +64,15 @@ export function Navigation() {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link
-                  to="/preferences"
+                <button
+                  onClick={() => navigate("/preferences")}
                   className={cn(
                     "flex items-center justify-center rounded-md p-2 hover:bg-accent",
                     location.pathname === "/preferences" && "bg-accent"
                   )}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (location.pathname !== "/preferences") {
-                      window.history.pushState({}, "", "/preferences");
-                      window.dispatchEvent(new PopStateEvent("popstate"));
-                    }
-                  }}
                 >
                   <Target className="h-5 w-5" />
-                </Link>
+                </button>
               </TooltipTrigger>
               <TooltipContent side="right" sideOffset={10} className="z-[110]">
                 Target Profile
