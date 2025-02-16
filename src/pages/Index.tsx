@@ -1,10 +1,10 @@
+
 import { useState, useEffect } from "react";
 import { CompanyCard } from "@/components/CompanyCard";
 import { Filters } from "@/components/Filters";
 import { Input } from "@/components/ui/input";
 import { Search, Loader2 } from "lucide-react";
 import { AddCompanyDialog } from "@/components/AddCompanyDialog";
-import { TrackingPreferences } from "@/components/TrackingPreferences";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -117,7 +117,7 @@ const Index = () => {
   });
 
   return (
-    <div className="min-h-screen bg-soft-gray">
+    <div className="min-h-screen bg-background">
       <div className="container py-8 space-y-8">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
