@@ -11,6 +11,7 @@ import Onboarding from "@/pages/Onboarding";
 import CompanyDetails from "@/pages/CompanyDetails";
 import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "@/pages/NotFound";
+import Preferences from "@/pages/Preferences";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ function App() {
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/company/:id" element={<ProtectedRoute><CompanyDetails /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/preferences" element={<ProtectedRoute><Preferences /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Toaster />
