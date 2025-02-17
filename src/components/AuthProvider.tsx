@@ -108,9 +108,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!session || isLoading || preferencesLoading) return;
 
-    if (preferences === null && !location.pathname.startsWith('/onboarding')) {
+    if (preferences && !preferences.has_completed_onboarding && !location.pathname.startsWith('/onboarding')) {
+      // Only redirect to onboarding if we explicitly know the user hasn't completed it
       navigate('/onboarding');
     } else if (preferences?.has_completed_onboarding && location.pathname === '/auth') {
+      // Redirect to home if user has completed onboarding and is on auth page
       navigate('/');
     }
   }, [session, preferences, isLoading, preferencesLoading, location.pathname, navigate]);
