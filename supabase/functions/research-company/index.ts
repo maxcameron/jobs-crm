@@ -9,6 +9,29 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const validSectors = [
+  'Artificial Intelligence (AI)',
+  'Fintech',
+  'HealthTech',
+  'E-commerce & RetailTech',
+  'Sales Tech & RevOps',
+  'HR Tech & WorkTech',
+  'PropTech (Real Estate Tech)',
+  'LegalTech',
+  'EdTech',
+  'Cybersecurity',
+  'Logistics & Supply Chain Tech',
+  'Developer Tools & Web Infrastructure',
+  'SaaS & Enterprise Software',
+  'Marketing Tech (MarTech)',
+  'InsurTech',
+  'GovTech',
+  'Marketplace Platforms',
+  'Construction Tech & Fintech',
+  'Mobility & Transportation Tech',
+  'CleanTech & ClimateTech'
+];
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -20,8 +43,8 @@ serve(async (req) => {
     const systemPrompt = `I'm building a CRM for job seekers. Here are the data points I want to capture for the companies:
 - Company Name
  - ie Walmart
-- Sector
- - ie Fintech, Marketplace, Procurement & Supply Chain, Sales Tech, AI
+- Sector (MUST be one of these exact values):
+ - ${validSectors.join('\n - ')}
 - Sub-Sector
  - ie SMB, Insurance, HR Tech, Enterprise, Consumer
 - Funding Type
@@ -42,6 +65,7 @@ Instructions:
 - In addition to company websites, consult additional resources like TechCrunch, VentureBeat, Dealroom, Sifted, Tracxn, PitchBook, and TheSaaSNews while doing your research
 - Description should be limited to 20 words or less
 - If you find multiple funding rounds, show the most recent
+- For sector, you MUST use one of the provided values exactly as written. Do not make up new sectors.
 
 Format your response as a JSON object with these exact keys:
 {
@@ -100,6 +124,11 @@ Format your response as a JSON object with these exact keys:
     } catch (e) {
       console.error('Failed to parse GPT response:', data.choices[0].message.content);
       throw new Error('Failed to parse company data');
+    }
+
+    // Validate that the sector is one of the allowed values
+    if (!validSectors.includes(companyData.sector)) {
+      throw new Error(`Invalid sector: ${companyData.sector}. Must be one of: ${validSectors.join(', ')}`);
     }
 
     // Validate the required fields
