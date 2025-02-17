@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 
 const AdminDashboard = () => {
   const { supabase, session } = useAuth();
@@ -91,21 +93,59 @@ const AdminDashboard = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
+                <TableHead>Company Name</TableHead>
                 <TableHead>Sector</TableHead>
-                <TableHead>Location</TableHead>
+                <TableHead>Sub-Sector</TableHead>
                 <TableHead>Funding Type</TableHead>
+                <TableHead>Funding Date</TableHead>
                 <TableHead>Funding Amount</TableHead>
+                <TableHead>Website</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead>Description</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {companies?.map((company) => (
                 <TableRow key={company.id}>
-                  <TableCell className="font-medium">{company.name}</TableCell>
-                  <TableCell>{company.sector}</TableCell>
+                  <TableCell>
+                    <Link 
+                      to={`/company/${company.id}`}
+                      className="font-medium hover:text-primary transition-colors"
+                    >
+                      {company.name}
+                    </Link>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="bg-primary/5 text-primary">
+                      {company.sector}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="bg-muted/50">
+                      {company.sub_sector}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="bg-accent">
+                      {company.funding_type}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{company.funding_date}</TableCell>
+                  <TableCell>${company.funding_amount}</TableCell>
+                  <TableCell>
+                    <Link 
+                      to={company.website_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline"
+                    >
+                      {new URL(company.website_url).hostname}
+                    </Link>
+                  </TableCell>
                   <TableCell>{company.headquarter_location}</TableCell>
-                  <TableCell>{company.funding_type}</TableCell>
-                  <TableCell>{company.funding_amount}</TableCell>
+                  <TableCell className="max-w-md truncate">
+                    {company.description}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
