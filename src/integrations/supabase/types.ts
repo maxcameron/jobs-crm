@@ -9,6 +9,41 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      canonical_sectors: {
+        Row: {
+          created_at: string
+          id: string
+          merged_into: string | null
+          name: string
+          similar_terms: string[] | null
+          status: Database["public"]["Enums"]["sector_status"]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          merged_into?: string | null
+          name: string
+          similar_terms?: string[] | null
+          status?: Database["public"]["Enums"]["sector_status"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          merged_into?: string | null
+          name?: string
+          similar_terms?: string[] | null
+          status?: Database["public"]["Enums"]["sector_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "canonical_sectors_merged_into_fkey"
+            columns: ["merged_into"]
+            isOneToOne: false
+            referencedRelation: "canonical_sectors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           created_at: string
@@ -193,6 +228,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      manage_canonical_sector: {
+        Args: {
+          input_sector: string
+          similarity_threshold?: number
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "user"
@@ -246,6 +288,7 @@ export type Database = {
         | "Series D"
         | "Series E and above"
       office_preference: "Full-time Office" | "Hybrid" | "Remote"
+      sector_status: "active" | "merged"
     }
     CompositeTypes: {
       [_ in never]: never
