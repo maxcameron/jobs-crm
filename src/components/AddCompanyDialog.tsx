@@ -44,7 +44,7 @@ export const AddCompanyDialog = ({ open, onOpenChange }: AddCompanyDialogProps) 
 
       if (error) throw error;
 
-      // Add company to the database with correct column names
+      // Add company to the database with correct column names and canonical sector ID
       const { error: insertError } = await supabase
         .from('companies')
         .insert([{
@@ -56,7 +56,8 @@ export const AddCompanyDialog = ({ open, onOpenChange }: AddCompanyDialogProps) 
           funding_amount: data.fundingAmount,
           website_url: data.websiteUrl,
           headquarter_location: data.headquarterLocation,
-          description: data.description
+          description: data.description,
+          canonical_sector_id: data.canonicalSectorId
         }]);
 
       if (insertError) throw insertError;
@@ -108,7 +109,10 @@ export const AddCompanyDialog = ({ open, onOpenChange }: AddCompanyDialogProps) 
                 Researching Company...
               </>
             ) : (
-              'Add Company'
+              <>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Company
+              </>
             )}
           </Button>
         </form>

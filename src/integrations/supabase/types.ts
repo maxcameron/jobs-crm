@@ -46,6 +46,7 @@ export type Database = {
       }
       companies: {
         Row: {
+          canonical_sector_id: string | null
           created_at: string
           description: string
           funding_amount: string
@@ -60,6 +61,7 @@ export type Database = {
           website_url: string
         }
         Insert: {
+          canonical_sector_id?: string | null
           created_at?: string
           description: string
           funding_amount: string
@@ -74,6 +76,7 @@ export type Database = {
           website_url: string
         }
         Update: {
+          canonical_sector_id?: string | null
           created_at?: string
           description?: string
           funding_amount?: string
@@ -87,7 +90,15 @@ export type Database = {
           tags?: string[] | null
           website_url?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "companies_canonical_sector_id_fkey"
+            columns: ["canonical_sector_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_sectors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       company_contacts: {
         Row: {
