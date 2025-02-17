@@ -1,31 +1,24 @@
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/components/AuthProvider";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface AddCompanyDialogProps {
-  onAddCompany: (company: {
-    name: string;
-    sector: string;
-    subSector: string;
-    fundingType: string;
-    fundingDate: string;
-    fundingAmount: string;
-    websiteUrl: string;
-    headquarterLocation: string;
-    description: string;
-  }) => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export const AddCompanyDialog = ({ onAddCompany }: AddCompanyDialogProps) => {
-  const [open, setOpen] = useState(false);
+export const AddCompanyDialog = ({ open, onOpenChange }: AddCompanyDialogProps) => {
   const [url, setUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { supabase } = useAuth();
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,9 +61,9 @@ export const AddCompanyDialog = ({ onAddCompany }: AddCompanyDialogProps) => {
 
       if (insertError) throw insertError;
 
-      onAddCompany(data);
+      queryClient.invalidateQueries({ queryKey: ['adminCompanies'] });
       setUrl("");
-      setOpen(false);
+      onOpenChange(false);
 
       toast({
         title: "Company Added",
@@ -89,13 +82,7 @@ export const AddCompanyDialog = ({ onAddCompany }: AddCompanyDialogProps) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          Add Company
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add New Company</DialogTitle>
