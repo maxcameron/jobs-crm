@@ -60,30 +60,24 @@ const Index = () => {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <aside className="md:col-span-1">
-              <Filters
-                selectedSector={selectedSector}
-                selectedStage={selectedStage}
-                onSectorChange={setSelectedSector}
-                onStageChange={setSelectedStage}
-                availableSectors={uniqueSectors}
-                availableStages={uniqueStages}
-              />
-            </aside>
-            
-            <main className="md:col-span-3">
-              <CompaniesList
-                companies={companies}
-                isLoading={isLoading}
-                userSectors={userSectors}
-                userStages={userStages}
-                selectedSector={selectedSector}
-                selectedStage={selectedStage}
-                searchQuery={searchQuery}
-              />
-            </main>
-          </div>
+          <Filters
+            selectedSector={selectedSector}
+            selectedStage={selectedStage}
+            onSectorChange={setSelectedSector}
+            onStageChange={setSelectedStage}
+            availableSectors={uniqueSectors}
+            availableStages={uniqueStages}
+          />
+          
+          <CompaniesList
+            companies={companies}
+            isLoading={isLoading}
+            userSectors={userSectors}
+            userStages={userStages}
+            selectedSector={selectedSector}
+            selectedStage={selectedStage}
+            searchQuery={searchQuery}
+          />
         </div>
       </div>
       
