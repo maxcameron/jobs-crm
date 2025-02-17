@@ -78,7 +78,7 @@ const Navigation = () => {
                 {session.user.email}
               </span>
               <NavLink 
-                to="/onboarding" 
+                to="/preferences" 
                 className={({ isActive }) =>
                   `${isActive ? '' : 'hover:bg-accent hover:text-accent-foreground'} inline-flex items-center justify-center rounded-md w-10 h-10`
                 }
