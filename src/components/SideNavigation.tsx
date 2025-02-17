@@ -15,7 +15,7 @@ const SideNavigation = () => {
         <Building2 className="w-6 h-6" />
       </NavLink>
       <NavLink
-        to="/onboarding"
+        to="/preferences"
         className={({ isActive }) =>
           `p-2 rounded-md hover:bg-accent ${isActive ? 'bg-accent' : ''}`
         }
