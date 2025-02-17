@@ -104,7 +104,7 @@ const Index = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pl-16"> {/* Added pl-16 for left padding */}
       <div className="container py-8 space-y-8">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
