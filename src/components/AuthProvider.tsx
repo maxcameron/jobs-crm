@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { data: preferences } = useQuery({
+  const { data: preferences, isLoading: preferencesLoading } = useQuery({
     queryKey: ['preferences', session?.user.id],
     queryFn: async () => {
       if (!session?.user.id) return null;
@@ -71,12 +71,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log("Initial session check:", session?.user?.email || "No session");
       setSession(session);
+      
       if (!session) {
         navigate('/auth');
-      } else if (session && preferences === null && location.pathname !== '/onboarding') {
-        navigate('/onboarding');
-      } else if (session && preferences?.has_completed_onboarding && location.pathname === '/auth') {
-        navigate('/');
       }
       setIsLoading(false);
     }).catch(error => {
@@ -90,26 +87,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session?.user?.email);
-      
       setSession(session);
       
       if (!session) {
         navigate('/auth');
         return;
       }
-      
-      // Only redirect if we're on auth page or need onboarding
-      if (location.pathname === '/auth') {
-        if (preferences === null) {
-          navigate('/onboarding');
-        } else if (preferences?.has_completed_onboarding) {
-          navigate('/');
-        }
-      }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, preferences, location.pathname]);
+  }, [navigate]);
+
+  // Handle onboarding redirects separately from auth state
+  useEffect(() => {
+    if (!session || isLoading || preferencesLoading) return;
+
+    // Only redirect to onboarding if explicitly needed
+    if (preferences === null && !location.pathname.startsWith('/onboarding')) {
+      navigate('/onboarding');
+    } else if (preferences?.has_completed_onboarding && location.pathname === '/auth') {
+      navigate('/');
+    }
+  }, [session, preferences, isLoading, preferencesLoading, location.pathname, navigate]);
 
   return (
     <AuthContext.Provider value={{ session, isLoading, supabase }}>
