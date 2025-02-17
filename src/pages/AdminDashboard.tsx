@@ -117,19 +117,19 @@ const AdminDashboard = () => {
                     </Link>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="bg-primary/5 text-primary">
+                    <div className="text-sm font-medium text-primary">
                       {company.sector}
-                    </Badge>
+                    </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="bg-muted/50">
+                    <div className="text-sm text-muted-foreground">
                       {company.sub_sector}
-                    </Badge>
+                    </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="bg-accent">
+                    <div className="text-sm text-muted-foreground">
                       {company.funding_type}
-                    </Badge>
+                    </div>
                   </TableCell>
                   <TableCell>{company.funding_date}</TableCell>
                   <TableCell>${company.funding_amount}</TableCell>
