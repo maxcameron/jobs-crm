@@ -58,11 +58,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const handleSignOut = async () => {
     try {
-      setSession(null); // Clear session state first
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Error signing out:", error);
+      }
+      // Clear session state after signout attempt, regardless of result
+      setSession(null);
       navigate('/auth');
     } catch (error) {
-      console.error("Error signing out:", error);
+      console.error("Error in handleSignOut:", error);
+      // Ensure session is cleared and user is redirected even if there's an error
       setSession(null);
       navigate('/auth');
     }
