@@ -1,14 +1,34 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { Database } from "../../../src/integrations/supabase/types.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-type CompanySector = Database["public"]["Enums"]["company_sector"];
+// Define the necessary types directly in the edge function
+type CompanySector = 
+  | "Artificial Intelligence (AI)"
+  | "Fintech"
+  | "HealthTech"
+  | "E-commerce & RetailTech"
+  | "Sales Tech & RevOps"
+  | "HR Tech & WorkTech"
+  | "PropTech (Real Estate Tech)"
+  | "LegalTech"
+  | "EdTech"
+  | "Cybersecurity"
+  | "Logistics & Supply Chain Tech"
+  | "Developer Tools & Web Infrastructure"
+  | "SaaS & Enterprise Software"
+  | "Marketing Tech (MarTech)"
+  | "InsurTech"
+  | "GovTech"
+  | "Marketplace Platforms"
+  | "Construction Tech & Fintech"
+  | "Mobility & Transportation Tech"
+  | "CleanTech & ClimateTech";
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
