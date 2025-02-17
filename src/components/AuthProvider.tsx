@@ -28,10 +28,10 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+  const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const { data: preferences, isLoading: preferencesLoading } = useQuery({
     queryKey: ['preferences', session?.user.id],
@@ -117,8 +117,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [session, preferences, isLoading, preferencesLoading, location.pathname, navigate]);
 
+  const value = {
+    session,
+    isLoading,
+    supabase,
+    handleSignOut,
+  };
+
   return (
-    <AuthContext.Provider value={{ session, isLoading, supabase, handleSignOut }}>
+    <AuthContext.Provider value={value}>
       {!isLoading && children}
     </AuthContext.Provider>
   );
