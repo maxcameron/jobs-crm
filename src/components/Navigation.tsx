@@ -10,6 +10,8 @@ const Navigation = () => {
   const { session, supabase, handleSignOut } = useAuth();
   const { toast } = useToast();
 
+  console.log("Navigation render - session:", session?.user?.email); // Debug log
+
   const { data: isAdmin } = useQuery({
     queryKey: ['isAdmin', session?.user.id],
     queryFn: async () => {
@@ -40,7 +42,8 @@ const Navigation = () => {
     }
   };
 
-  if (!session) return null;
+  // Remove the early return that was hiding the navigation
+  // if (!session) return null;
 
   return (
     <nav className="border-b">
@@ -70,27 +73,29 @@ const Navigation = () => {
             )}
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-muted-foreground hidden md:block">
-            {session.user.email}
-          </span>
-          <NavLink 
-            to="/onboarding" 
-            className={({ isActive }) =>
-              `${isActive ? '' : 'hover:bg-accent hover:text-accent-foreground'} inline-flex items-center justify-center rounded-md w-10 h-10`
-            }
-          >
-            <Settings className="h-5 w-5" />
-          </NavLink>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={onSignOut}
-            className="hover:bg-destructive/10 hover:text-destructive"
-          >
-            <LogOut className="h-5 w-5" />
-          </Button>
-        </div>
+        {session && (
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-muted-foreground hidden md:block">
+              {session.user.email}
+            </span>
+            <NavLink 
+              to="/onboarding" 
+              className={({ isActive }) =>
+                `${isActive ? '' : 'hover:bg-accent hover:text-accent-foreground'} inline-flex items-center justify-center rounded-md w-10 h-10`
+              }
+            >
+              <Settings className="h-5 w-5" />
+            </NavLink>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={onSignOut}
+              className="hover:bg-destructive/10 hover:text-destructive"
+            >
+              <LogOut className="h-5 w-5" />
+            </Button>
+          </div>
+        )}
       </div>
     </nav>
   );
