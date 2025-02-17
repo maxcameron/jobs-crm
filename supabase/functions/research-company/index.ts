@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
@@ -132,7 +131,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4o',
         messages: [
           { 
             role: 'system', 
@@ -160,10 +159,8 @@ serve(async (req) => {
 
     let companyData;
     try {
-      // Add more detailed logging
       console.log('Raw GPT response:', data.choices[0].message.content);
       
-      // Try to extract JSON if it's wrapped in backticks or has extra text
       const content = data.choices[0].message.content;
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       
@@ -175,7 +172,6 @@ serve(async (req) => {
       
       console.log('Parsed company data:', companyData);
 
-      // Map the sector to a valid enum value
       if (companyData.sector) {
         const mappedSector = sectorMapping[companyData.sector] || companyData.sector;
         console.log(`Mapping sector from "${companyData.sector}" to "${mappedSector}"`);
@@ -188,7 +184,6 @@ serve(async (req) => {
       throw new Error('Failed to parse company data: ' + e.message);
     }
 
-    // Validate the required fields
     const requiredFields = [
       'name', 'sector', 'subSector', 'fundingType', 'fundingDate',
       'fundingAmount', 'websiteUrl', 'headquarterLocation', 'description'
@@ -200,7 +195,6 @@ serve(async (req) => {
       }
     }
 
-    // Get or create canonical sector
     const { data: canonicalSectorId, error: sectorError } = await supabase
       .rpc('manage_canonical_sector', {
         input_sector: companyData.sector
@@ -210,7 +204,6 @@ serve(async (req) => {
       throw new Error(`Error managing canonical sector: ${sectorError.message}`);
     }
 
-    // Add canonical sector ID to company data
     companyData.canonicalSectorId = canonicalSectorId;
 
     return new Response(JSON.stringify(companyData), {
