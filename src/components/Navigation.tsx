@@ -1,5 +1,4 @@
-
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/AuthProvider";
 import { Settings, LogOut } from "lucide-react";
@@ -7,9 +6,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
 const Navigation = () => {
-  const { session, supabase } = useAuth();
+  const { session, supabase, handleSignOut } = useAuth();
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const { data: isAdmin } = useQuery({
     queryKey: ['isAdmin', session?.user.id],
@@ -25,32 +23,14 @@ const Navigation = () => {
     enabled: !!session?.user.id,
   });
 
-  const handleSignOut = async () => {
+  const onSignOut = async () => {
     try {
-      // First attempt to sign out from Supabase
-      const { error } = await supabase.auth.signOut();
-      
-      // Regardless of the sign out result, navigate to auth page
-      navigate('/auth');
-      
-      if (error) {
-        console.error('Error signing out:', error);
-        // Don't show error for session_not_found as it's expected in some cases
-        if (!error.message.includes('session_not_found')) {
-          toast({
-            title: "Note",
-            description: "You have been signed out.",
-          });
-        }
-      } else {
-        toast({
-          title: "Success",
-          description: "You have been successfully signed out.",
-        });
-      }
+      await handleSignOut();
+      toast({
+        title: "Success",
+        description: "You have been successfully signed out.",
+      });
     } catch (error) {
-      // Even if there's an error, ensure we navigate to auth
-      navigate('/auth');
       console.error('Error signing out:', error);
       toast({
         title: "Note",
@@ -104,7 +84,7 @@ const Navigation = () => {
           <Button 
             variant="ghost" 
             size="icon"
-            onClick={handleSignOut}
+            onClick={onSignOut}
             className="hover:bg-destructive/10 hover:text-destructive"
           >
             <LogOut className="h-5 w-5" />

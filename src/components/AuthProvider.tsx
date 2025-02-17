@@ -9,12 +9,14 @@ interface AuthContextType {
   session: Session | null;
   isLoading: boolean;
   supabase: typeof supabase;
+  handleSignOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   session: null,
   isLoading: true,
   supabase,
+  handleSignOut: async () => {},
 });
 
 export const useAuth = () => {
@@ -56,8 +58,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const handleSignOut = async () => {
     try {
+      setSession(null); // Clear session state first
       await supabase.auth.signOut();
-      setSession(null);
       navigate('/auth');
     } catch (error) {
       console.error("Error signing out:", error);
@@ -111,7 +113,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [session, preferences, isLoading, preferencesLoading, location.pathname, navigate]);
 
   return (
-    <AuthContext.Provider value={{ session, isLoading, supabase }}>
+    <AuthContext.Provider value={{ session, isLoading, supabase, handleSignOut }}>
       {!isLoading && children}
     </AuthContext.Provider>
   );
