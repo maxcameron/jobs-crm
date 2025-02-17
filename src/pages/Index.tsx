@@ -47,6 +47,7 @@ const Index = () => {
   const [uniqueStages, setUniqueStages] = useState<string[]>([]);
   const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
   const [userSectors, setUserSectors] = useState<string[]>([]);
+  const [userStages, setUserStages] = useState<string[]>([]);
   const { session } = useAuth();
   const { toast } = useToast();
 
@@ -58,23 +59,22 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    if (companies.length > 0 && userSectors.length > 0) {
-      // Get companies that match user's selected sectors
-      const companiesInUserSectors = companies.filter(company => 
-        userSectors.includes(company.sector)
+    if (companies.length > 0 && userSectors.length > 0 && userStages.length > 0) {
+      // Get companies that match user's selected sectors and stages
+      const companiesInUserPreferences = companies.filter(company => 
+        userSectors.includes(company.sector) && userStages.includes(company.funding_type)
       );
 
       // Only show sectors that are in user preferences
       const filteredSectors = Array.from(new Set(
-        companiesInUserSectors.map(company => company.sector)
+        companiesInUserPreferences.map(company => company.sector)
       ));
       setUniqueSectors(filteredSectors);
 
-      // Only show stages from companies in user's selected sectors
+      // Only show stages from companies in user's selected sectors and stages
       const filteredStages = Array.from(new Set(
-        companiesInUserSectors.map(company => company.funding_type)
+        companiesInUserPreferences.map(company => company.funding_type)
       )).sort((a, b) => {
-        // Custom sorting for funding stages
         const stageOrder = {
           'Seed': 1,
           'Series A': 2,
@@ -87,7 +87,7 @@ const Index = () => {
       });
       setUniqueStages(filteredStages);
     }
-  }, [companies, userSectors]);
+  }, [companies, userSectors, userStages]);
 
   const fetchUserPreferences = async () => {
     if (!session?.user.id) return;
@@ -95,7 +95,7 @@ const Index = () => {
     try {
       const { data: preferences, error } = await supabase
         .from('user_tracking_preferences')
-        .select('sectors')
+        .select('sectors, stages')
         .eq('user_id', session.user.id)
         .single();
 
@@ -103,6 +103,7 @@ const Index = () => {
 
       if (preferences) {
         setUserSectors(preferences.sectors);
+        setUserStages(preferences.stages);
       }
     } catch (error) {
       console.error('Error fetching user preferences:', error);
@@ -150,7 +151,8 @@ const Index = () => {
     const matchesSearch = company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          company.description.toLowerCase().includes(searchQuery.toLowerCase());
     const isInUserSectors = userSectors.includes(company.sector);
-    return matchesSector && matchesStage && matchesSearch && isInUserSectors;
+    const isInUserStages = userStages.includes(company.funding_type);
+    return matchesSector && matchesStage && matchesSearch && isInUserSectors && isInUserStages;
   });
 
   return (
