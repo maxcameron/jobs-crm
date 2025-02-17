@@ -1,89 +1,58 @@
 
-import { NavLink, useLocation } from "react-router-dom";
-import { Building2, Target } from "lucide-react";
-import { cn } from "@/lib/utils";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useAuth } from "./AuthProvider";
+import { Link, NavLink } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/components/AuthProvider";
+import { Settings } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 
-export function Navigation() {
-  const location = useLocation();
-  const { session } = useAuth();
-  
-  const { data: preferences } = useQuery({
-    queryKey: ['preferences', session?.user.id],
+const Navigation = () => {
+  const { session, supabase } = useAuth();
+
+  const { data: isAdmin } = useQuery({
+    queryKey: ['isAdmin', session?.user.id],
     queryFn: async () => {
-      if (!session?.user.id) return null;
-      const { data, error } = await supabase
-        .from('user_tracking_preferences')
-        .select('has_completed_onboarding')
-        .eq('user_id', session.user.id)
-        .maybeSingle();
-
-      if (error) throw error;
+      if (!session?.user.id) return false;
+      const { data, error } = await supabase.rpc('has_role', {
+        _user_id: session.user.id,
+        _role: 'admin'
+      });
+      if (error) return false;
       return data;
     },
     enabled: !!session?.user.id,
   });
-  
-  if (!session) {
-    return null;
-  }
 
-  const isOnboarding = location.pathname === '/onboarding';
-  const onboardingComplete = preferences?.has_completed_onboarding;
-  
+  if (!session) return null;
+
   return (
-    <nav className="fixed left-0 top-0 z-[100] h-screen w-[64px] border-r bg-background px-2 py-4">
-      <div className="flex h-full flex-col items-center gap-4">
-        <div className="flex flex-col items-center gap-2">
-          <TooltipProvider delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <NavLink
-                  to="/"
-                  className={({ isActive }) =>
-                    cn(
-                      "flex items-center justify-center rounded-md p-2 hover:bg-accent",
-                      isActive && "bg-accent"
-                    )
-                  }
-                >
-                  <Building2 className="h-5 w-5" />
-                </NavLink>
-              </TooltipTrigger>
-              <TooltipContent side="right" sideOffset={10} className="z-[110]">
-                Companies
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <NavLink
-                  to="/preferences"
-                  className={({ isActive }) =>
-                    cn(
-                      "flex items-center justify-center rounded-md p-2 hover:bg-accent",
-                      isActive && "bg-accent"
-                    )
-                  }
-                >
-                  <Target className="h-5 w-5" />
-                </NavLink>
-              </TooltipTrigger>
-              <TooltipContent side="right" sideOffset={10} className="z-[110]">
-                Target Profile
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+    <nav className="border-b">
+      <div className="container mx-auto px-4 flex items-center justify-between h-16">
+        <Link to="/" className="font-semibold text-lg">
+          Jobs CRM
+        </Link>
+        <div className="flex items-center gap-4">
+          {isAdmin && (
+            <NavLink 
+              to="/admin"
+              className={({ isActive }) =>
+                `text-sm font-medium ${isActive ? 'text-primary' : 'text-muted-foreground'}`
+              }
+            >
+              Admin
+            </NavLink>
+          )}
+          <NavLink 
+            to="/onboarding" 
+            className={({ isActive }) =>
+              `${isActive ? '' : 'hover:bg-accent hover:text-accent-foreground'} inline-flex items-center justify-center rounded-md w-10 h-10`
+            }
+          >
+            <Settings className="h-5 w-5" />
+          </NavLink>
         </div>
       </div>
     </nav>
   );
-}
+};
+
+export default Navigation;

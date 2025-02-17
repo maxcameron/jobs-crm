@@ -1,122 +1,38 @@
 
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/components/AuthProvider";
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import { AuthProvider } from "./components/AuthProvider";
-import { ProtectedRoute } from "./components/ProtectedRoute";
-import { Navigation } from "./components/Navigation";
-import Index from "./pages/Index";
-import CompanyDetails from "./pages/CompanyDetails";
-import Auth from "./pages/Auth";
-import Onboarding from "./pages/Onboarding";
-import NotFound from "./pages/NotFound";
-import { TrackingPreferences } from "./components/TrackingPreferences";
-import { useAuth } from "./components/AuthProvider";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import Navigation from "@/components/Navigation";
+import Index from "@/pages/Index";
+import Auth from "@/pages/Auth";
+import Onboarding from "@/pages/Onboarding";
+import CompanyDetails from "@/pages/CompanyDetails";
+import AdminDashboard from "@/pages/AdminDashboard";
+import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const TopNav = () => {
-  const { session, supabase } = useAuth();
-  
-  if (!session) return null;
-  
+function App() {
   return (
-    <div className="fixed top-0 left-[64px] right-0 h-[64px] border-b bg-background z-40 px-6">
-      <div className="flex h-full items-center justify-between">
-        <div>
-          <Link to="/" className="text-xl font-bold">
-            Jobs CRM
-          </Link>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-muted-foreground">
-            {session.user.email}
-          </span>
-          <a 
-            href="mailto:maxecameron@gmail.com"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Feedback
-          </a>
-          <button
-            onClick={() => supabase.auth.signOut()}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Sign out
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const AppContent = () => {
-  const { session } = useAuth();
-  
-  return (
-    <div className="relative min-h-screen">
-      <Navigation />
-      <TopNav />
-      <main className={session ? "pl-[64px] pt-[64px]" : ""}>
-        <Routes>
-          <Route path="/auth" element={<Auth />} />
-          <Route
-            path="/onboarding"
-            element={
-              <ProtectedRoute>
-                <Onboarding />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Index />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/preferences"
-            element={
-              <ProtectedRoute>
-                <div className="container py-8">
-                  <h1 className="text-4xl font-bold tracking-tight mb-8">Target Profile</h1>
-                  <TrackingPreferences />
-                </div>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/company/:id"
-            element={
-              <ProtectedRoute>
-                <CompanyDetails />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </main>
-    </div>
-  );
-};
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <Router>
         <AuthProvider>
-          <AppContent />
+          <Navigation />
+          <Routes>
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/company/:id" element={<ProtectedRoute><CompanyDetails /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Toaster />
         </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+      </Router>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
-
