@@ -46,13 +46,35 @@ const Index = () => {
   const [uniqueSectors, setUniqueSectors] = useState<string[]>([]);
   const [uniqueStages, setUniqueStages] = useState<string[]>([]);
   const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
+  const [userSectors, setUserSectors] = useState<string[]>([]);
   const { session } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchCompanies();
-    fetchUserPreferences();
+    const loadData = async () => {
+      await Promise.all([fetchCompanies(), fetchUserPreferences()]);
+    };
+    loadData();
   }, []);
+
+  useEffect(() => {
+    if (companies.length > 0 && userSectors.length > 0) {
+      // Only show sectors that are in user preferences
+      const filteredSectors = Array.from(new Set(
+        companies
+          .filter(company => userSectors.includes(company.sector))
+          .map(company => company.sector)
+      ));
+      setUniqueSectors(filteredSectors);
+
+      const stages = Array.from(new Set(
+        companies
+          .filter(company => userSectors.includes(company.sector))
+          .map(company => company.funding_type)
+      ));
+      setUniqueStages(stages);
+    }
+  }, [companies, userSectors]);
 
   const fetchUserPreferences = async () => {
     if (!session?.user.id) return;
@@ -66,16 +88,8 @@ const Index = () => {
 
       if (error) throw error;
 
-      if (preferences && companies.length > 0) {
-        const filteredSectors = Array.from(new Set(
-          companies
-            .filter(company => preferences.sectors.includes(company.sector))
-            .map(company => company.sector)
-        ));
-        setUniqueSectors(filteredSectors);
-
-        const stages = Array.from(new Set(companies.map(company => company.funding_type)));
-        setUniqueStages(stages);
+      if (preferences) {
+        setUserSectors(preferences.sectors);
       }
     } catch (error) {
       console.error('Error fetching user preferences:', error);
@@ -122,7 +136,8 @@ const Index = () => {
     const matchesStage = selectedStage === "All" || company.funding_type === selectedStage;
     const matchesSearch = company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          company.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSector && matchesStage && matchesSearch;
+    const isInUserSectors = userSectors.includes(company.sector);
+    return matchesSector && matchesStage && matchesSearch && isInUserSectors;
   });
 
   return (
