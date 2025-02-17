@@ -134,7 +134,7 @@ const AdminDashboard = () => {
                     </div>
                   </TableCell>
                   <TableCell>{company.funding_date}</TableCell>
-                  <TableCell>${company.funding_amount}</TableCell>
+                  <TableCell>{company.funding_amount}</TableCell>
                   <TableCell>
                     <Link 
                       to={company.website_url}
