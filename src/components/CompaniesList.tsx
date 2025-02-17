@@ -67,12 +67,14 @@ export function CompaniesList({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Name</TableHead>
+            <TableHead>Company Name</TableHead>
             <TableHead>Sector</TableHead>
             <TableHead>Sub-Sector</TableHead>
-            <TableHead>Location</TableHead>
             <TableHead>Funding Type</TableHead>
+            <TableHead>Funding Date</TableHead>
             <TableHead>Funding Amount</TableHead>
+            <TableHead>Website</TableHead>
+            <TableHead>Location</TableHead>
             <TableHead>Description</TableHead>
           </TableRow>
         </TableHeader>
@@ -99,13 +101,24 @@ export function CompaniesList({
                     {displayCompany.subSector}
                   </Badge>
                 </TableCell>
-                <TableCell>{displayCompany.headquarterLocation}</TableCell>
                 <TableCell>
                   <Badge variant="outline" className="bg-accent">
                     {displayCompany.fundingType}
                   </Badge>
                 </TableCell>
+                <TableCell>{displayCompany.fundingDate}</TableCell>
                 <TableCell>${displayCompany.fundingAmount}</TableCell>
+                <TableCell>
+                  <Link 
+                    to={displayCompany.websiteUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    {new URL(displayCompany.websiteUrl).hostname}
+                  </Link>
+                </TableCell>
+                <TableCell>{displayCompany.headquarterLocation}</TableCell>
                 <TableCell className="max-w-md truncate">
                   {displayCompany.description}
                 </TableCell>
