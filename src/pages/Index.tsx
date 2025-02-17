@@ -3,10 +3,11 @@ import { useState, useEffect } from "react";
 import { CompanyCard } from "@/components/CompanyCard";
 import { Filters } from "@/components/Filters";
 import { Input } from "@/components/ui/input";
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader2, Plus } from "lucide-react";
 import { AddCompanyDialog } from "@/components/AddCompanyDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 
 interface Company {
   id: string;
@@ -43,6 +44,7 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [uniqueSectors, setUniqueSectors] = useState<string[]>([]);
   const [uniqueStages, setUniqueStages] = useState<string[]>([]);
+  const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -80,21 +82,6 @@ const Index = () => {
     }
   };
 
-  const handleAddCompany = (newCompany: CompanyDisplay) => {
-    const dbCompany: Partial<Company> = {
-      name: newCompany.name,
-      sector: newCompany.sector,
-      sub_sector: newCompany.subSector,
-      funding_type: newCompany.fundingType,
-      funding_date: newCompany.fundingDate,
-      funding_amount: newCompany.fundingAmount,
-      website_url: newCompany.websiteUrl,
-      headquarter_location: newCompany.headquarterLocation,
-      description: newCompany.description,
-    };
-    setCompanies((prev) => [{ ...dbCompany, id: '', created_at: new Date().toISOString() } as Company, ...prev]);
-  };
-
   const mapToDisplayCompany = (company: Company): CompanyDisplay & { id: string } => ({
     id: company.id,
     name: company.name,
@@ -126,7 +113,10 @@ const Index = () => {
               Track and filter companies by sector and funding stage.
             </p>
           </div>
-          <AddCompanyDialog onAddCompany={handleAddCompany} />
+          <Button onClick={() => setIsAddCompanyOpen(true)} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Add Company
+          </Button>
         </div>
 
         <div className="space-y-6">
@@ -173,6 +163,11 @@ const Index = () => {
           </div>
         </div>
       </div>
+      
+      <AddCompanyDialog 
+        open={isAddCompanyOpen}
+        onOpenChange={setIsAddCompanyOpen}
+      />
     </div>
   );
 };
