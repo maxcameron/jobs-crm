@@ -55,7 +55,7 @@ export type Database = {
           headquarter_location: string
           id: string
           name: string
-          sector: string
+          sector: Database["public"]["Enums"]["company_sector"]
           sub_sector: string
           tags: string[] | null
           website_url: string
@@ -70,7 +70,7 @@ export type Database = {
           headquarter_location: string
           id?: string
           name: string
-          sector: string
+          sector: Database["public"]["Enums"]["company_sector"]
           sub_sector: string
           tags?: string[] | null
           website_url: string
@@ -85,7 +85,7 @@ export type Database = {
           headquarter_location?: string
           id?: string
           name?: string
-          sector?: string
+          sector?: Database["public"]["Enums"]["company_sector"]
           sub_sector?: string
           tags?: string[] | null
           website_url?: string
