@@ -116,17 +116,19 @@ export function TrackingPreferences() {
     
     setIsSaving(true);
     try {
-      const { error } = await supabase
+      // First try to update the existing record
+      const { data, error: updateError } = await supabase
         .from('user_tracking_preferences')
-        .upsert({
-          user_id: session.user.id,
+        .update({
           stages: preferences.stages,
           sectors: preferences.sectors,
           locations: preferences.locations,
           office_preferences: preferences.office_preferences
-        });
+        })
+        .eq('user_id', session.user.id)
+        .select();
 
-      if (error) throw error;
+      if (updateError) throw updateError;
 
       toast({
         title: "Success",
