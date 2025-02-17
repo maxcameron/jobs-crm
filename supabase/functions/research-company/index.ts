@@ -36,7 +36,19 @@ Instructions:
 - For each company URL, try to fill out all of the data points
 - In addition to company websites, consult additional resources like TechCrunch, VentureBeat, Dealroom, Sifted, Tracxn, PitchBook, and TheSaaSNews while doing your research
 - Description should be limited to 20 words or less
-- If you find multiple funding rounds, show the most recent`;
+- If you find multiple funding rounds, show the most recent
+- IMPORTANT: Return the data in valid JSON format with these exact keys:
+{
+  "name": "string",
+  "sector": "string",
+  "subSector": "string",
+  "fundingType": "string",
+  "fundingDate": "string",
+  "fundingAmount": "string",
+  "websiteUrl": "string",
+  "headquarterLocation": "string",
+  "description": "string"
+}`;
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -68,7 +80,7 @@ serve(async (req) => {
           },
           { 
             role: 'user', 
-            content: `Research this company: ${url}` 
+            content: `Research this company: ${url}. Return ONLY the JSON object, no other text.` 
           }
         ],
         temperature: 0.7,
@@ -88,10 +100,24 @@ serve(async (req) => {
 
     let companyData;
     try {
-      companyData = JSON.parse(data.choices[0].message.content);
+      // Add more detailed logging
+      console.log('Raw GPT response:', data.choices[0].message.content);
+      
+      // Try to extract JSON if it's wrapped in backticks or has extra text
+      const content = data.choices[0].message.content;
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      
+      if (jsonMatch) {
+        companyData = JSON.parse(jsonMatch[0]);
+      } else {
+        companyData = JSON.parse(content);
+      }
+      
+      console.log('Parsed company data:', companyData);
     } catch (e) {
       console.error('Failed to parse GPT response:', data.choices[0].message.content);
-      throw new Error('Failed to parse company data');
+      console.error('Parse error:', e);
+      throw new Error('Failed to parse company data: ' + e.message);
     }
 
     // Validate the required fields
