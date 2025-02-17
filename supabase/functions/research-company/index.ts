@@ -9,46 +9,15 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const validSectors = [
-  'Artificial Intelligence (AI)',
-  'Fintech',
-  'HealthTech',
-  'E-commerce & RetailTech',
-  'Sales Tech & RevOps',
-  'HR Tech & WorkTech',
-  'PropTech (Real Estate Tech)',
-  'LegalTech',
-  'EdTech',
-  'Cybersecurity',
-  'Logistics & Supply Chain Tech',
-  'Developer Tools & Web Infrastructure',
-  'SaaS & Enterprise Software',
-  'Marketing Tech (MarTech)',
-  'InsurTech',
-  'GovTech',
-  'Marketplace Platforms',
-  'Construction Tech & Fintech',
-  'Mobility & Transportation Tech',
-  'CleanTech & ClimateTech'
-];
-
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-
-  try {
-    const { url } = await req.json();
-
-    const systemPrompt = `I'm building a CRM for job seekers. Here are the data points I want to capture for the companies:
+const systemPrompt = `I'm building a CRM for job seekers. Here are the data points I want to capture for the companies:
 - Company Name
  - ie Walmart
-- Sector (MUST be one of these exact values):
- - ${validSectors.join('\n - ')}
+- Sector
+ - ie Fintech, Marketplace, Procurement & Supply Chain, Sales Tech, AI
 - Sub-Sector
  - ie SMB, Insurance, HR Tech, Enterprise, Consumer
 - Funding Type
- - ie Pre-Seed, Seed, Series A, Series B, Series C, Venture
+ - ie Pre-Seed, Seed, Series A, Series B, Series C, Series D, Series E or Later
 - Funding Date
  - expressed as month/year ie 02/2024 
 - Funding Amount in USD
@@ -64,21 +33,15 @@ Instructions:
 - For each company URL, try to fill out all of the data points
 - In addition to company websites, consult additional resources like TechCrunch, VentureBeat, Dealroom, Sifted, Tracxn, PitchBook, and TheSaaSNews while doing your research
 - Description should be limited to 20 words or less
-- If you find multiple funding rounds, show the most recent
-- For sector, you MUST use one of the provided values exactly as written. Do not make up new sectors.
+- If you find multiple funding rounds, show the most recent`;
 
-Format your response as a JSON object with these exact keys:
-{
-  "name": "string",
-  "sector": "string",
-  "subSector": "string",
-  "fundingType": "string",
-  "fundingDate": "string",
-  "fundingAmount": "string",
-  "websiteUrl": "string",
-  "headquarterLocation": "string",
-  "description": "string"
-}`;
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { url } = await req.json();
 
     if (!openAIApiKey) {
       throw new Error('OpenAI API key is not configured');
@@ -124,11 +87,6 @@ Format your response as a JSON object with these exact keys:
     } catch (e) {
       console.error('Failed to parse GPT response:', data.choices[0].message.content);
       throw new Error('Failed to parse company data');
-    }
-
-    // Validate that the sector is one of the allowed values
-    if (!validSectors.includes(companyData.sector)) {
-      throw new Error(`Invalid sector: ${companyData.sector}. Must be one of: ${validSectors.join(', ')}`);
     }
 
     // Validate the required fields
