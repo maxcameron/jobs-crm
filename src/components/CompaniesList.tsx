@@ -94,19 +94,19 @@ export function CompaniesList({
                   </Link>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className="bg-primary/5 text-primary">
+                  <div className="text-sm font-medium text-primary">
                     {displayCompany.sector}
-                  </Badge>
+                  </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className="bg-muted/50">
+                  <div className="text-sm text-muted-foreground">
                     {displayCompany.subSector}
-                  </Badge>
+                  </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className="bg-accent">
+                  <div className="text-sm text-muted-foreground">
                     {displayCompany.fundingType}
-                  </Badge>
+                  </div>
                 </TableCell>
                 <TableCell>{displayCompany.fundingDate}</TableCell>
                 <TableCell>${displayCompany.fundingAmount}</TableCell>
@@ -150,3 +150,4 @@ export function CompaniesList({
     </div>
   );
 }
+
