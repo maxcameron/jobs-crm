@@ -30,15 +30,11 @@ const Navigation = () => {
   const onSignOut = async () => {
     try {
       await handleSignOut();
-      toast({
-        title: "Success",
-        description: "You have been successfully signed out.",
-      });
     } catch (error) {
       console.error('Error signing out:', error);
       toast({
-        title: "Note",
-        description: "You have been signed out.",
+        title: "Error",
+        description: "There was a problem signing out. Please try again.",
       });
     }
   };

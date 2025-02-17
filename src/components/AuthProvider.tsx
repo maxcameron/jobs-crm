@@ -57,18 +57,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   const handleSignOut = async () => {
+    setIsLoading(true);
     try {
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error("Error signing out:", error);
       }
-      // Clear session state after signout attempt, regardless of result
-      setSession(null);
-      navigate('/auth');
     } catch (error) {
       console.error("Error in handleSignOut:", error);
-      // Ensure session is cleared and user is redirected even if there's an error
+    } finally {
+      // Always clear session and redirect regardless of errors
       setSession(null);
+      setIsLoading(false);
       navigate('/auth');
     }
   };
@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log("Initial session check:", session?.user?.email || "No session");
       setSession(session);
       
-      if (!session) {
+      if (!session && location.pathname !== '/auth') {
         navigate('/auth');
       }
       setIsLoading(false);
@@ -96,20 +96,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log("Auth state changed:", event, session?.user?.email);
       setSession(session);
       
-      if (!session) {
+      if (!session && location.pathname !== '/auth') {
         navigate('/auth');
-        return;
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   // Handle onboarding redirects separately from auth state
   useEffect(() => {
     if (!session || isLoading || preferencesLoading) return;
 
-    // Only redirect to onboarding if explicitly needed
     if (preferences === null && !location.pathname.startsWith('/onboarding')) {
       navigate('/onboarding');
     } else if (preferences?.has_completed_onboarding && location.pathname === '/auth') {
