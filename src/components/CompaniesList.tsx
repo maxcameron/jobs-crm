@@ -94,17 +94,17 @@ export function CompaniesList({
                   </Link>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className="bg-primary/5 text-primary">
+                  <div className="text-sm font-medium text-primary">
                     {displayCompany.sector}
-                  </Badge>
+                  </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className="bg-muted/50">
+                  <div className="text-sm text-muted-foreground">
                     {displayCompany.subSector}
-                  </Badge>
+                  </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className="bg-accent">
+                  <Badge variant="outline" className="bg-accent/10">
                     {displayCompany.fundingType}
                   </Badge>
                 </TableCell>
