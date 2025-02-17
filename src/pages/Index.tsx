@@ -59,20 +59,33 @@ const Index = () => {
 
   useEffect(() => {
     if (companies.length > 0 && userSectors.length > 0) {
+      // Get companies that match user's selected sectors
+      const companiesInUserSectors = companies.filter(company => 
+        userSectors.includes(company.sector)
+      );
+
       // Only show sectors that are in user preferences
       const filteredSectors = Array.from(new Set(
-        companies
-          .filter(company => userSectors.includes(company.sector))
-          .map(company => company.sector)
+        companiesInUserSectors.map(company => company.sector)
       ));
       setUniqueSectors(filteredSectors);
 
-      const stages = Array.from(new Set(
-        companies
-          .filter(company => userSectors.includes(company.sector))
-          .map(company => company.funding_type)
-      ));
-      setUniqueStages(stages);
+      // Only show stages from companies in user's selected sectors
+      const filteredStages = Array.from(new Set(
+        companiesInUserSectors.map(company => company.funding_type)
+      )).sort((a, b) => {
+        // Custom sorting for funding stages
+        const stageOrder = {
+          'Seed': 1,
+          'Series A': 2,
+          'Series B': 3,
+          'Series C': 4,
+          'Series D': 5,
+          'Series E and above': 6
+        };
+        return (stageOrder[a as keyof typeof stageOrder] || 0) - (stageOrder[b as keyof typeof stageOrder] || 0);
+      });
+      setUniqueStages(filteredStages);
     }
   }, [companies, userSectors]);
 
