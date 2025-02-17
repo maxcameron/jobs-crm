@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
@@ -67,7 +68,7 @@ const AdminDashboard = () => {
         headquarter_location: 'Woodstock, GA, USA',
         description: 'AI-driven solutions for revenue optimization in healthcare organizations.',
       })
-      .eq('name', 'SlicedHealth');
+      .eq('id', '1de6bd7d-7f94-4551-b70b-abbe92661fcf');
 
     if (error) {
       toast({
@@ -108,7 +109,7 @@ const AdminDashboard = () => {
     return null;
   }
 
-  const updateButton = companies?.some(company => company.name === 'SlicedHealth') && (
+  const updateButton = (
     <Button 
       onClick={updateSlicedHealth}
       className="ml-4"
