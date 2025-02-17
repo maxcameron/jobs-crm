@@ -110,7 +110,8 @@ export function CompaniesList({
                   {displayCompany.description}
                 </TableCell>
               </TableRow>
-            ))}
+            );
+          })}
         </TableBody>
       </Table>
       {filteredCompanies.length === 0 && (
