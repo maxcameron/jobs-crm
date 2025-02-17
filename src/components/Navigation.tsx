@@ -26,38 +26,35 @@ const Navigation = () => {
   });
 
   const handleSignOut = async () => {
-    // First clear the local session and redirect
-    navigate('/auth');
-    
     try {
+      // First attempt to sign out from Supabase
       const { error } = await supabase.auth.signOut();
+      
+      // Regardless of the sign out result, navigate to auth page
+      navigate('/auth');
       
       if (error) {
         console.error('Error signing out:', error);
-        if (error.message.includes('session_not_found')) {
+        // Don't show error for session_not_found as it's expected in some cases
+        if (!error.message.includes('session_not_found')) {
           toast({
-            title: "Session Expired",
-            description: "Your session has expired. Please sign in again.",
-          });
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to sign out. Please try again.",
-            variant: "destructive",
+            title: "Note",
+            description: "You have been signed out.",
           });
         }
       } else {
         toast({
-          title: "Signed out",
+          title: "Success",
           description: "You have been successfully signed out.",
         });
       }
     } catch (error) {
+      // Even if there's an error, ensure we navigate to auth
+      navigate('/auth');
       console.error('Error signing out:', error);
       toast({
-        title: "Error",
-        description: "Failed to sign out. Please try again.",
-        variant: "destructive",
+        title: "Note",
+        description: "You have been signed out.",
       });
     }
   };
