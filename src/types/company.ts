@@ -11,6 +11,7 @@ export interface Company {
   website_url: string;
   headquarter_location: string;
   description: string;
+  tags: string[];
 }
 
 export interface CompanyDisplay {
@@ -24,4 +25,5 @@ export interface CompanyDisplay {
   websiteUrl: string;
   headquarterLocation: string;
   description: string;
+  tags: string[];
 }

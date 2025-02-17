@@ -33,6 +33,7 @@ const mapToDisplayCompany = (company: Company): CompanyDisplay & { id: string } 
   websiteUrl: company.website_url,
   headquarterLocation: company.headquarter_location,
   description: company.description,
+  tags: company.tags || [],
 });
 
 export function CompaniesList({ 
@@ -76,6 +77,7 @@ export function CompaniesList({
             <TableHead>Website</TableHead>
             <TableHead>Location</TableHead>
             <TableHead>Description</TableHead>
+            <TableHead>Tags</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -121,6 +123,19 @@ export function CompaniesList({
                 <TableCell>{displayCompany.headquarterLocation}</TableCell>
                 <TableCell className="max-w-md truncate">
                   {displayCompany.description}
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-wrap gap-1">
+                    {displayCompany.tags?.map((tag, index) => (
+                      <Badge 
+                        key={index}
+                        variant="secondary" 
+                        className="text-xs"
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
                 </TableCell>
               </TableRow>
             );

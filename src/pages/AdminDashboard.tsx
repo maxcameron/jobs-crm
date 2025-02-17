@@ -102,6 +102,7 @@ const AdminDashboard = () => {
                 <TableHead>Website</TableHead>
                 <TableHead>Location</TableHead>
                 <TableHead>Description</TableHead>
+                <TableHead>Tags</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -145,6 +146,19 @@ const AdminDashboard = () => {
                   <TableCell>{company.headquarter_location}</TableCell>
                   <TableCell className="max-w-md truncate">
                     {company.description}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {company.tags?.map((tag, index) => (
+                        <Badge 
+                          key={index}
+                          variant="secondary" 
+                          className="text-xs"
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

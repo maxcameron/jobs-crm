@@ -21,6 +21,7 @@ export type Database = {
           name: string
           sector: string
           sub_sector: string
+          tags: string[] | null
           website_url: string
         }
         Insert: {
@@ -34,6 +35,7 @@ export type Database = {
           name: string
           sector: string
           sub_sector: string
+          tags?: string[] | null
           website_url: string
         }
         Update: {
@@ -47,6 +49,7 @@ export type Database = {
           name?: string
           sector?: string
           sub_sector?: string
+          tags?: string[] | null
           website_url?: string
         }
         Relationships: []
