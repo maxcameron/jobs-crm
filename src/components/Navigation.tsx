@@ -26,12 +26,11 @@ const Navigation = () => {
   });
 
   const handleSignOut = async () => {
+    // First clear the local session and redirect
+    navigate('/auth');
+    
     try {
       const { error } = await supabase.auth.signOut();
-      
-      // Even if there's an error, we want to clear the local session
-      // and redirect to auth page
-      navigate('/auth');
       
       if (error) {
         console.error('Error signing out:', error);
@@ -55,7 +54,6 @@ const Navigation = () => {
       }
     } catch (error) {
       console.error('Error signing out:', error);
-      navigate('/auth');
       toast({
         title: "Error",
         description: "Failed to sign out. Please try again.",
