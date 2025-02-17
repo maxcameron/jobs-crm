@@ -14,7 +14,7 @@ export function SectorPreferences({ availableSectors, selectedSectors, onChange 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Industry</CardTitle>
+        <CardTitle>Sector</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-4">
         {availableSectors.map((sector) => (
