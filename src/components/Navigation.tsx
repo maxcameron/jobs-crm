@@ -45,7 +45,7 @@ const Navigation = () => {
 
   return (
     <>
-      <nav className="border-b">
+      <nav className="sticky top-0 z-50 bg-background border-b">
         <div className="container mx-auto px-4 flex items-center justify-between h-16">
           <div className="flex items-center gap-8">
             <Link to="/" className="font-semibold text-lg">
