@@ -1,0 +1,8 @@
+
+# project ID should stay as first line
+project_id = "boibtyufrcuruntqgeoq"
+
+[global.env]
+OPENAI_API_KEY = "OPENAI_API_KEY"
+SUPABASE_URL = "SUPABASE_URL"
+SUPABASE_SERVICE_ROLE_KEY = "SUPABASE_SERVICE_ROLE_KEY"
