@@ -54,38 +54,6 @@ const AdminDashboard = () => {
     enabled: !!isAdmin,
   });
 
-  const updateSlicedHealth = async () => {
-    const { error } = await supabase
-      .from('companies')
-      .update({
-        name: 'SlicedHealth',
-        sector: 'HealthTech',
-        sub_sector: 'AI',
-        funding_type: 'Series A',
-        funding_date: '07/2024',
-        funding_amount: '5,000,000',
-        website_url: 'https://www.slicedhealth.com',
-        headquarter_location: 'Woodstock, GA, USA',
-        description: 'AI-driven solutions for revenue optimization in healthcare organizations.',
-      })
-      .eq('id', '1de6bd7d-7f94-4551-b70b-abbe92661fcf');
-
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update SlicedHealth record.",
-        variant: "destructive",
-      });
-      console.error('Error updating company:', error);
-    } else {
-      toast({
-        title: "Success",
-        description: "SlicedHealth record has been updated.",
-      });
-      queryClient.invalidateQueries({ queryKey: ['adminCompanies'] });
-    }
-  };
-
   useEffect(() => {
     if (!isCheckingAdmin && !isAdmin) {
       toast({
@@ -109,26 +77,13 @@ const AdminDashboard = () => {
     return null;
   }
 
-  const updateButton = (
-    <Button 
-      onClick={updateSlicedHealth}
-      className="ml-4"
-      variant="outline"
-    >
-      Update SlicedHealth Record
-    </Button>
-  );
-
   return (
     <div className="container mx-auto py-8 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Company Management</h1>
-        <div className="flex items-center">
-          <Button onClick={() => setIsAddCompanyOpen(true)}>
-            Add Company
-          </Button>
-          {updateButton}
-        </div>
+        <Button onClick={() => setIsAddCompanyOpen(true)}>
+          Add Company
+        </Button>
       </div>
 
       {isLoadingCompanies ? (
