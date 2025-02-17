@@ -1,5 +1,5 @@
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CompanyStage, COMPANY_STAGES } from "./types";
@@ -20,7 +20,10 @@ export function StagePreferences({ selectedStages, onChange }: StagePreferencesP
 
   return (
     <Card>
-      <CardContent className="pt-6">
+      <CardHeader>
+        <CardTitle>Funding Stage</CardTitle>
+      </CardHeader>
+      <CardContent>
         <RadioGroup className="space-y-4">
           {COMPANY_STAGES.map((stage) => (
             <div key={stage} className="flex items-center space-x-2">

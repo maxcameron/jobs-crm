@@ -1,5 +1,4 @@
-
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { CompanyLocation } from "./types";
@@ -54,7 +53,10 @@ export function LocationPreferences({ availableLocations, selectedLocations, onC
 
   return (
     <Card>
-      <CardContent className="pt-6">
+      <CardHeader>
+        <CardTitle>Location</CardTitle>
+      </CardHeader>
+      <CardContent>
         <div className="space-y-6">
           {Object.entries(groupedLocations).map(([region, locations]) => (
             <div key={region} className="space-y-3">

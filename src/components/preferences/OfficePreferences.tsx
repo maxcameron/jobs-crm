@@ -1,5 +1,5 @@
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { OFFICE_PREFERENCES, OfficePreference } from "./types";
@@ -20,7 +20,10 @@ export function OfficePreferences({ selectedPreference = [], onChange }: OfficeP
 
   return (
     <Card>
-      <CardContent className="pt-6">
+      <CardHeader>
+        <CardTitle>Work Policy</CardTitle>
+      </CardHeader>
+      <CardContent>
         <div className="space-y-4">
           {OFFICE_PREFERENCES.map((preference) => (
             <div key={preference} className="flex items-center space-x-2">
