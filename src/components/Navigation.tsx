@@ -1,5 +1,5 @@
 
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/AuthProvider";
 import { Settings, LogOut } from "lucide-react";
@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 const Navigation = () => {
   const { session, supabase } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const { data: isAdmin } = useQuery({
     queryKey: ['isAdmin', session?.user.id],
@@ -26,13 +27,35 @@ const Navigation = () => {
 
   const handleSignOut = async () => {
     try {
-      await supabase.auth.signOut();
-      toast({
-        title: "Signed out",
-        description: "You have been successfully signed out.",
-      });
+      const { error } = await supabase.auth.signOut();
+      
+      // Even if there's an error, we want to clear the local session
+      // and redirect to auth page
+      navigate('/auth');
+      
+      if (error) {
+        console.error('Error signing out:', error);
+        if (error.message.includes('session_not_found')) {
+          toast({
+            title: "Session Expired",
+            description: "Your session has expired. Please sign in again.",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to sign out. Please try again.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "Signed out",
+          description: "You have been successfully signed out.",
+        });
+      }
     } catch (error) {
       console.error('Error signing out:', error);
+      navigate('/auth');
       toast({
         title: "Error",
         description: "Failed to sign out. Please try again.",
