@@ -31,7 +31,7 @@ export function StepContent({
       return (
         <StagePreferences
           selectedStages={preferences.stages}
-          onChange={(stages) => setPreferences(prev => ({ ...prev, stages }))}
+          onChange={(stages) => setPreferences((prev: any) => ({ ...prev, stages }))}
         />
       );
     case "sectors":
@@ -39,7 +39,7 @@ export function StepContent({
         <SectorPreferences
           availableSectors={availableSectors}
           selectedSectors={preferences.sectors}
-          onChange={(sectors) => setPreferences(prev => ({ ...prev, sectors }))}
+          onChange={(sectors) => setPreferences((prev: any) => ({ ...prev, sectors }))}
         />
       );
     case "locations":
@@ -47,7 +47,7 @@ export function StepContent({
         <LocationPreferences
           availableLocations={availableLocations}
           selectedLocations={preferences.locations}
-          onChange={(locations) => setPreferences(prev => ({ ...prev, locations }))}
+          onChange={(locations) => setPreferences((prev: any) => ({ ...prev, locations }))}
         />
       );
     case "office":
@@ -55,7 +55,7 @@ export function StepContent({
         <OfficePreferences
           selectedPreference={preferences.office_preferences}
           onChange={(office_preferences) => 
-            setPreferences(prev => ({ ...prev, office_preferences }))
+            setPreferences((prev: any) => ({ ...prev, office_preferences }))
           }
         />
       );

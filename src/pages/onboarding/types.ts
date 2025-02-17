@@ -18,7 +18,7 @@ export const STEPS: OnboardingStep[] = [
   },
   {
     title: "Company Location",
-    description: "Which company locations are you open to? You may not want to track companies based on timezone preferences and other factors.",
+    description: "Which company locations are you open to?",
     component: "locations"
   },
   {
