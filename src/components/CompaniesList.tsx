@@ -1,7 +1,16 @@
 
-import { CompanyCard } from "@/components/CompanyCard";
 import { Loader2 } from "lucide-react";
 import { Company, CompanyDisplay } from "@/types/company";
+import { 
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 
 interface CompaniesListProps {
   companies: Company[];
@@ -54,10 +63,56 @@ export function CompaniesList({
   }
 
   return (
-    <div className="grid gap-4">
-      {filteredCompanies.map((company) => (
-        <CompanyCard key={company.id} {...mapToDisplayCompany(company)} />
-      ))}
+    <div className="border rounded-lg">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Sector</TableHead>
+            <TableHead>Sub-Sector</TableHead>
+            <TableHead>Location</TableHead>
+            <TableHead>Funding Type</TableHead>
+            <TableHead>Funding Amount</TableHead>
+            <TableHead>Description</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {filteredCompanies.map((company) => {
+            const displayCompany = mapToDisplayCompany(company);
+            return (
+              <TableRow key={company.id}>
+                <TableCell>
+                  <Link 
+                    to={`/company/${company.id}`}
+                    className="font-medium hover:text-primary transition-colors"
+                  >
+                    {displayCompany.name}
+                  </Link>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="bg-primary/5 text-primary">
+                    {displayCompany.sector}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="bg-muted/50">
+                    {displayCompany.subSector}
+                  </Badge>
+                </TableCell>
+                <TableCell>{displayCompany.headquarterLocation}</TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="bg-accent">
+                    {displayCompany.fundingType}
+                  </Badge>
+                </TableCell>
+                <TableCell>${displayCompany.fundingAmount}</TableCell>
+                <TableCell className="max-w-md truncate">
+                  {displayCompany.description}
+                </TableCell>
+              </TableRow>
+            ))}
+        </TableBody>
+      </Table>
       {filteredCompanies.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">
           No companies found matching your criteria.
