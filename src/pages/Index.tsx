@@ -8,6 +8,7 @@ import { AddCompanyDialog } from "@/components/AddCompanyDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/components/AuthProvider";
 
 interface Company {
   id: string;
@@ -45,20 +46,41 @@ const Index = () => {
   const [uniqueSectors, setUniqueSectors] = useState<string[]>([]);
   const [uniqueStages, setUniqueStages] = useState<string[]>([]);
   const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
+  const { session } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
     fetchCompanies();
+    fetchUserPreferences();
   }, []);
 
-  useEffect(() => {
-    if (companies.length > 0) {
-      const sectors = Array.from(new Set(companies.map(company => company.sector)));
-      const stages = Array.from(new Set(companies.map(company => company.funding_type)));
-      setUniqueSectors(sectors);
-      setUniqueStages(stages);
+  const fetchUserPreferences = async () => {
+    if (!session?.user.id) return;
+
+    try {
+      const { data: preferences, error } = await supabase
+        .from('user_tracking_preferences')
+        .select('sectors')
+        .eq('user_id', session.user.id)
+        .single();
+
+      if (error) throw error;
+
+      if (preferences && companies.length > 0) {
+        const filteredSectors = Array.from(new Set(
+          companies
+            .filter(company => preferences.sectors.includes(company.sector))
+            .map(company => company.sector)
+        ));
+        setUniqueSectors(filteredSectors);
+
+        const stages = Array.from(new Set(companies.map(company => company.funding_type)));
+        setUniqueStages(stages);
+      }
+    } catch (error) {
+      console.error('Error fetching user preferences:', error);
     }
-  }, [companies]);
+  };
 
   const fetchCompanies = async () => {
     try {
@@ -104,7 +126,7 @@ const Index = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background pl-16"> {/* Added pl-16 for left padding */}
+    <div className="min-h-screen bg-background pl-16">
       <div className="container py-8 space-y-8">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
