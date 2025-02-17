@@ -12,11 +12,49 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Map common sectors to our enum values
+const sectorMapping: { [key: string]: string } = {
+  "Real Estate": "PropTech (Real Estate Tech)",
+  "PropTech": "PropTech (Real Estate Tech)",
+  "Real Estate Tech": "PropTech (Real Estate Tech)",
+  "AI": "Artificial Intelligence (AI)",
+  "Artificial Intelligence": "Artificial Intelligence (AI)",
+  "Finance": "Fintech",
+  "Financial Technology": "Fintech",
+  "Health": "HealthTech",
+  "Healthcare": "HealthTech",
+  "E-commerce": "E-commerce & RetailTech",
+  "Retail": "E-commerce & RetailTech",
+  "Sales": "Sales Tech & RevOps",
+  "HR": "HR Tech & WorkTech",
+  "Human Resources": "HR Tech & WorkTech",
+  "Legal": "LegalTech",
+  "Education": "EdTech",
+  "Security": "Cybersecurity",
+  "Cyber Security": "Cybersecurity",
+  "Logistics": "Logistics & Supply Chain Tech",
+  "Supply Chain": "Logistics & Supply Chain Tech",
+  "Developer": "Developer Tools & Web Infrastructure",
+  "Web Infrastructure": "Developer Tools & Web Infrastructure",
+  "SaaS": "SaaS & Enterprise Software",
+  "Enterprise": "SaaS & Enterprise Software",
+  "Marketing": "Marketing Tech (MarTech)",
+  "MarTech": "Marketing Tech (MarTech)",
+  "Insurance": "InsurTech",
+  "Government": "GovTech",
+  "Marketplace": "Marketplace Platforms",
+  "Construction": "Construction Tech & Fintech",
+  "Mobility": "Mobility & Transportation Tech",
+  "Transportation": "Mobility & Transportation Tech",
+  "Climate": "CleanTech & ClimateTech",
+  "Clean Tech": "CleanTech & ClimateTech",
+};
+
 const systemPrompt = `I'm building a CRM for job seekers. Here are the data points I want to capture for the companies:
 - Company Name
  - ie Walmart
 - Sector
- - ie Fintech, Marketplace, Procurement & Supply Chain, Sales Tech, AI
+ - ie Fintech, Marketplace, PropTech (Real Estate Tech), Sales Tech & RevOps, Artificial Intelligence (AI)
 - Sub-Sector
  - ie SMB, Insurance, HR Tech, Enterprise, Consumer
 - Funding Type
@@ -48,7 +86,29 @@ Instructions:
   "websiteUrl": "string",
   "headquarterLocation": "string",
   "description": "string"
-}`;
+}
+
+For sectors, use ONLY these exact values:
+- Artificial Intelligence (AI)
+- Fintech
+- HealthTech
+- E-commerce & RetailTech
+- Sales Tech & RevOps
+- HR Tech & WorkTech
+- PropTech (Real Estate Tech)
+- LegalTech
+- EdTech
+- Cybersecurity
+- Logistics & Supply Chain Tech
+- Developer Tools & Web Infrastructure
+- SaaS & Enterprise Software
+- Marketing Tech (MarTech)
+- InsurTech
+- GovTech
+- Marketplace Platforms
+- Construction Tech & Fintech
+- Mobility & Transportation Tech
+- CleanTech & ClimateTech`;
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -114,6 +174,14 @@ serve(async (req) => {
       }
       
       console.log('Parsed company data:', companyData);
+
+      // Map the sector to a valid enum value
+      if (companyData.sector) {
+        const mappedSector = sectorMapping[companyData.sector] || companyData.sector;
+        console.log(`Mapping sector from "${companyData.sector}" to "${mappedSector}"`);
+        companyData.sector = mappedSector;
+      }
+
     } catch (e) {
       console.error('Failed to parse GPT response:', data.choices[0].message.content);
       console.error('Parse error:', e);
