@@ -9,10 +9,12 @@ import { ProgressIndicator } from "./onboarding/ProgressIndicator";
 import { StepContent } from "./onboarding/StepContent";
 import { CompanyStage, CompanySector, CompanyLocation, OfficePreference } from "@/components/preferences/types";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Onboarding = () => {
   const { session } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(0);
   const [preferences, setPreferences] = useState<{
     stages: CompanyStage[];
@@ -59,19 +61,49 @@ const Onboarding = () => {
     } else {
       // This is the last step, save preferences and redirect
       try {
-        const { error: preferencesError } = await supabase
+        // First check if a record exists
+        const { data: existingPreferences } = await supabase
           .from('user_tracking_preferences')
-          .upsert({
-            user_id: session.user.id,
-            stages: preferences.stages,
-            sectors: preferences.sectors,
-            locations: preferences.locations,
-            office_preferences: preferences.office_preferences,
-            has_completed_onboarding: true
-          });
+          .select('id')
+          .eq('user_id', session.user.id)
+          .single();
 
-        if (preferencesError) {
-          console.error('Error saving preferences:', preferencesError);
+        let error;
+        
+        if (existingPreferences) {
+          // Update existing record
+          const { error: updateError } = await supabase
+            .from('user_tracking_preferences')
+            .update({
+              stages: preferences.stages,
+              sectors: preferences.sectors,
+              locations: preferences.locations,
+              office_preferences: preferences.office_preferences,
+              has_completed_onboarding: true
+            })
+            .eq('user_id', session.user.id);
+          
+          error = updateError;
+        } else {
+          // Insert new record
+          const { error: insertError } = await supabase
+            .from('user_tracking_preferences')
+            .insert([{
+              user_id: session.user.id,
+              ...preferences,
+              has_completed_onboarding: true
+            }]);
+          
+          error = insertError;
+        }
+
+        if (error) {
+          console.error('Error saving preferences:', error);
+          toast({
+            title: "Error",
+            description: "Failed to save preferences. Please try again.",
+            variant: "destructive",
+          });
           return;
         }
 
@@ -79,6 +111,11 @@ const Onboarding = () => {
         navigate('/');
       } catch (error) {
         console.error('Error in handleNext:', error);
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred. Please try again.",
+          variant: "destructive",
+        });
       }
     }
   };
