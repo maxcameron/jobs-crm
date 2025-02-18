@@ -324,7 +324,7 @@ export type Database = {
         | "Tokyo"
       company_sector:
         | "Marketing Technology"
-        | "Business & Productivity Software"
+        | "Business and Productivity Software"
         | "Procurement Tech"
         | "Marketplace"
         | "Fintech"
