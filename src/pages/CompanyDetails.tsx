@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Building2, Users, Briefcase } from "lucide-react";
+import { ArrowLeft, Building2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,14 +13,6 @@ interface Contact {
   name: string;
   title: string;
   email: string;
-}
-
-interface JobPosting {
-  id: string;
-  title: string;
-  description: string;
-  location: string;
-  type: string;
 }
 
 interface Company {
@@ -40,7 +32,6 @@ const CompanyDetails = () => {
   const { id } = useParams();
   const [company, setCompany] = useState<Company | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
-  const [jobs, setJobs] = useState<JobPosting[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -65,15 +56,6 @@ const CompanyDetails = () => {
 
         if (contactsError) throw contactsError;
         setContacts(contactsData);
-
-        // Fetch job postings
-        const { data: jobsData, error: jobsError } = await supabase
-          .from('job_postings')
-          .select('*')
-          .eq('company_id', id);
-
-        if (jobsError) throw jobsError;
-        setJobs(jobsData);
       } catch (error) {
         console.error('Error fetching company data:', error);
         toast({
@@ -128,7 +110,7 @@ const CompanyDetails = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2">
             <Card>
               <CardHeader className="flex flex-row items-center gap-2">
                 <Building2 className="h-5 w-5" />
@@ -161,26 +143,6 @@ const CompanyDetails = () => {
                     <p className="font-medium">{company.funding_date}</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-2">
-                <Briefcase className="h-5 w-5" />
-                <h2 className="text-xl font-semibold">Open Positions</h2>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {jobs.length > 0 ? (
-                  jobs.map((job) => (
-                    <div key={job.id} className="border-b last:border-0 pb-4 last:pb-0">
-                      <h3 className="font-semibold">{job.title}</h3>
-                      <p className="text-sm text-muted-foreground">{job.location} • {job.type}</p>
-                      <p className="mt-2 text-sm">{job.description}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-muted-foreground">No open positions at the moment.</p>
-                )}
               </CardContent>
             </Card>
           </div>
