@@ -10,19 +10,39 @@ interface LocationPreferencesProps {
   onChange: (locations: CompanyLocation[]) => void;
 }
 
+interface LocationStructure {
+  [key: string]: CompanyLocation[];
+}
+
 export function LocationPreferences({ availableLocations, selectedLocations, onChange }: LocationPreferencesProps) {
-  // Group locations by region to help users make better decisions
-  const groupedLocations = availableLocations.reduce((groups, location) => {
-    const country = getCountry(location);
-    if (!groups[country]) {
-      groups[country] = [];
-    }
-    groups[country].push(location);
-    return groups;
-  }, {} as Record<string, CompanyLocation[]>);
+  // Group locations by country
+  const groupedLocations: LocationStructure = {
+    "United Arab Emirates": ["Abu Dhabi"],
+    "United States": [
+      "New York",
+      "San Francisco",
+      "Boston",
+      "Austin",
+      "Seattle",
+      "Chicago",
+      "Los Angeles",
+      "Miami",
+    ],
+    "Canada": ["Vancouver", "Toronto"],
+    "United Kingdom": ["London"],
+    "Germany": ["Berlin"],
+    "France": ["Paris"],
+    "Netherlands": ["Amsterdam"],
+    "Ireland": ["Dublin"],
+    "Sweden": ["Stockholm"],
+    "Singapore": ["Singapore"],
+    "Australia": ["Sydney"],
+    "Japan": ["Tokyo"],
+    "Israel": ["Tel Aviv"],
+  };
 
   const handleCountryChange = (country: string, checked: boolean) => {
-    const countryLocations = groupedLocations[country];
+    const countryLocations = groupedLocations[country] || [];
     if (checked) {
       // Add all locations from the country that aren't already selected
       const newLocations = [
@@ -40,17 +60,74 @@ export function LocationPreferences({ availableLocations, selectedLocations, onC
   };
 
   const isCountryFullySelected = (country: string) => {
-    const countryLocations = groupedLocations[country];
-    return countryLocations.every(loc => selectedLocations.includes(loc));
+    const countryLocations = groupedLocations[country] || [];
+    return countryLocations.length > 0 && 
+           countryLocations.every(loc => selectedLocations.includes(loc));
   };
 
   const isCountryPartiallySelected = (country: string) => {
-    const countryLocations = groupedLocations[country];
+    const countryLocations = groupedLocations[country] || [];
     const selectedCount = countryLocations.filter(loc => 
       selectedLocations.includes(loc)
     ).length;
     return selectedCount > 0 && selectedCount < countryLocations.length;
   };
+
+  // Function to render single location that isn't part of a country group
+  const renderSingleLocation = (location: CompanyLocation) => (
+    <div key={location} className="flex items-center space-x-2">
+      <Checkbox
+        id={`location-${location}`}
+        checked={selectedLocations.includes(location)}
+        onCheckedChange={(checked) => {
+          onChange(
+            checked
+              ? [...selectedLocations, location]
+              : selectedLocations.filter(loc => loc !== location)
+          );
+        }}
+      />
+      <Label htmlFor={`location-${location}`}>{location}</Label>
+    </div>
+  );
+
+  // Function to render a country group with its cities
+  const renderCountryGroup = (country: string, locations: CompanyLocation[]) => (
+    <div key={country} className="space-y-2">
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id={`country-${country}`}
+          checked={isCountryFullySelected(country)}
+          className={isCountryPartiallySelected(country) ? "bg-primary/50" : ""}
+          onCheckedChange={(checked) => handleCountryChange(country, checked as boolean)}
+        />
+        <Label htmlFor={`country-${country}`} className="font-medium">{country}</Label>
+      </div>
+      <div className="ml-6 space-y-2">
+        {locations.map((location) => (
+          <div key={location} className="flex items-center space-x-2">
+            <Checkbox
+              id={`location-${location}`}
+              checked={selectedLocations.includes(location)}
+              onCheckedChange={(checked) => {
+                onChange(
+                  checked
+                    ? [...selectedLocations, location]
+                    : selectedLocations.filter(loc => loc !== location)
+                );
+              }}
+            />
+            <Label htmlFor={`location-${location}`}>{location}</Label>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // Get locations that aren't part of any country group
+  const ungroupedLocations = availableLocations.filter(location => 
+    !Object.values(groupedLocations).flat().includes(location)
+  );
 
   return (
     <Card>
@@ -58,67 +135,16 @@ export function LocationPreferences({ availableLocations, selectedLocations, onC
         <CardTitle>Location</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
-          {Object.entries(groupedLocations).map(([country, locations]) => (
-            <div key={country} className="space-y-3">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id={`country-${country}`}
-                  checked={isCountryFullySelected(country)}
-                  className={isCountryPartiallySelected(country) ? "bg-primary/50" : ""}
-                  onCheckedChange={(checked) => handleCountryChange(country, checked as boolean)}
-                />
-                <Label htmlFor={`country-${country}`} className="font-medium text-sm">{country}</Label>
-              </div>
-              <div className="grid gap-4 ml-6">
-                {locations.map((location) => (
-                  <div key={location} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`location-${location}`}
-                      checked={selectedLocations.includes(location)}
-                      onCheckedChange={(checked) => {
-                        onChange(
-                          checked
-                            ? [...selectedLocations, location]
-                            : selectedLocations.filter(loc => loc !== location)
-                        );
-                      }}
-                    />
-                    <Label htmlFor={`location-${location}`}>{location}</Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+        <div className="space-y-4">
+          {/* Render single locations first */}
+          {ungroupedLocations.map(location => renderSingleLocation(location))}
+          
+          {/* Render country groups */}
+          {Object.entries(groupedLocations)
+            .sort(([a], [b]) => a.localeCompare(b)) // Sort countries alphabetically
+            .map(([country, locations]) => renderCountryGroup(country, locations))}
         </div>
       </CardContent>
     </Card>
   );
-}
-
-// Helper function to group locations by country
-function getCountry(location: CompanyLocation): string {
-  const locationMap: Record<string, string> = {
-    "New York": "United States",
-    "San Francisco": "United States",
-    "Boston": "United States",
-    "Austin": "United States",
-    "Seattle": "United States",
-    "Chicago": "United States",
-    "Los Angeles": "United States",
-    "Miami": "United States",
-    "Vancouver": "Canada",
-    "London": "United Kingdom",
-    "Berlin": "Germany",
-    "Paris": "France",
-    "Amsterdam": "Netherlands",
-    "Dublin": "Ireland",
-    "Stockholm": "Sweden",
-    "Singapore": "Singapore",
-    "Sydney": "Australia",
-    "Tokyo": "Japan",
-    "Tel Aviv": "Israel"
-  };
-
-  return locationMap[location] || location;
 }

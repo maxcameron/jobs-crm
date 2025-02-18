@@ -89,7 +89,12 @@ interface AddCompanyForm {
   location: CompanyLocation;
 }
 
-export function AddCompanyDialog() {
+interface AddCompanyDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function AddCompanyDialog({ open, onOpenChange }: AddCompanyDialogProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const form = useForm<AddCompanyForm>();
@@ -117,7 +122,7 @@ export function AddCompanyDialog() {
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button>Add Company</Button>
       </DialogTrigger>
