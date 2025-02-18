@@ -30,6 +30,21 @@ const Onboarding = () => {
 
   const currentStepData = STEPS[currentStep];
 
+  const isNextDisabled = () => {
+    switch (currentStepData.component) {
+      case "stages":
+        return preferences.stages.length === 0;
+      case "sectors":
+        return preferences.sectors.length === 0;
+      case "locations":
+        return preferences.locations.length === 0;
+      case "office":
+        return preferences.office_preferences.length === 0;
+      default:
+        return false;
+    }
+  };
+
   const handleNext = () => {
     if (currentStep < STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -70,7 +85,7 @@ const Onboarding = () => {
 
           <Button
             onClick={handleNext}
-            disabled={currentStep === STEPS.length - 1}
+            disabled={currentStep === STEPS.length - 1 || isNextDisabled()}
           >
             Next
             <ChevronRight className="w-4 h-4 ml-2" />
