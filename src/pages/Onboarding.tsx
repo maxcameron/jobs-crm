@@ -1,7 +1,7 @@
 
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { STEPS } from "./onboarding/types";
@@ -31,8 +31,10 @@ const Onboarding = () => {
   const currentStepData = STEPS[currentStep];
 
   const isNextDisabled = () => {
-    console.log('Current step component:', currentStepData.component);
-    console.log('Current preferences:', preferences);
+    console.log('Checking next disabled:', {
+      component: currentStepData.component,
+      preferences: preferences
+    });
     
     switch (currentStepData.component) {
       case "stages":
@@ -41,7 +43,8 @@ const Onboarding = () => {
         return preferences.sectors.length === 0;
       case "locations":
         return preferences.locations.length === 0;
-      case "office":  // This matches the type definition in STEPS
+      case "office":
+        console.log('Office preferences length:', preferences.office_preferences.length);
         return preferences.office_preferences.length === 0;
       default:
         return false;
@@ -88,7 +91,7 @@ const Onboarding = () => {
 
           <Button
             onClick={handleNext}
-            disabled={currentStep === STEPS.length - 1 || isNextDisabled()}
+            disabled={isNextDisabled()}
           >
             Next
             <ChevronRight className="w-4 h-4 ml-2" />

@@ -30,7 +30,10 @@ export function OfficePreferences({ selectedPreference = [], onChange }: OfficeP
               <Checkbox
                 id={`office-${preference}`}
                 checked={selectedPreference.includes(preference)}
-                onCheckedChange={(checked) => handleCheckboxChange(preference, checked === true)}
+                onCheckedChange={(checked) => {
+                  console.log('Checkbox changed:', preference, checked);
+                  handleCheckboxChange(preference, checked === true);
+                }}
               />
               <Label htmlFor={`office-${preference}`}>{preference}</Label>
             </div>
