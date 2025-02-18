@@ -7,7 +7,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Define the necessary types directly in the edge function
 type CompanySector = 
   | "Artificial Intelligence (AI)"
   | "Fintech"
@@ -31,7 +30,6 @@ type CompanySector =
   | "CleanTech & ClimateTech";
 
 function cleanAndParseJSON(text: string): any {
-  // Remove any markdown code block syntax
   const cleanedText = text
     .replace(/```json\s*/, '')
     .replace(/```\s*$/, '')
@@ -63,41 +61,37 @@ serve(async (req) => {
       throw new Error('OpenAI API key is not configured');
     }
 
-    const prompt = `I need accurate, factual information about the company at ${url}. 
+    // First, let's get the company website content
+    console.log('Fetching website content...');
+    const websiteResponse = await fetch(url);
+    const websiteContent = await websiteResponse.text();
     
-IMPORTANT: You must ONLY return information that you can verify through the company's website or through reputable sources like:
-- Crunchbase
-- LinkedIn
-- TechCrunch
-- Bloomberg
-- Reuters
-- SEC filings
-- Company press releases
+    const prompt = `You are a precise company research assistant. I need you to analyze this company website content and provide accurate information.
 
-Return the information in this JSON format:
+Website URL: ${url}
+Website Content: """${websiteContent}"""
 
+VERY IMPORTANT RULES:
+1. ONLY use information directly visible in the provided website content
+2. If you cannot find specific information in the website content, use "Not Available" or "Not Disclosed"
+3. DO NOT make assumptions or generate information
+4. DO NOT use external sources - ONLY use the provided website content
+
+Return a JSON object with these fields:
 {
   "name": "Company name (exactly as shown on their website)",
   "sector": One of these exact values: ["Artificial Intelligence (AI)", "Fintech", "HealthTech", "E-commerce & RetailTech", "Sales Tech & RevOps", "HR Tech & WorkTech", "PropTech (Real Estate Tech)", "LegalTech", "EdTech", "Cybersecurity", "Logistics & Supply Chain Tech", "Developer Tools & Web Infrastructure", "SaaS & Enterprise Software", "Marketing Tech (MarTech)", "InsurTech", "GovTech", "Marketplace Platforms", "Construction Tech & Fintech", "Mobility & Transportation Tech", "CleanTech & ClimateTech"],
-  "subSector": "Specific focus area (e.g., SMB, Insurance, Enterprise)",
-  "fundingType": "Most recent funding round (e.g., Pre-Seed, Seed, Series A, Series B, Series C)",
-  "fundingDate": "Date of most recent funding in MM/YYYY format",
-  "fundingAmount": "Most recent funding amount in USD, numbers only",
+  "subSector": "Specific focus area from website (e.g., SMB, Insurance, Enterprise)",
+  "fundingType": "Not Disclosed",
+  "fundingDate": "Not Disclosed",
+  "fundingAmount": "0",
   "websiteUrl": "${url}",
-  "headquarterLocation": "City, State/Country (e.g., San Francisco, CA)",
-  "description": "Describe the company's main product/service in 20 words or less",
-  "tags": ["array", "of", "relevant", "technology", "or", "industry", "tags"]
+  "headquarterLocation": "Location if shown on website, otherwise Not Available",
+  "description": "Main product/service description in 20 words or less from website content",
+  "tags": ["3-5 relevant tags based on website content"]
 }
 
-Critical rules:
-1. The websiteUrl MUST be exactly "${url}" - do not change or modify it
-2. Use ONLY the predefined sector values from the list
-3. If you cannot find verified funding information, use "Not Disclosed" for fundingType, fundingDate, and 0 for fundingAmount
-4. If you cannot verify any piece of information, use "Not Available" for text fields or [] for arrays
-5. Description must be 20 words or less and based on their website/materials
-6. For fundingAmount, provide only numbers, no currency symbols or commas
-7. Include 3-5 relevant tags based on their actual technology/industry focus
-8. NEVER generate or guess information - if you can't verify it, mark it as Not Available`;
+For the sector field, choose the MOST appropriate category from the provided list based on the website content.`;
 
     console.log('Sending request to OpenAI...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -111,7 +105,7 @@ Critical rules:
         messages: [
           { 
             role: 'system', 
-            content: 'You are a precise research assistant that ONLY returns verified company information. Never generate or guess information. Return only valid JSON without any markdown formatting.' 
+            content: 'You are a precise research assistant. Only use information directly from the provided website content. Never make assumptions or generate information. Only return valid JSON.' 
           },
           { role: 'user', content: prompt }
         ],
@@ -131,7 +125,7 @@ Critical rules:
     const companyData = cleanAndParseJSON(data.choices[0].message.content);
     console.log('Parsed company data:', companyData);
 
-    // Validate that the returned URL matches the input URL
+    // Validate URL
     if (companyData.websiteUrl !== url) {
       throw new Error('OpenAI returned data for wrong company URL');
     }
@@ -155,7 +149,7 @@ Critical rules:
     const cleanedData = {
       ...companyData,
       fundingAmount: companyData.fundingAmount.toString().replace(/[^0-9]/g, ''),
-      fundingDate: companyData.fundingDate.replace(/^(\d{1})\//, '0$1/'),
+      fundingDate: companyData.fundingDate === "Not Disclosed" ? "Not Disclosed" : companyData.fundingDate.replace(/^(\d{1})\//, '0$1/'),
       tags: Array.isArray(companyData.tags) ? companyData.tags.slice(0, 5) : [],
     };
 
