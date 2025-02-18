@@ -1,149 +1,111 @@
-
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useForm } from "react-hook-form";
+import { CompanyLocation, CompanySector } from "./preferences/types";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/components/AuthProvider";
-import { useQueryClient } from "@tanstack/react-query";
-import { Database } from "@/integrations/supabase/types";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
 
-type CompanySector = Database["public"]["Enums"]["company_sector"];
-type CompanyStage = Database["public"]["Enums"]["company_stage"];
+const COMPANY_LOCATIONS: CompanyLocation[] = [
+  "New York",
+  "San Francisco",
+  "London",
+  "Berlin",
+  "Paris",
+  "Toronto",
+  "Amsterdam",
+  "Singapore",
+  "Sydney",
+  "Tel Aviv",
+  "Boston",
+  "Austin",
+  "Seattle",
+  "Chicago",
+  "Los Angeles",
+  "Miami",
+  "Vancouver",
+  "Dublin",
+  "Stockholm",
+  "Tokyo"
+];
+
+const COMPANY_SECTORS: CompanySector[] = [
+  "Marketing Technology",
+  "Business and Productivity Software",
+  "Procurement Tech",
+  "Marketplace",
+  "Fintech",
+  "Logistics",
+  "AI",
+  "PropTech",
+  "SaaS",
+  "Automotive",
+  "Energy",
+  "Construction Technology",
+  "HealthTech",
+  "Home Services",
+  "Communication Software",
+  "Industrial Technology",
+  "Medical Technology",
+  "HR Tech",
+  "Sales Tech",
+  "Event Technology",
+  "Legal Tech",
+  "E-Commerce",
+  "Media and Information Services",
+  "Advertising Technology",
+  "Travel Technology",
+  "Data Infrastructure",
+  "Recreation Tech",
+  "InsurTech",
+  "FoodTech",
+  "AgTech",
+  "Market Intelligence",
+  "Manufacturing",
+  "Customer Experience Technology",
+  "Recruitment Technology",
+  "Retail Technology",
+  "Professional Training and Coaching",
+  "Government Technology",
+  "Sustainability Technology",
+  "Childcare Services",
+  "Business Intelligence",
+  "Entertainment Software",
+  "EdTech",
+  "Customer Support Technology",
+  "Mobility",
+  "Nonprofit Tech",
+  "Blockchain"
+];
 
 interface AddCompanyForm {
   name: string;
-  sector: CompanySector;
-  subSector: string;
-  fundingType: CompanyStage;
-  fundingDate: string;
-  fundingAmount: string;
-  websiteUrl: string;
-  headquarterLocation: string;
   description: string;
+  sector: CompanySector;
+  location: CompanyLocation;
 }
 
-interface AddCompanyDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-export const AddCompanyDialog = ({ open, onOpenChange }: AddCompanyDialogProps) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isResearching, setIsResearching] = useState(false);
-  const [formData, setFormData] = useState<AddCompanyForm>({
-    name: "",
-    sector: "Artificial Intelligence",
-    subSector: "",
-    fundingType: "Seed",
-    fundingDate: "",
-    fundingAmount: "",
-    websiteUrl: "",
-    headquarterLocation: "",
-    description: "",
-  });
-
+export function AddCompanyDialog() {
   const { toast } = useToast();
-  const { supabase } = useAuth();
-  const queryClient = useQueryClient();
+  const [isLoading, setIsLoading] = useState(false);
+  const form = useForm<AddCompanyForm>();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleResearch = async () => {
-    if (!formData.websiteUrl) {
-      toast({
-        title: "Error",
-        description: "Please enter a website URL to research.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsResearching(true);
-
-    try {
-      const response = await supabase.functions.invoke('research-company', {
-        body: { url: formData.websiteUrl }
-      });
-
-      if (response.error) throw new Error(response.error.message || 'Research failed');
-      
-      const data = response.data;
-
-      setFormData(prev => ({
-        ...prev,
-        name: data.name || prev.name,
-        sector: data.sector || prev.sector,
-        subSector: data.subSector || prev.subSector,
-        fundingType: data.fundingType || prev.fundingType,
-        fundingDate: data.fundingDate || prev.fundingDate,
-        fundingAmount: data.fundingAmount || prev.fundingAmount,
-        headquarterLocation: data.headquarterLocation || prev.headquarterLocation,
-        description: data.description || prev.description,
-      }));
-
-      toast({
-        title: "Research Complete",
-        description: "Company information has been filled automatically.",
-      });
-    } catch (error) {
-      console.error('Research error:', error);
-      toast({
-        title: "Research Failed",
-        description: error instanceof Error ? error.message : "Failed to research company.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsResearching(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: AddCompanyForm) => {
     setIsLoading(true);
-
     try {
-      const { error } = await supabase
-        .from('companies')
-        .insert([{
-          name: formData.name,
-          sector: formData.sector,
-          sub_sector: formData.subSector,
-          funding_type: formData.fundingType,
-          funding_date: formData.fundingDate,
-          funding_amount: formData.fundingAmount,
-          website_url: formData.websiteUrl,
-          headquarter_location: formData.headquarterLocation,
-          description: formData.description,
-        }]);
-
+      const { error } = await supabase.from('companies').insert(data);
       if (error) throw error;
-
-      queryClient.invalidateQueries({ queryKey: ['adminCompanies'] });
-      setFormData({
-        name: "",
-        sector: "Artificial Intelligence",
-        subSector: "",
-        fundingType: "Seed",
-        fundingDate: "",
-        fundingAmount: "",
-        websiteUrl: "",
-        headquarterLocation: "",
-        description: "",
-      });
-      onOpenChange(false);
-
       toast({
-        title: "Company Added",
-        description: "The company has been successfully added to your tracker.",
+        title: "Success",
+        description: "Company added successfully!",
       });
+      form.reset();
     } catch (error) {
-      console.error('Error adding company:', error);
+      console.error("Error adding company:", error);
       toast({
         title: "Error",
         description: "Failed to add company. Please try again.",
@@ -154,219 +116,98 @@ export const AddCompanyDialog = ({ open, onOpenChange }: AddCompanyDialogProps) 
     }
   };
 
-  const sectors: CompanySector[] = [
-    "Marketing Technology",
-    "Business & Productivity Software",
-    "Procurement Tech",
-    "Marketplace",
-    "Fintech",
-    "Logistics",
-    "Artificial Intelligence",
-    "PropTech",
-    "SaaS",
-    "Automotive Tech",
-    "Energy Tech",
-    "Construction Tech",
-    "HealthTech",
-    "Home Services Tech",
-    "Communication Software",
-    "Industrial Tech",
-    "Medical Tech",
-    "HR Tech",
-    "Sales Tech",
-    "Event Tech",
-    "Legal Tech",
-    "E-commerce",
-    "Media & Information Services",
-    "AdTech",
-    "Travel Tech",
-    "Data Infrastructure",
-    "Recreation Tech",
-    "InsurTech",
-    "FoodTech",
-    "AgTech",
-    "Market Intelligence",
-    "Manufacturing Tech",
-    "Customer Experience Tech",
-    "Recruitment Tech",
-    "Retail Tech",
-    "Professional Training Tech",
-    "GovTech",
-    "Sustainability Tech",
-    "Childcare Tech",
-    "Business Intelligence",
-    "Entertainment Software",
-    "EdTech",
-    "Customer Support Tech",
-    "Mobility Tech",
-    "Nonprofit Tech",
-    "Blockchain"
-  ];
-
-  const stages: CompanyStage[] = [
-    "Seed",
-    "Series A",
-    "Series B",
-    "Series C",
-    "Series D",
-    "Series E and above"
-  ];
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Add Company</Button>
+      </DialogTrigger>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Add New Company</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="websiteUrl">Company Website</Label>
-            <div className="flex gap-2">
-              <Input
-                id="websiteUrl"
-                name="websiteUrl"
-                type="url"
-                value={formData.websiteUrl}
-                onChange={handleChange}
-                placeholder="https://example.com"
-                required
-              />
-              <Button 
-                type="button" 
-                onClick={handleResearch}
-                disabled={isResearching}
-              >
-                {isResearching ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Researching...
-                  </>
-                ) : (
-                  "Research"
-                )}
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Company Name</Label>
-              <Input
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="e.g., Acme Inc."
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="sector">Sector</Label>
-              <select
-                id="sector"
-                name="sector"
-                value={formData.sector}
-                onChange={handleChange}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                required
-              >
-                {sectors.map((sector) => (
-                  <option key={sector} value={sector}>{sector}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="subSector">Sub-Sector</Label>
-              <Input
-                id="subSector"
-                name="subSector"
-                value={formData.subSector}
-                onChange={handleChange}
-                placeholder="e.g., SMB, Enterprise"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="fundingType">Funding Stage</Label>
-              <select
-                id="fundingType"
-                name="fundingType"
-                value={formData.fundingType}
-                onChange={handleChange}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                required
-              >
-                {stages.map((stage) => (
-                  <option key={stage} value={stage}>{stage}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="fundingDate">Funding Date</Label>
-              <Input
-                id="fundingDate"
-                name="fundingDate"
-                value={formData.fundingDate}
-                onChange={handleChange}
-                placeholder="MM/YYYY"
-                pattern="\d{2}/\d{4}"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="fundingAmount">Funding Amount</Label>
-              <Input
-                id="fundingAmount"
-                name="fundingAmount"
-                value={formData.fundingAmount}
-                onChange={handleChange}
-                placeholder="e.g., 1,000,000"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="headquarterLocation">Headquarters</Label>
-              <Input
-                id="headquarterLocation"
-                name="headquarterLocation"
-                value={formData.headquarterLocation}
-                onChange={handleChange}
-                placeholder="e.g., San Francisco"
-                required
-              />
-            </div>
-
-            <div className="space-y-2 col-span-2">
-              <Label htmlFor="description">Description</Label>
-              <Input
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Brief company description"
-                required
-              />
-            </div>
-          </div>
-          
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Adding Company...
-              </>
-            ) : (
-              "Add Company"
-            )}
-          </Button>
-        </form>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Company Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter company name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter company description" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="sector"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Sector</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select sector" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {COMPANY_SECTORS.map((sector) => (
+                        <SelectItem key={sector} value={sector}>
+                          {sector}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Location</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select location" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {COMPANY_LOCATIONS.map((location) => (
+                        <SelectItem key={location} value={location}>
+                          {location}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Add Company
+            </Button>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
-};
+}

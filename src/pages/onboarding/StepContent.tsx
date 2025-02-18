@@ -6,6 +6,7 @@ import { OfficePreferences } from "@/components/preferences/OfficePreferences";
 import { CompanyStage, CompanySector, CompanyLocation, OfficePreference } from "@/components/preferences/types";
 import { OnboardingStep } from "./types";
 import { useSectors } from "@/hooks/useSectors";
+import { useLocations } from "@/hooks/useLocations";
 import { Loader2 } from "lucide-react";
 
 interface StepContentProps {
@@ -17,16 +18,15 @@ interface StepContentProps {
     office_preferences: OfficePreference[];
   };
   setPreferences: (preferences: any) => void;
-  availableLocations?: CompanyLocation[];
 }
 
 export function StepContent({ 
   step, 
   preferences, 
   setPreferences,
-  availableLocations = []
 }: StepContentProps) {
   const { sectors: availableSectors, isLoading: isLoadingSectors } = useSectors();
+  const { locations: availableLocations, isLoading: isLoadingLocations } = useLocations();
 
   switch (step.component) {
     case "stages":
@@ -52,6 +52,13 @@ export function StepContent({
         />
       );
     case "locations":
+      if (isLoadingLocations) {
+        return (
+          <div className="flex justify-center items-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        );
+      }
       return (
         <LocationPreferences
           availableLocations={availableLocations}
