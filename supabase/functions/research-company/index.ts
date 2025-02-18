@@ -23,29 +23,39 @@ serve(async (req) => {
 
     console.log('Researching URL:', url);
 
-    const prompt = `You are a research assistant. Given the URL ${url}, provide detailed company information in a strict JSON format with these exact keys:
+    const prompt = `Research the company at ${url} and provide ONLY a JSON response with detailed information.
+Focus on finding the most recent and accurate information.
+
+Required format:
 {
-  "name": "Company name",
+  "name": "Full company name (e.g., Stack AI)",
   "sector": "One of: Artificial Intelligence (AI), Fintech, HealthTech, E-commerce & RetailTech, Sales Tech & RevOps, HR Tech & WorkTech, PropTech (Real Estate Tech), LegalTech, EdTech, Cybersecurity, Logistics & Supply Chain Tech, Developer Tools & Web Infrastructure, SaaS & Enterprise Software, Marketing Tech (MarTech), InsurTech, GovTech, Marketplace Platforms, Construction Tech & Fintech, Mobility & Transportation Tech, CleanTech & ClimateTech",
-  "subSector": "Specific focus area",
-  "fundingType": "One of: Seed, Series A, Series B, Series C, Series D, Series E and above",
-  "fundingDate": "MM/YYYY format",
-  "fundingAmount": "Amount in USD",
-  "headquarterLocation": "City name",
-  "description": "20 words or less description"
+  "subSector": "Be specific and descriptive (e.g., Enterprise Automation, AI-Powered Customer Service)",
+  "fundingType": "Most recent funding round. One of: Seed, Series A, Series B, Series C, Series D, Series E and above",
+  "fundingDate": "Date of most recent funding in MM/YYYY format",
+  "fundingAmount": "Amount in USD (e.g., 16100000)",
+  "headquarterLocation": "City, State/Country (e.g., San Francisco, CA)",
+  "description": "Clear, specific description of what the company does in 20 words or less"
 }
 
-Research using:
-- Company website
-- TechCrunch
-- VentureBeat
-- Dealroom
-- Sifted
-- Tracxn
-- PitchBook
-- The SaaS News
+Important:
+- Search recent funding news on TechCrunch, VentureBeat, Dealroom, Sifted, Tracxn, PitchBook
+- Verify information across multiple sources
+- Focus on the most recent funding round
+- Make the sub-sector and description specific and meaningful
+- Return ONLY the JSON object, no additional text or markdown
 
-Return ONLY the JSON object, no other text. Ensure all values match the required formats exactly.`;
+Example of good output:
+{
+  "name": "Stack AI",
+  "sector": "Artificial Intelligence (AI)",
+  "subSector": "Enterprise Automation",
+  "fundingType": "Series A",
+  "fundingDate": "10/2024",
+  "fundingAmount": "16100000",
+  "headquarterLocation": "San Francisco, CA",
+  "description": "Platform for deploying AI agents to automate back-office operations."
+}`;
 
     console.log('Sending request to OpenAI...');
 
@@ -60,11 +70,11 @@ Return ONLY the JSON object, no other text. Ensure all values match the required
         messages: [
           { 
             role: 'system', 
-            content: 'You are a helpful assistant that researches companies and returns structured data in JSON format only, no additional text.' 
+            content: 'You are a company research assistant. Return only valid JSON without any markdown formatting or additional text.' 
           },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.7,
+        temperature: 0.3, // Lower temperature for more consistent outputs
       }),
     });
 
