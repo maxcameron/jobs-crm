@@ -63,33 +63,42 @@ serve(async (req) => {
       throw new Error('OpenAI API key is not configured');
     }
 
-    const prompt = `
-You are a company research assistant. Given the URL ${url}, research the company and provide the following information in a JSON format, without any markdown formatting or code block syntax:
+    const prompt = `I'm researching companies and need detailed information about the company at ${url}.
+
+For this research:
+- Consult these additional resources while doing the research:
+  - https://techcrunch.com
+  - https://venturebeat.com
+  - https://dealroom.co
+  - https://sifted.eu 
+  - https://tracxn.com
+  - https://pitchbook.com
+  - https://www.thesaasnews.com
+
+Return the information in this JSON format, without any markdown formatting or code block syntax:
 
 {
-  "name": "Company name",
+  "name": "Company name (e.g., Walmart)",
   "sector": One of these exact values: ["Artificial Intelligence (AI)", "Fintech", "HealthTech", "E-commerce & RetailTech", "Sales Tech & RevOps", "HR Tech & WorkTech", "PropTech (Real Estate Tech)", "LegalTech", "EdTech", "Cybersecurity", "Logistics & Supply Chain Tech", "Developer Tools & Web Infrastructure", "SaaS & Enterprise Software", "Marketing Tech (MarTech)", "InsurTech", "GovTech", "Marketplace Platforms", "Construction Tech & Fintech", "Mobility & Transportation Tech", "CleanTech & ClimateTech"],
-  "subSector": "Specific sub-sector within the main sector",
-  "fundingType": "Most recent funding round type (e.g., Seed, Series A, Series B, etc.)",
-  "fundingDate": "Date of most recent funding (MM/YYYY format)",
-  "fundingAmount": "Amount in USD of most recent funding (numbers only, no currency symbols)",
+  "subSector": "Specific focus area (e.g., SMB, Insurance, Enterprise)",
+  "fundingType": "Most recent funding round (e.g., Pre-Seed, Seed, Series A, Series B, Series C, Venture)",
+  "fundingDate": "Date of most recent funding in MM/YYYY format (e.g., 02/2024)",
+  "fundingAmount": "Most recent funding amount in USD, numbers only",
   "websiteUrl": "Company's website URL",
-  "headquarterLocation": "City, State/Country format",
-  "description": "2-3 sentences describing what the company does, focusing on their main product/service.",
+  "headquarterLocation": "City, State/Country (e.g., San Francisco, CA)",
+  "description": "Describe the company's main product/service in 20 words or less",
   "tags": ["array", "of", "relevant", "technology", "or", "industry", "tags"]
 }
 
-Important: Return ONLY the JSON object, no markdown formatting or code block syntax.
-
-Rules:
-1. Use ONLY the predefined sector values from the list. Do not create new ones.
-2. For fundingAmount, provide only numbers, no currency symbols or commas.
-3. For dates, use MM/YYYY format.
-4. Keep descriptions concise but informative.
-5. Location should be in City, State/Country format.
-6. Only include verified information you can find.
-7. For subSector, be specific but brief.
-8. Include 3-5 relevant tags.`;
+Important rules:
+1. Use ONLY the predefined sector values from the list
+2. Show ONLY the most recent funding round if multiple are found
+3. Description must be 20 words or less
+4. For fundingAmount, provide only numbers, no currency symbols or commas
+5. Dates must be in MM/YYYY format
+6. Location should be City, State/Country format
+7. Include 3-5 relevant tags
+8. Only include verified information from the website or additional resources provided`;
 
     console.log('Sending request to OpenAI...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -99,11 +108,11 @@ Rules:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4',
+        model: 'gpt-4o-mini',
         messages: [
           { 
             role: 'system', 
-            content: 'You are a precise company research assistant that returns only valid JSON without any markdown formatting or code blocks.' 
+            content: 'You are a precise company research assistant that returns only valid JSON without any markdown formatting or code blocks. You have access to various sources for company information and should strive to provide accurate, verified information.' 
           },
           { role: 'user', content: prompt }
         ],
