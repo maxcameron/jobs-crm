@@ -94,6 +94,12 @@ const CompanyDetails = () => {
     );
   }
 
+  // Helper function to format sector name for display
+  const formatSectorName = (sector: string) => {
+    // Format the sector name to be more readable if needed
+    return sector;
+  };
+
   return (
     <div className="min-h-screen bg-soft-gray">
       <div className="container py-8 space-y-8">
@@ -105,7 +111,9 @@ const CompanyDetails = () => {
           </Button>
           <div>
             <h1 className="text-4xl font-bold tracking-tight">{company.name}</h1>
-            <p className="text-muted-foreground">{company.sector} • {company.sub_sector}</p>
+            <p className="text-muted-foreground">
+              {formatSectorName(company.sector)} • {company.sub_sector}
+            </p>
           </div>
         </div>
 

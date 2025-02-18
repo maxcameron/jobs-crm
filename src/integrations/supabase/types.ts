@@ -55,7 +55,7 @@ export type Database = {
           headquarter_location: string
           id: string
           name: string
-          sector: Database["public"]["Enums"]["company_sector"]
+          sector: Database["public"]["Enums"]["company_sector"] | null
           sub_sector: string
           tags: string[] | null
           website_url: string
@@ -70,7 +70,7 @@ export type Database = {
           headquarter_location: string
           id?: string
           name: string
-          sector: Database["public"]["Enums"]["company_sector"]
+          sector?: Database["public"]["Enums"]["company_sector"] | null
           sub_sector: string
           tags?: string[] | null
           website_url: string
@@ -85,7 +85,7 @@ export type Database = {
           headquarter_location?: string
           id?: string
           name?: string
-          sector?: Database["public"]["Enums"]["company_sector"]
+          sector?: Database["public"]["Enums"]["company_sector"] | null
           sub_sector?: string
           tags?: string[] | null
           website_url?: string
@@ -199,30 +199,36 @@ export type Database = {
           created_at: string
           has_completed_onboarding: boolean | null
           id: string
-          locations: Database["public"]["Enums"]["company_location"][]
-          office_preferences: Database["public"]["Enums"]["office_preference"][]
-          sectors: Database["public"]["Enums"]["company_sector"][]
-          stages: Database["public"]["Enums"]["company_stage"][]
+          locations: Database["public"]["Enums"]["company_location"][] | null
+          office_preferences:
+            | Database["public"]["Enums"]["office_preference"][]
+            | null
+          sectors: Database["public"]["Enums"]["company_sector"][] | null
+          stages: Database["public"]["Enums"]["company_stage"][] | null
           user_id: string
         }
         Insert: {
           created_at?: string
           has_completed_onboarding?: boolean | null
           id?: string
-          locations?: Database["public"]["Enums"]["company_location"][]
-          office_preferences?: Database["public"]["Enums"]["office_preference"][]
-          sectors?: Database["public"]["Enums"]["company_sector"][]
-          stages?: Database["public"]["Enums"]["company_stage"][]
+          locations?: Database["public"]["Enums"]["company_location"][] | null
+          office_preferences?:
+            | Database["public"]["Enums"]["office_preference"][]
+            | null
+          sectors?: Database["public"]["Enums"]["company_sector"][] | null
+          stages?: Database["public"]["Enums"]["company_stage"][] | null
           user_id: string
         }
         Update: {
           created_at?: string
           has_completed_onboarding?: boolean | null
           id?: string
-          locations?: Database["public"]["Enums"]["company_location"][]
-          office_preferences?: Database["public"]["Enums"]["office_preference"][]
-          sectors?: Database["public"]["Enums"]["company_sector"][]
-          stages?: Database["public"]["Enums"]["company_stage"][]
+          locations?: Database["public"]["Enums"]["company_location"][] | null
+          office_preferences?:
+            | Database["public"]["Enums"]["office_preference"][]
+            | null
+          sectors?: Database["public"]["Enums"]["company_sector"][] | null
+          stages?: Database["public"]["Enums"]["company_stage"][] | null
           user_id?: string
         }
         Relationships: []
@@ -317,26 +323,52 @@ export type Database = {
         | "Stockholm"
         | "Tokyo"
       company_sector:
-        | "Artificial Intelligence (AI)"
+        | "Marketing Technology"
+        | "Business & Productivity Software"
+        | "Procurement Tech"
+        | "Marketplace"
         | "Fintech"
+        | "Logistics"
+        | "Artificial Intelligence"
+        | "PropTech"
+        | "SaaS"
+        | "Automotive Tech"
+        | "Energy Tech"
+        | "Construction Tech"
         | "HealthTech"
-        | "E-commerce & RetailTech"
-        | "Sales Tech & RevOps"
-        | "HR Tech & WorkTech"
-        | "PropTech (Real Estate Tech)"
-        | "LegalTech"
-        | "EdTech"
-        | "Cybersecurity"
-        | "Logistics & Supply Chain Tech"
-        | "Developer Tools & Web Infrastructure"
-        | "SaaS & Enterprise Software"
-        | "Marketing Tech (MarTech)"
+        | "Home Services Tech"
+        | "Communication Software"
+        | "Industrial Tech"
+        | "Medical Tech"
+        | "HR Tech"
+        | "Sales Tech"
+        | "Event Tech"
+        | "Legal Tech"
+        | "E-commerce"
+        | "Media & Information Services"
+        | "AdTech"
+        | "Travel Tech"
+        | "Data Infrastructure"
+        | "Recreation Tech"
         | "InsurTech"
+        | "FoodTech"
+        | "AgTech"
+        | "Market Intelligence"
+        | "Manufacturing Tech"
+        | "Customer Experience Tech"
+        | "Recruitment Tech"
+        | "Retail Tech"
+        | "Professional Training Tech"
         | "GovTech"
-        | "Marketplace Platforms"
-        | "Construction Tech & Fintech"
-        | "Mobility & Transportation Tech"
-        | "CleanTech & ClimateTech"
+        | "Sustainability Tech"
+        | "Childcare Tech"
+        | "Business Intelligence"
+        | "Entertainment Software"
+        | "EdTech"
+        | "Customer Support Tech"
+        | "Mobility Tech"
+        | "Nonprofit Tech"
+        | "Blockchain"
       company_stage:
         | "Seed"
         | "Series A"
