@@ -26,6 +26,7 @@ export function LocationPreferences({ availableLocations, selectedLocations, onC
       "Chicago",
       "Los Angeles",
       "Miami",
+      "Atlanta, GA"
     ],
     "Canada": ["Vancouver", "Toronto"],
     "United Kingdom": ["London"],
