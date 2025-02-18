@@ -44,12 +44,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .maybeSingle();
 
       if (error) {
-        if (error.code === '403') {
-          console.error("User authentication error:", error);
-          await handleSignOut();
-          return null;
-        }
-        throw error;
+        console.error("Preferences fetch error:", error);
+        return null;
       }
       return data;
     },
@@ -57,63 +53,57 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   const handleSignOut = async () => {
-    setIsLoading(true);
     try {
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error("Error signing out:", error);
       }
+      setSession(null);
+      navigate('/auth');
     } catch (error) {
       console.error("Error in handleSignOut:", error);
-    } finally {
-      // Always clear session and redirect regardless of errors
-      setSession(null);
-      setIsLoading(false);
-      navigate('/auth');
     }
   };
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Initial session check:", session?.user?.email || "No session");
-      setSession(session);
-      
-      if (!session && location.pathname !== '/auth') {
+    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      console.log("Initial session check:", initialSession?.user?.email || "No session");
+      if (initialSession?.user) {
+        setSession(initialSession);
+      } else if (location.pathname !== '/auth') {
         navigate('/auth');
       }
       setIsLoading(false);
-    }).catch(error => {
-      console.error("Error getting initial session:", error);
-      setIsLoading(false);
-      navigate('/auth');
     });
 
-    // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session?.user?.email);
-      setSession(session);
+    } = supabase.auth.onAuthStateChange(async (_event, currentSession) => {
+      console.log("Auth state changed:", _event, currentSession?.user?.email);
+      setSession(currentSession);
       
-      if (!session && location.pathname !== '/auth') {
+      if (!currentSession && location.pathname !== '/auth') {
         navigate('/auth');
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [navigate, location.pathname]);
 
-  // Handle onboarding redirects separately from auth state
+  // Handle onboarding redirects after confirming auth state
   useEffect(() => {
     if (!session || isLoading || preferencesLoading) return;
 
-    if (preferences && !preferences.has_completed_onboarding && !location.pathname.startsWith('/onboarding')) {
-      // Only redirect to onboarding if we explicitly know the user hasn't completed it
+    if (location.pathname === '/auth') {
+      if (preferences?.has_completed_onboarding) {
+        navigate('/');
+      } else {
+        navigate('/onboarding');
+      }
+    } else if (!preferences?.has_completed_onboarding && !location.pathname.startsWith('/onboarding')) {
       navigate('/onboarding');
-    } else if (preferences?.has_completed_onboarding && location.pathname === '/auth') {
-      // Redirect to home if user has completed onboarding and is on auth page
-      navigate('/');
     }
   }, [session, preferences, isLoading, preferencesLoading, location.pathname, navigate]);
 
