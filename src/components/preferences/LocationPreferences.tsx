@@ -17,7 +17,6 @@ interface LocationStructure {
 export function LocationPreferences({ availableLocations, selectedLocations, onChange }: LocationPreferencesProps) {
   // Group locations by country
   const groupedLocations: LocationStructure = {
-    "United Arab Emirates": ["Abu Dhabi"],
     "United States": [
       "New York",
       "San Francisco",
