@@ -18,6 +18,15 @@ interface CompaniesTableProps {
 }
 
 export function CompaniesTable({ companies, isLoading }: CompaniesTableProps) {
+  const getDisplayUrl = (url: string) => {
+    try {
+      const urlObject = new URL(url);
+      return urlObject.hostname;
+    } catch (error) {
+      return url;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -72,14 +81,18 @@ export function CompaniesTable({ companies, isLoading }: CompaniesTableProps) {
               <TableCell>{company.funding_date}</TableCell>
               <TableCell>{company.funding_amount}</TableCell>
               <TableCell>
-                <Link 
-                  to={company.website_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  {new URL(company.website_url).hostname}
-                </Link>
+                {company.website_url ? (
+                  <Link 
+                    to={company.website_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    {getDisplayUrl(company.website_url)}
+                  </Link>
+                ) : (
+                  <span className="text-muted-foreground">N/A</span>
+                )}
               </TableCell>
               <TableCell>{company.headquarter_location}</TableCell>
               <TableCell className="max-w-xl whitespace-normal">
