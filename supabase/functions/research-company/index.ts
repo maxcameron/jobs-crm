@@ -63,42 +63,41 @@ serve(async (req) => {
       throw new Error('OpenAI API key is not configured');
     }
 
-    const prompt = `I'm researching companies and need detailed information about the company at ${url}.
+    const prompt = `I need accurate, factual information about the company at ${url}. 
+    
+IMPORTANT: You must ONLY return information that you can verify through the company's website or through reputable sources like:
+- Crunchbase
+- LinkedIn
+- TechCrunch
+- Bloomberg
+- Reuters
+- SEC filings
+- Company press releases
 
-For this research:
-- Consult these additional resources while doing the research:
-  - https://techcrunch.com
-  - https://venturebeat.com
-  - https://dealroom.co
-  - https://sifted.eu 
-  - https://tracxn.com
-  - https://pitchbook.com
-  - https://www.thesaasnews.com
-
-Return the information in this JSON format, without any markdown formatting or code block syntax:
+Return the information in this JSON format:
 
 {
-  "name": "Company name (e.g., Walmart)",
+  "name": "Company name (exactly as shown on their website)",
   "sector": One of these exact values: ["Artificial Intelligence (AI)", "Fintech", "HealthTech", "E-commerce & RetailTech", "Sales Tech & RevOps", "HR Tech & WorkTech", "PropTech (Real Estate Tech)", "LegalTech", "EdTech", "Cybersecurity", "Logistics & Supply Chain Tech", "Developer Tools & Web Infrastructure", "SaaS & Enterprise Software", "Marketing Tech (MarTech)", "InsurTech", "GovTech", "Marketplace Platforms", "Construction Tech & Fintech", "Mobility & Transportation Tech", "CleanTech & ClimateTech"],
   "subSector": "Specific focus area (e.g., SMB, Insurance, Enterprise)",
-  "fundingType": "Most recent funding round (e.g., Pre-Seed, Seed, Series A, Series B, Series C, Venture)",
-  "fundingDate": "Date of most recent funding in MM/YYYY format (e.g., 02/2024)",
+  "fundingType": "Most recent funding round (e.g., Pre-Seed, Seed, Series A, Series B, Series C)",
+  "fundingDate": "Date of most recent funding in MM/YYYY format",
   "fundingAmount": "Most recent funding amount in USD, numbers only",
-  "websiteUrl": "Company's website URL",
+  "websiteUrl": "${url}",
   "headquarterLocation": "City, State/Country (e.g., San Francisco, CA)",
   "description": "Describe the company's main product/service in 20 words or less",
   "tags": ["array", "of", "relevant", "technology", "or", "industry", "tags"]
 }
 
-Important rules:
-1. Use ONLY the predefined sector values from the list
-2. Show ONLY the most recent funding round if multiple are found
-3. Description must be 20 words or less
-4. For fundingAmount, provide only numbers, no currency symbols or commas
-5. Dates must be in MM/YYYY format
-6. Location should be City, State/Country format
-7. Include 3-5 relevant tags
-8. Only include verified information from the website or additional resources provided`;
+Critical rules:
+1. The websiteUrl MUST be exactly "${url}" - do not change or modify it
+2. Use ONLY the predefined sector values from the list
+3. If you cannot find verified funding information, use "Not Disclosed" for fundingType, fundingDate, and 0 for fundingAmount
+4. If you cannot verify any piece of information, use "Not Available" for text fields or [] for arrays
+5. Description must be 20 words or less and based on their website/materials
+6. For fundingAmount, provide only numbers, no currency symbols or commas
+7. Include 3-5 relevant tags based on their actual technology/industry focus
+8. NEVER generate or guess information - if you can't verify it, mark it as Not Available`;
 
     console.log('Sending request to OpenAI...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -108,15 +107,15 @@ Important rules:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o',
         messages: [
           { 
             role: 'system', 
-            content: 'You are a precise company research assistant that returns only valid JSON without any markdown formatting or code blocks. You have access to various sources for company information and should strive to provide accurate, verified information.' 
+            content: 'You are a precise research assistant that ONLY returns verified company information. Never generate or guess information. Return only valid JSON without any markdown formatting.' 
           },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.1,
+        temperature: 0,
       }),
     });
 
@@ -131,6 +130,11 @@ Important rules:
     
     const companyData = cleanAndParseJSON(data.choices[0].message.content);
     console.log('Parsed company data:', companyData);
+
+    // Validate that the returned URL matches the input URL
+    if (companyData.websiteUrl !== url) {
+      throw new Error('OpenAI returned data for wrong company URL');
+    }
 
     // Validate sector
     const validSectors: CompanySector[] = [
