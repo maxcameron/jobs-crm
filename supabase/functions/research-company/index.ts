@@ -23,38 +23,43 @@ serve(async (req) => {
 
     console.log('Researching URL:', url);
 
-    const prompt = `Research the company at ${url} and provide ONLY a JSON response with detailed information.
-Focus on finding the most recent and accurate information.
+    const prompt = `Act as an expert company research analyst. Research the company at ${url} and provide ONLY a JSON response.
+
+CRITICAL: Before responding:
+1. Use CURRENT news sources and company announcements to find the MOST RECENT funding round
+2. Cross-reference multiple sources (TechCrunch, VentureBeat, company press releases, Crunchbase, etc.)
+3. Ensure you find the absolute latest funding information from 2024-2025
+4. Be highly specific in the sub-sector classification and company description
 
 Required format:
 {
   "name": "Full company name (e.g., Stack AI)",
   "sector": "One of: Artificial Intelligence (AI), Fintech, HealthTech, E-commerce & RetailTech, Sales Tech & RevOps, HR Tech & WorkTech, PropTech (Real Estate Tech), LegalTech, EdTech, Cybersecurity, Logistics & Supply Chain Tech, Developer Tools & Web Infrastructure, SaaS & Enterprise Software, Marketing Tech (MarTech), InsurTech, GovTech, Marketplace Platforms, Construction Tech & Fintech, Mobility & Transportation Tech, CleanTech & ClimateTech",
-  "subSector": "Be specific and descriptive (e.g., Enterprise Automation, AI-Powered Customer Service)",
+  "subSector": "Be VERY specific (e.g., 'AI-Powered Enterprise Process Automation' rather than just 'Enterprise Automation')",
   "fundingType": "Most recent funding round. One of: Seed, Series A, Series B, Series C, Series D, Series E and above",
-  "fundingDate": "Date of most recent funding in MM/YYYY format",
-  "fundingAmount": "Amount in USD (e.g., 16100000)",
+  "fundingDate": "Date of most recent funding in MM/YYYY format. Must be most current from 2024-2025 if available",
+  "fundingAmount": "Amount in USD (e.g., 16100000). Must be from most recent round",
   "headquarterLocation": "City, State/Country (e.g., San Francisco, CA)",
-  "description": "Clear, specific description of what the company does in 20 words or less"
+  "description": "Clear, specific description focusing on unique value proposition and technology in 20 words or less"
 }
 
-Important:
-- Search recent funding news on TechCrunch, VentureBeat, Dealroom, Sifted, Tracxn, PitchBook
-- Verify information across multiple sources
-- Focus on the most recent funding round
-- Make the sub-sector and description specific and meaningful
-- Return ONLY the JSON object, no additional text or markdown
+CRITICAL RESEARCH STEPS:
+1. First, search for funding announcements from 2024-2025
+2. Check company newsroom or press releases
+3. Verify details across multiple tech news sources
+4. Cross-reference with investment databases
+5. Ensure funding date and amount are from the MOST RECENT round only
 
-Example of good output:
+Example of expected detail level:
 {
   "name": "Stack AI",
   "sector": "Artificial Intelligence (AI)",
-  "subSector": "Enterprise Automation",
+  "subSector": "Enterprise Process Automation & LLM-based Workflow Orchestration",
   "fundingType": "Series A",
   "fundingDate": "10/2024",
   "fundingAmount": "16100000",
   "headquarterLocation": "San Francisco, CA",
-  "description": "Platform for deploying AI agents to automate back-office operations."
+  "description": "LLM-powered platform deploying autonomous AI agents for end-to-end automation of complex enterprise workflows and operations."
 }`;
 
     console.log('Sending request to OpenAI...');
@@ -70,11 +75,11 @@ Example of good output:
         messages: [
           { 
             role: 'system', 
-            content: 'You are a company research assistant. Return only valid JSON without any markdown formatting or additional text.' 
+            content: 'You are a company research analyst specializing in finding the most recent funding information and providing highly detailed company classifications. Always prioritize finding current (2024-2025) funding data. Return only valid JSON without any markdown formatting or additional text.' 
           },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.3, // Lower temperature for more consistent outputs
+        temperature: 0.2, // Even lower temperature for more focused research
       }),
     });
 
