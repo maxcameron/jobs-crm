@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -26,7 +25,6 @@ export function LocationPreferences({ availableLocations, selectedLocations, onC
       "Chicago",
       "Los Angeles",
       "Miami",
-      "Atlanta, GA"
     ],
     "Canada": ["Vancouver", "Toronto"],
     "United Kingdom": ["London"],
