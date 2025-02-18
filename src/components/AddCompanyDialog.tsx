@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,7 @@ export const AddCompanyDialog = ({ open, onOpenChange }: AddCompanyDialogProps) 
   const [isResearching, setIsResearching] = useState(false);
   const [formData, setFormData] = useState<AddCompanyForm>({
     name: "",
-    sector: "Artificial Intelligence (AI)",
+    sector: "Artificial Intelligence",
     subSector: "",
     fundingType: "Seed",
     fundingDate: "",
@@ -126,7 +127,7 @@ export const AddCompanyDialog = ({ open, onOpenChange }: AddCompanyDialogProps) 
       queryClient.invalidateQueries({ queryKey: ['adminCompanies'] });
       setFormData({
         name: "",
-        sector: "Artificial Intelligence (AI)",
+        sector: "Artificial Intelligence",
         subSector: "",
         fundingType: "Seed",
         fundingDate: "",
@@ -154,26 +155,52 @@ export const AddCompanyDialog = ({ open, onOpenChange }: AddCompanyDialogProps) 
   };
 
   const sectors: CompanySector[] = [
-    "Artificial Intelligence (AI)",
+    "Marketing Technology",
+    "Business & Productivity Software",
+    "Procurement Tech",
+    "Marketplace",
     "Fintech",
+    "Logistics",
+    "Artificial Intelligence",
+    "PropTech",
+    "SaaS",
+    "Automotive Tech",
+    "Energy Tech",
+    "Construction Tech",
     "HealthTech",
-    "E-commerce & RetailTech",
-    "Sales Tech & RevOps",
-    "HR Tech & WorkTech",
-    "PropTech (Real Estate Tech)",
-    "LegalTech",
-    "EdTech",
-    "Cybersecurity",
-    "Logistics & Supply Chain Tech",
-    "Developer Tools & Web Infrastructure",
-    "SaaS & Enterprise Software",
-    "Marketing Tech (MarTech)",
+    "Home Services Tech",
+    "Communication Software",
+    "Industrial Tech",
+    "Medical Tech",
+    "HR Tech",
+    "Sales Tech",
+    "Event Tech",
+    "Legal Tech",
+    "E-commerce",
+    "Media & Information Services",
+    "AdTech",
+    "Travel Tech",
+    "Data Infrastructure",
+    "Recreation Tech",
     "InsurTech",
+    "FoodTech",
+    "AgTech",
+    "Market Intelligence",
+    "Manufacturing Tech",
+    "Customer Experience Tech",
+    "Recruitment Tech",
+    "Retail Tech",
+    "Professional Training Tech",
     "GovTech",
-    "Marketplace Platforms",
-    "Construction Tech & Fintech",
-    "Mobility & Transportation Tech",
-    "CleanTech & ClimateTech",
+    "Sustainability Tech",
+    "Childcare Tech",
+    "Business Intelligence",
+    "Entertainment Software",
+    "EdTech",
+    "Customer Support Tech",
+    "Mobility Tech",
+    "Nonprofit Tech",
+    "Blockchain"
   ];
 
   const stages: CompanyStage[] = [
