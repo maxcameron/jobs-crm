@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -67,18 +66,13 @@ export const AddCompanyDialog = ({ open, onOpenChange }: AddCompanyDialogProps) 
     setIsResearching(true);
 
     try {
-      const response = await fetch('/functions/v1/research-company', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({ url: formData.websiteUrl }),
+      const response = await supabase.functions.invoke('research-company', {
+        body: { url: formData.websiteUrl }
       });
 
-      const data = await response.json();
+      if (response.error) throw new Error(response.error.message || 'Research failed');
       
-      if (!response.ok) throw new Error(data.error || 'Research failed');
+      const data = response.data;
 
       setFormData(prev => ({
         ...prev,
