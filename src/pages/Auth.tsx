@@ -11,7 +11,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +25,17 @@ const Auth = () => {
   const { session } = useAuth();
   const navigate = useNavigate();
 
+  // Clear any existing sessions on component mount
+  useEffect(() => {
+    const clearSession = async () => {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error clearing session:', error);
+      }
+    };
+    clearSession();
+  }, []);
+
   if (session) {
     return <Navigate to="/onboarding" replace />;
   }
@@ -33,17 +44,27 @@ const Auth = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
         console.error('Sign in error:', error);
+        let errorMessage = error.message;
+        if (error.message.includes('Invalid refresh token')) {
+          errorMessage = "Session expired. Please sign in again.";
+        }
         toast({
           title: "Error signing in",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive",
+        });
+      } else if (data.user) {
+        // Successful login
+        toast({
+          title: "Success",
+          description: "Successfully signed in",
         });
       }
     } catch (error: any) {
@@ -62,9 +83,12 @@ const Auth = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: window.location.origin,
+        }
       });
 
       if (error) {
