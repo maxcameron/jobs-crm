@@ -32,6 +32,7 @@ interface AddCompanyDialogProps {
 
 export const AddCompanyDialog = ({ open, onOpenChange }: AddCompanyDialogProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isResearching, setIsResearching] = useState(false);
   const [formData, setFormData] = useState<AddCompanyForm>({
     name: "",
     sector: "Artificial Intelligence (AI)",
@@ -51,6 +52,60 @@ export const AddCompanyDialog = ({ open, onOpenChange }: AddCompanyDialogProps) 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleResearch = async () => {
+    if (!formData.websiteUrl) {
+      toast({
+        title: "Error",
+        description: "Please enter a website URL to research.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsResearching(true);
+
+    try {
+      const response = await fetch('/functions/v1/research-company', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ url: formData.websiteUrl }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) throw new Error(data.error || 'Research failed');
+
+      setFormData(prev => ({
+        ...prev,
+        name: data.name || prev.name,
+        sector: data.sector || prev.sector,
+        subSector: data.subSector || prev.subSector,
+        fundingType: data.fundingType || prev.fundingType,
+        fundingDate: data.fundingDate || prev.fundingDate,
+        fundingAmount: data.fundingAmount || prev.fundingAmount,
+        headquarterLocation: data.headquarterLocation || prev.headquarterLocation,
+        description: data.description || prev.description,
+      }));
+
+      toast({
+        title: "Research Complete",
+        description: "Company information has been filled automatically.",
+      });
+    } catch (error) {
+      console.error('Research error:', error);
+      toast({
+        title: "Research Failed",
+        description: error instanceof Error ? error.message : "Failed to research company.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsResearching(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -143,6 +198,35 @@ export const AddCompanyDialog = ({ open, onOpenChange }: AddCompanyDialogProps) 
           <DialogTitle>Add New Company</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="websiteUrl">Company Website</Label>
+            <div className="flex gap-2">
+              <Input
+                id="websiteUrl"
+                name="websiteUrl"
+                type="url"
+                value={formData.websiteUrl}
+                onChange={handleChange}
+                placeholder="https://example.com"
+                required
+              />
+              <Button 
+                type="button" 
+                onClick={handleResearch}
+                disabled={isResearching}
+              >
+                {isResearching ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Researching...
+                  </>
+                ) : (
+                  "Research"
+                )}
+              </Button>
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name">Company Name</Label>
@@ -221,19 +305,6 @@ export const AddCompanyDialog = ({ open, onOpenChange }: AddCompanyDialogProps) 
                 value={formData.fundingAmount}
                 onChange={handleChange}
                 placeholder="e.g., 1,000,000"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="websiteUrl">Website URL</Label>
-              <Input
-                id="websiteUrl"
-                name="websiteUrl"
-                type="url"
-                value={formData.websiteUrl}
-                onChange={handleChange}
-                placeholder="https://example.com"
                 required
               />
             </div>
