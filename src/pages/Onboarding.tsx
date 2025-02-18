@@ -1,16 +1,18 @@
 
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { STEPS } from "./onboarding/types";
 import { ProgressIndicator } from "./onboarding/ProgressIndicator";
 import { StepContent } from "./onboarding/StepContent";
 import { CompanyStage, CompanySector, CompanyLocation, OfficePreference } from "@/components/preferences/types";
+import { supabase } from "@/integrations/supabase/client";
 
 const Onboarding = () => {
   const { session } = useAuth();
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [preferences, setPreferences] = useState<{
     stages: CompanyStage[];
@@ -51,9 +53,33 @@ const Onboarding = () => {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
+    } else {
+      // This is the last step, save preferences and redirect
+      try {
+        const { error: preferencesError } = await supabase
+          .from('user_tracking_preferences')
+          .upsert({
+            user_id: session.user.id,
+            stages: preferences.stages,
+            sectors: preferences.sectors,
+            locations: preferences.locations,
+            office_preferences: preferences.office_preferences,
+            has_completed_onboarding: true
+          });
+
+        if (preferencesError) {
+          console.error('Error saving preferences:', preferencesError);
+          return;
+        }
+
+        // Redirect to index page after successful save
+        navigate('/');
+      } catch (error) {
+        console.error('Error in handleNext:', error);
+      }
     }
   };
 
@@ -93,7 +119,7 @@ const Onboarding = () => {
             onClick={handleNext}
             disabled={isNextDisabled()}
           >
-            Next
+            {currentStep === STEPS.length - 1 ? 'Finish' : 'Next'}
             <ChevronRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
