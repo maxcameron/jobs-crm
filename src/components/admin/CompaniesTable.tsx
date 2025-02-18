@@ -39,7 +39,7 @@ export function CompaniesTable({ companies, isLoading }: CompaniesTableProps) {
             <TableHead>Funding Amount</TableHead>
             <TableHead>Website</TableHead>
             <TableHead>Location</TableHead>
-            <TableHead>Description</TableHead>
+            <TableHead className="max-w-xl">Description</TableHead>
             <TableHead>Tags</TableHead>
           </TableRow>
         </TableHeader>
@@ -82,7 +82,7 @@ export function CompaniesTable({ companies, isLoading }: CompaniesTableProps) {
                 </Link>
               </TableCell>
               <TableCell>{company.headquarter_location}</TableCell>
-              <TableCell className="max-w-md truncate">
+              <TableCell className="max-w-xl whitespace-normal">
                 {company.description}
               </TableCell>
               <TableCell>

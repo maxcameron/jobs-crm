@@ -76,7 +76,7 @@ export function CompaniesList({
             <TableHead>Funding Amount</TableHead>
             <TableHead>Website</TableHead>
             <TableHead>Location</TableHead>
-            <TableHead>Description</TableHead>
+            <TableHead className="max-w-xl">Description</TableHead>
             <TableHead>Tags</TableHead>
           </TableRow>
         </TableHeader>
@@ -121,7 +121,7 @@ export function CompaniesList({
                   </Link>
                 </TableCell>
                 <TableCell>{displayCompany.headquarterLocation}</TableCell>
-                <TableCell className="max-w-md truncate">
+                <TableCell className="max-w-xl whitespace-normal">
                   {displayCompany.description}
                 </TableCell>
                 <TableCell>
@@ -150,4 +150,3 @@ export function CompaniesList({
     </div>
   );
 }
-
