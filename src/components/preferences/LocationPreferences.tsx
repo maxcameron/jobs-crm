@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -17,15 +18,29 @@ export function LocationPreferences({ availableLocations, selectedLocations, onC
   // Group locations by country
   const groupedLocations: LocationStructure = {
     "United States": [
-      "New York",
-      "San Francisco",
-      "Boston",
-      "Austin",
-      "Seattle",
-      "Chicago",
-      "Los Angeles",
-      "Miami",
+      "Arlington, VA",
+      "Atlanta, GA",
+      "Austin, TX",
+      "Bend, OR",
+      "Berwyn, Pennsylvania",
+      "Boston, MA",
+      "Brooklyn, NY",
+      "Campbell, CA",
+      "Canton, MA",
+      "Charlotte, NC",
+      "Chicago, IL",
+      "Columbus, OH",
+      "Denver, CO",
+      "Des Moines, IA",
+      "Detroit, Michigan",
+      "Foster City, California",
+      "Los Angeles, CA",
+      "Miami, FL",
+      "New York, NY",
+      "San Francisco, CA",
+      "Seattle, WA"
     ],
+    "United Arab Emirates": ["Abu Dhabi"],
     "Canada": ["Vancouver", "Toronto"],
     "United Kingdom": ["London"],
     "Germany": ["Berlin"],
@@ -37,6 +52,7 @@ export function LocationPreferences({ availableLocations, selectedLocations, onC
     "Australia": ["Sydney"],
     "Japan": ["Tokyo"],
     "Israel": ["Tel Aviv"],
+    "Cayman Islands": ["George Town"]
   };
 
   const handleCountryChange = (country: string, checked: boolean) => {
@@ -134,13 +150,13 @@ export function LocationPreferences({ availableLocations, selectedLocations, onC
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {/* Render single locations first */}
-          {ungroupedLocations.map(location => renderSingleLocation(location))}
-          
           {/* Render country groups */}
           {Object.entries(groupedLocations)
             .sort(([a], [b]) => a.localeCompare(b)) // Sort countries alphabetically
             .map(([country, locations]) => renderCountryGroup(country, locations))}
+          
+          {/* Render any ungrouped locations last */}
+          {ungroupedLocations.map(location => renderSingleLocation(location))}
         </div>
       </CardContent>
     </Card>
