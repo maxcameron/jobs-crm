@@ -1,6 +1,7 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -45,6 +46,29 @@ function cleanAndParseJSON(text: string): any {
   }
 }
 
+function extractRelevantText(html: string): string {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  if (!doc) return '';
+
+  // Remove script and style elements
+  doc.querySelectorAll('script, style').forEach(el => el.remove());
+
+  // Get text from important elements
+  const titleText = doc.querySelector('title')?.textContent || '';
+  const metaDescription = doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+  const h1Text = Array.from(doc.querySelectorAll('h1')).map(el => el.textContent).join(' ');
+  const h2Text = Array.from(doc.querySelectorAll('h2')).slice(0, 3).map(el => el.textContent).join(' ');
+  const mainText = doc.querySelector('main')?.textContent || '';
+  
+  // Combine and clean the text
+  let combinedText = `${titleText} ${metaDescription} ${h1Text} ${h2Text} ${mainText}`
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 4000); // Limit to 4000 characters
+
+  return combinedText;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -61,37 +85,31 @@ serve(async (req) => {
       throw new Error('OpenAI API key is not configured');
     }
 
-    // First, let's get the company website content
+    // Fetch and extract relevant content from website
     console.log('Fetching website content...');
     const websiteResponse = await fetch(url);
-    const websiteContent = await websiteResponse.text();
+    const htmlContent = await websiteResponse.text();
+    const relevantContent = extractRelevantText(htmlContent);
     
-    const prompt = `You are a precise company research assistant. I need you to analyze this company website content and provide accurate information.
+    console.log('Extracted content length:', relevantContent.length);
+    
+    const prompt = `Analyze this company's website content and provide accurate information. Only use the information provided:
 
-Website URL: ${url}
-Website Content: """${websiteContent}"""
+${relevantContent}
 
-VERY IMPORTANT RULES:
-1. ONLY use information directly visible in the provided website content
-2. If you cannot find specific information in the website content, use "Not Available" or "Not Disclosed"
-3. DO NOT make assumptions or generate information
-4. DO NOT use external sources - ONLY use the provided website content
-
-Return a JSON object with these fields:
+Return a JSON object strictly following this format:
 {
-  "name": "Company name (exactly as shown on their website)",
-  "sector": One of these exact values: ["Artificial Intelligence (AI)", "Fintech", "HealthTech", "E-commerce & RetailTech", "Sales Tech & RevOps", "HR Tech & WorkTech", "PropTech (Real Estate Tech)", "LegalTech", "EdTech", "Cybersecurity", "Logistics & Supply Chain Tech", "Developer Tools & Web Infrastructure", "SaaS & Enterprise Software", "Marketing Tech (MarTech)", "InsurTech", "GovTech", "Marketplace Platforms", "Construction Tech & Fintech", "Mobility & Transportation Tech", "CleanTech & ClimateTech"],
-  "subSector": "Specific focus area from website (e.g., SMB, Insurance, Enterprise)",
+  "name": "Company name from website",
+  "sector": One of ["Artificial Intelligence (AI)", "Fintech", "HealthTech", "E-commerce & RetailTech", "Sales Tech & RevOps", "HR Tech & WorkTech", "PropTech (Real Estate Tech)", "LegalTech", "EdTech", "Cybersecurity", "Logistics & Supply Chain Tech", "Developer Tools & Web Infrastructure", "SaaS & Enterprise Software", "Marketing Tech (MarTech)", "InsurTech", "GovTech", "Marketplace Platforms", "Construction Tech & Fintech", "Mobility & Transportation Tech", "CleanTech & ClimateTech"],
+  "subSector": "Specific focus area from content",
   "fundingType": "Not Disclosed",
   "fundingDate": "Not Disclosed",
   "fundingAmount": "0",
   "websiteUrl": "${url}",
-  "headquarterLocation": "Location if shown on website, otherwise Not Available",
-  "description": "Main product/service description in 20 words or less from website content",
-  "tags": ["3-5 relevant tags based on website content"]
-}
-
-For the sector field, choose the MOST appropriate category from the provided list based on the website content.`;
+  "headquarterLocation": "Location from content or Not Available",
+  "description": "Main product/service description in 20 words or less",
+  "tags": ["3-5 relevant tags"]
+}`;
 
     console.log('Sending request to OpenAI...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -105,7 +123,7 @@ For the sector field, choose the MOST appropriate category from the provided lis
         messages: [
           { 
             role: 'system', 
-            content: 'You are a precise research assistant. Only use information directly from the provided website content. Never make assumptions or generate information. Only return valid JSON.' 
+            content: 'You are a precise research assistant that analyzes company websites. Only use the provided content. Never make assumptions or generate information.' 
           },
           { role: 'user', content: prompt }
         ],
