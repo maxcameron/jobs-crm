@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -12,43 +13,43 @@ interface LocationPreferencesProps {
 export function LocationPreferences({ availableLocations, selectedLocations, onChange }: LocationPreferencesProps) {
   // Group locations by region to help users make better decisions
   const groupedLocations = availableLocations.reduce((groups, location) => {
-    const region = getRegion(location);
-    if (!groups[region]) {
-      groups[region] = [];
+    const country = getCountry(location);
+    if (!groups[country]) {
+      groups[country] = [];
     }
-    groups[region].push(location);
+    groups[country].push(location);
     return groups;
   }, {} as Record<string, CompanyLocation[]>);
 
-  const handleRegionChange = (region: string, checked: boolean) => {
-    const regionLocations = groupedLocations[region];
+  const handleCountryChange = (country: string, checked: boolean) => {
+    const countryLocations = groupedLocations[country];
     if (checked) {
-      // Add all locations from the region that aren't already selected
+      // Add all locations from the country that aren't already selected
       const newLocations = [
         ...selectedLocations,
-        ...regionLocations.filter(loc => !selectedLocations.includes(loc))
+        ...countryLocations.filter(loc => !selectedLocations.includes(loc))
       ];
       onChange(newLocations);
     } else {
-      // Remove all locations from this region
+      // Remove all locations from this country
       const newLocations = selectedLocations.filter(
-        loc => !regionLocations.includes(loc)
+        loc => !countryLocations.includes(loc)
       );
       onChange(newLocations);
     }
   };
 
-  const isRegionFullySelected = (region: string) => {
-    const regionLocations = groupedLocations[region];
-    return regionLocations.every(loc => selectedLocations.includes(loc));
+  const isCountryFullySelected = (country: string) => {
+    const countryLocations = groupedLocations[country];
+    return countryLocations.every(loc => selectedLocations.includes(loc));
   };
 
-  const isRegionPartiallySelected = (region: string) => {
-    const regionLocations = groupedLocations[region];
-    const selectedCount = regionLocations.filter(loc => 
+  const isCountryPartiallySelected = (country: string) => {
+    const countryLocations = groupedLocations[country];
+    const selectedCount = countryLocations.filter(loc => 
       selectedLocations.includes(loc)
     ).length;
-    return selectedCount > 0 && selectedCount < regionLocations.length;
+    return selectedCount > 0 && selectedCount < countryLocations.length;
   };
 
   return (
@@ -58,16 +59,16 @@ export function LocationPreferences({ availableLocations, selectedLocations, onC
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          {Object.entries(groupedLocations).map(([region, locations]) => (
-            <div key={region} className="space-y-3">
+          {Object.entries(groupedLocations).map(([country, locations]) => (
+            <div key={country} className="space-y-3">
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id={`region-${region}`}
-                  checked={isRegionFullySelected(region)}
-                  className={isRegionPartiallySelected(region) ? "bg-primary/50" : ""}
-                  onCheckedChange={(checked) => handleRegionChange(region, checked as boolean)}
+                  id={`country-${country}`}
+                  checked={isCountryFullySelected(country)}
+                  className={isCountryPartiallySelected(country) ? "bg-primary/50" : ""}
+                  onCheckedChange={(checked) => handleCountryChange(country, checked as boolean)}
                 />
-                <Label htmlFor={`region-${region}`} className="font-medium text-sm">{region}</Label>
+                <Label htmlFor={`country-${country}`} className="font-medium text-sm">{country}</Label>
               </div>
               <div className="grid gap-4 ml-6">
                 {locations.map((location) => (
@@ -95,16 +96,29 @@ export function LocationPreferences({ availableLocations, selectedLocations, onC
   );
 }
 
-// Helper function to group locations by region
-function getRegion(location: CompanyLocation): string {
-  const northAmerica = ["New York", "San Francisco", "Boston", "Austin", "Seattle", "Chicago", "Los Angeles", "Miami", "Vancouver"];
-  const europe = ["London", "Berlin", "Paris", "Amsterdam", "Dublin", "Stockholm"];
-  const asiaPacific = ["Singapore", "Sydney", "Tokyo"];
-  const middleEast = ["Tel Aviv"];
+// Helper function to group locations by country
+function getCountry(location: CompanyLocation): string {
+  const locationMap: Record<string, string> = {
+    "New York": "United States",
+    "San Francisco": "United States",
+    "Boston": "United States",
+    "Austin": "United States",
+    "Seattle": "United States",
+    "Chicago": "United States",
+    "Los Angeles": "United States",
+    "Miami": "United States",
+    "Vancouver": "Canada",
+    "London": "United Kingdom",
+    "Berlin": "Germany",
+    "Paris": "France",
+    "Amsterdam": "Netherlands",
+    "Dublin": "Ireland",
+    "Stockholm": "Sweden",
+    "Singapore": "Singapore",
+    "Sydney": "Australia",
+    "Tokyo": "Japan",
+    "Tel Aviv": "Israel"
+  };
 
-  if (northAmerica.includes(location)) return "North America";
-  if (europe.includes(location)) return "Europe";
-  if (asiaPacific.includes(location)) return "Asia Pacific";
-  if (middleEast.includes(location)) return "Middle East";
-  return "Other";
+  return locationMap[location] || location;
 }
