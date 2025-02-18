@@ -41,7 +41,7 @@ const Onboarding = () => {
         return preferences.sectors.length === 0;
       case "locations":
         return preferences.locations.length === 0;
-      case "office_preferences":  // This was the issue - wrong case name
+      case "office":  // This matches the type definition in STEPS
         return preferences.office_preferences.length === 0;
       default:
         return false;
