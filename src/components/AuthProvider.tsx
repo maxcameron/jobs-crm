@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     queryKey: ['preferences', session?.user.id],
     queryFn: async () => {
       if (!session?.user.id) return null;
+      console.log("Fetching preferences for user:", session.user.id);
       const { data, error } = await supabase
         .from('user_tracking_preferences')
         .select('has_completed_onboarding')
@@ -47,6 +48,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.error("Preferences fetch error:", error);
         return null;
       }
+      console.log("Fetched preferences:", data);
       return data;
     },
     enabled: !!session?.user.id,
@@ -95,14 +97,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Handle onboarding redirects after confirming auth state
   useEffect(() => {
     if (!session || isLoading || preferencesLoading) return;
+    console.log("Checking onboarding status:", {
+      path: location.pathname,
+      preferences,
+      isLoading,
+      preferencesLoading
+    });
 
-    if (location.pathname === '/auth') {
-      if (preferences?.has_completed_onboarding) {
-        navigate('/');
-      } else {
-        navigate('/onboarding');
-      }
-    } else if (!preferences?.has_completed_onboarding && !location.pathname.startsWith('/onboarding')) {
+    // Don't redirect if we're already on the auth or onboarding pages
+    if (location.pathname === '/auth' || location.pathname.startsWith('/onboarding')) return;
+
+    // Only redirect to onboarding if we have confirmed the user hasn't completed it
+    if (preferences === null || preferences?.has_completed_onboarding === false) {
+      console.log("Redirecting to onboarding - preferences:", preferences);
       navigate('/onboarding');
     }
   }, [session, preferences, isLoading, preferencesLoading, location.pathname, navigate]);
