@@ -10,14 +10,14 @@ import { COUNTRY_LOCATIONS } from "./locationTypes";
 import { useLocationMappings } from "@/hooks/useLocationMappings";
 
 interface LocationPreferencesProps {
-  availableLocations: CompanyLocation[];
-  selectedLocations: CompanyLocation[];
+  availableLocations?: CompanyLocation[];
+  selectedLocations?: CompanyLocation[];
   onChange: (locations: CompanyLocation[]) => void;
 }
 
 export function LocationPreferences({
-  availableLocations,
-  selectedLocations,
+  availableLocations = [],
+  selectedLocations = [],
   onChange,
 }: LocationPreferencesProps) {
   const [searchQuery, setSearchQuery] = useState("");
