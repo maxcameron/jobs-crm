@@ -1,4 +1,3 @@
-
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { useState } from "react";
@@ -10,6 +9,7 @@ import { StepContent } from "./onboarding/StepContent";
 import { CompanyStage, CompanySector, CompanyLocation, OfficePreference } from "@/components/preferences/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "react-query";
 
 const Onboarding = () => {
   const { session } = useAuth();
@@ -17,6 +17,7 @@ const Onboarding = () => {
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const queryClient = useQueryClient();
   const [preferences, setPreferences] = useState<{
     stages: CompanyStage[];
     sectors: CompanySector[];
@@ -51,17 +52,20 @@ const Onboarding = () => {
   };
 
   const verifyPreferencesSaved = async (userId: string): Promise<boolean> => {
+    console.log("[Onboarding] Verifying preferences for user:", userId);
+    
     const { data, error } = await supabase
       .from('user_tracking_preferences')
-      .select('has_completed_onboarding')
+      .select('*')
       .eq('user_id', userId)
       .maybeSingle();
 
     if (error) {
-      console.error("Error verifying preferences:", error);
+      console.error("[Onboarding] Error verifying preferences:", error);
       return false;
     }
 
+    console.log("[Onboarding] Verification data from DB:", data);
     return data?.has_completed_onboarding === true;
   };
 
@@ -73,6 +77,8 @@ const Onboarding = () => {
 
     // This is the last step, save preferences and redirect
     setIsSubmitting(true);
+    console.log("[Onboarding] Starting preferences save...");
+    
     try {
       const preferencesData = {
         stages: preferences.stages,
@@ -83,21 +89,37 @@ const Onboarding = () => {
         user_id: session.user.id
       };
 
-      const { error } = await supabase
+      console.log("[Onboarding] Saving preferences data:", preferencesData);
+
+      const { data, error } = await supabase
         .from('user_tracking_preferences')
         .upsert(preferencesData, { 
           onConflict: 'user_id',
           ignoreDuplicates: false 
-        });
+        })
+        .select();
 
       if (error) throw error;
+
+      console.log("[Onboarding] Upsert response:", data);
 
       // Verify the preferences were saved
       const isVerified = await verifyPreferencesSaved(session.user.id);
       
+      console.log("[Onboarding] Preferences verification result:", isVerified);
+
       if (!isVerified) {
         throw new Error("Failed to verify preferences were saved");
       }
+
+      // Invalidate the preferences query to force a fresh fetch
+      console.log("[Onboarding] Invalidating preferences cache");
+      await queryClient.invalidateQueries({ queryKey: ['preferences', session.user.id] });
+
+      // Force an immediate refetch
+      await queryClient.refetchQueries({ queryKey: ['preferences', session.user.id] });
+
+      console.log("[Onboarding] Cache invalidated and refetched");
 
       toast({
         title: "Success",
@@ -105,12 +127,14 @@ const Onboarding = () => {
       });
 
       // Use a short delay to ensure the database update is processed
+      console.log("[Onboarding] Preparing for navigation...");
       setTimeout(() => {
+        console.log("[Onboarding] Navigating to home...");
         navigate('/', { replace: true });
-      }, 500);
+      }, 1000);
 
     } catch (error) {
-      console.error('Error saving preferences:', error);
+      console.error("[Onboarding] Error saving preferences:", error);
       toast({
         title: "Error",
         description: "Failed to save preferences. Please try again.",
