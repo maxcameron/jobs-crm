@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log("Fetching preferences for user:", session.user.id);
       const { data, error } = await supabase
         .from('user_tracking_preferences')
-        .select('has_completed_onboarding')
+        .select('*')  // Select all fields to ensure we have complete data
         .eq('user_id', session.user.id)
         .maybeSingle();
 
@@ -52,6 +52,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return data;
     },
     enabled: !!session?.user.id,
+    staleTime: 1000, // Add a small stale time to prevent immediate refetches
+    refetchOnMount: true, // Ensure we always have fresh data when mounting
   });
 
   const handleSignOut = async () => {
@@ -101,6 +103,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log("Checking onboarding status:", {
       path: location.pathname,
       preferences,
+      hasCompletedOnboarding: preferences?.has_completed_onboarding,
       isLoading,
       preferencesLoading
     });
@@ -108,23 +111,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Don't redirect if we're already on the auth or onboarding pages
     if (location.pathname === '/auth' || location.pathname === '/onboarding') return;
 
-    // If preferences don't exist or onboarding is not completed, redirect to onboarding
-    if (!preferences?.has_completed_onboarding) {
-      console.log("Redirecting to onboarding - preferences:", preferences);
+    // Explicitly check for false value of has_completed_onboarding
+    if (preferences?.has_completed_onboarding === false) {
+      console.log("Redirecting to onboarding - not completed");
       navigate('/onboarding', { replace: true });
     }
   }, [session, preferences, isLoading, preferencesLoading, location.pathname, navigate]);
 
   const value = {
     session,
-    isLoading,
+    isLoading: isLoading || preferencesLoading,
     supabase,
     handleSignOut,
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!isLoading && children}
+      {!isLoading && !preferencesLoading && children}
     </AuthContext.Provider>
   );
 };

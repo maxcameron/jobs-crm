@@ -50,6 +50,21 @@ const Onboarding = () => {
     }
   };
 
+  const verifyPreferencesSaved = async (userId: string): Promise<boolean> => {
+    const { data, error } = await supabase
+      .from('user_tracking_preferences')
+      .select('has_completed_onboarding')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Error verifying preferences:", error);
+      return false;
+    }
+
+    return data?.has_completed_onboarding === true;
+  };
+
   const handleNext = async () => {
     if (currentStep < STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -59,13 +74,6 @@ const Onboarding = () => {
     // This is the last step, save preferences and redirect
     setIsSubmitting(true);
     try {
-      // First check if a record exists
-      const { data: existingPreferences } = await supabase
-        .from('user_tracking_preferences')
-        .select('id')
-        .eq('user_id', session.user.id)
-        .single();
-
       const preferencesData = {
         stages: preferences.stages,
         sectors: preferences.sectors,
@@ -75,17 +83,20 @@ const Onboarding = () => {
         user_id: session.user.id
       };
 
-      const { error } = existingPreferences
-        ? await supabase
-            .from('user_tracking_preferences')
-            .update(preferencesData)
-            .eq('user_id', session.user.id)
-        : await supabase
-            .from('user_tracking_preferences')
-            .insert([preferencesData]);
+      const { error } = await supabase
+        .from('user_tracking_preferences')
+        .upsert(preferencesData, { 
+          onConflict: 'user_id',
+          ignoreDuplicates: false 
+        });
 
-      if (error) {
-        throw error;
+      if (error) throw error;
+
+      // Verify the preferences were saved
+      const isVerified = await verifyPreferencesSaved(session.user.id);
+      
+      if (!isVerified) {
+        throw new Error("Failed to verify preferences were saved");
       }
 
       toast({
@@ -93,11 +104,10 @@ const Onboarding = () => {
         description: "Your preferences have been saved.",
       });
 
-      // Use setTimeout to ensure the state update and toast are processed
-      // before navigation
+      // Use a short delay to ensure the database update is processed
       setTimeout(() => {
         navigate('/', { replace: true });
-      }, 100);
+      }, 500);
 
     } catch (error) {
       console.error('Error saving preferences:', error);
