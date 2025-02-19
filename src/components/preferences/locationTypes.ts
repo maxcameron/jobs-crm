@@ -16,34 +16,38 @@ export interface LocationGroup {
 }
 
 export const US_REGIONS = {
-  Northeast: [
+  "Massachusetts": [
     "Boston",
+  ],
+  "New York": [
     "New York",
   ],
-  Southeast: [
+  "Florida": [
     "Miami",
+  ],
+  "Georgia": [
     "Atlanta",
   ],
-  Midwest: [
+  "Illinois": [
     "Chicago",
+  ],
+  "Michigan": [
     "Detroit",
   ],
-  Southwest: [
+  "Texas": [
     "Austin",
   ],
-  "West Coast": [
+  "California": [
     "San Francisco",
     "Los Angeles",
+  ],
+  "Washington": [
     "Seattle",
   ],
-  Mountain: [
+  "Colorado": [
     "Denver",
   ],
-  Other: [
-    "Boston",
-    "Austin",
-  ],
-} as const;
+};
 
 export const COUNTRY_LOCATIONS: LocationGroup = {
   "United States": {
