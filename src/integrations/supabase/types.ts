@@ -173,6 +173,27 @@ export type Database = {
           },
         ]
       }
+      location_mappings: {
+        Row: {
+          created_at: string
+          full_form: string
+          id: string
+          short_form: string
+        }
+        Insert: {
+          created_at?: string
+          full_form: string
+          id?: string
+          short_form: string
+        }
+        Update: {
+          created_at?: string
+          full_form?: string
+          id?: string
+          short_form?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -199,7 +220,6 @@ export type Database = {
           created_at: string
           has_completed_onboarding: boolean | null
           id: string
-          locations: Database["public"]["Enums"]["company_location"][] | null
           office_preferences:
             | Database["public"]["Enums"]["office_preference"][]
             | null
@@ -211,7 +231,6 @@ export type Database = {
           created_at?: string
           has_completed_onboarding?: boolean | null
           id?: string
-          locations?: Database["public"]["Enums"]["company_location"][] | null
           office_preferences?:
             | Database["public"]["Enums"]["office_preference"][]
             | null
@@ -223,7 +242,6 @@ export type Database = {
           created_at?: string
           has_completed_onboarding?: boolean | null
           id?: string
-          locations?: Database["public"]["Enums"]["company_location"][] | null
           office_preferences?:
             | Database["public"]["Enums"]["office_preference"][]
             | null
@@ -302,26 +320,83 @@ export type Database = {
     Enums: {
       app_role: "admin" | "user"
       company_location:
-        | "New York"
-        | "San Francisco"
-        | "London"
-        | "Berlin"
-        | "Paris"
-        | "Toronto"
+        | "Abu Dhabi"
         | "Amsterdam"
+        | "Arlington"
+        | "Atlanta"
+        | "Austin"
+        | "Bend"
+        | "Berlin"
+        | "Berwyn"
+        | "Boston"
+        | "Brooklyn"
+        | "Brookline"
+        | "Campbell"
+        | "Canton"
+        | "Charlotte"
+        | "Chicago"
+        | "Columbus"
+        | "Denver"
+        | "Des Moines"
+        | "Detroit"
+        | "Distributed"
+        | "Dublin"
+        | "Fort Collins"
+        | "Foster City"
+        | "George Town"
+        | "Greenwood Village"
+        | "Holmdel"
+        | "Irvine"
+        | "Jersey City"
+        | "Kansas City"
+        | "Karlsruhe"
+        | "Lehi"
+        | "Lewes"
+        | "London"
+        | "Los Altos"
+        | "Los Angeles"
+        | "Medellín"
+        | "Menlo Park"
+        | "Miami"
+        | "Middletown"
+        | "Munich"
+        | "Newton"
+        | "New York"
+        | "North Miami Beach"
+        | "Oakland"
+        | "Omaha"
+        | "Or Yehuda"
+        | "Palo Alto"
+        | "Paris"
+        | "Phoenix"
+        | "Portland"
+        | "Raleigh"
+        | "Redmond"
+        | "Redwood City"
+        | "Salt Lake City"
+        | "San Francisco"
+        | "San Jose"
+        | "San Mateo"
+        | "San Rafael"
+        | "Santa Ana"
+        | "Santa Cruz"
+        | "São Paulo"
+        | "Seattle"
+        | "Silver Spring"
         | "Singapore"
+        | "Stamford"
+        | "Stockholm"
+        | "Sunnyvale"
         | "Sydney"
         | "Tel Aviv"
-        | "Boston"
-        | "Austin"
-        | "Seattle"
-        | "Chicago"
-        | "Los Angeles"
-        | "Miami"
-        | "Vancouver"
-        | "Dublin"
-        | "Stockholm"
         | "Tokyo"
+        | "Toronto"
+        | "Vancouver"
+        | "Washington"
+        | "West Hollywood"
+        | "West Palm Beach"
+        | "Woodstock"
+        | "Youngstown"
       company_sector:
         | "Marketing Technology"
         | "Business and Productivity Software"
