@@ -16,6 +16,7 @@ const Onboarding = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [preferences, setPreferences] = useState<{
     stages: CompanyStage[];
     sectors: CompanySector[];
@@ -52,68 +53,61 @@ const Onboarding = () => {
   const handleNext = async () => {
     if (currentStep < STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
-    } else {
-      // This is the last step, save preferences and redirect
-      try {
-        // First check if a record exists
-        const { data: existingPreferences } = await supabase
-          .from('user_tracking_preferences')
-          .select('id')
-          .eq('user_id', session.user.id)
-          .single();
+      return;
+    }
 
-        let error;
-        const preferencesData = {
-          stages: preferences.stages,
-          sectors: preferences.sectors,
-          locations: preferences.locations,
-          office_preferences: preferences.office_preferences,
-          has_completed_onboarding: true,
-          user_id: session.user.id
-        };
-        
-        if (existingPreferences) {
-          // Update existing record
-          const { error: updateError } = await supabase
+    // This is the last step, save preferences and redirect
+    setIsSubmitting(true);
+    try {
+      // First check if a record exists
+      const { data: existingPreferences } = await supabase
+        .from('user_tracking_preferences')
+        .select('id')
+        .eq('user_id', session.user.id)
+        .single();
+
+      const preferencesData = {
+        stages: preferences.stages,
+        sectors: preferences.sectors,
+        locations: preferences.locations,
+        office_preferences: preferences.office_preferences,
+        has_completed_onboarding: true,
+        user_id: session.user.id
+      };
+
+      const { error } = existingPreferences
+        ? await supabase
             .from('user_tracking_preferences')
             .update(preferencesData)
-            .eq('user_id', session.user.id);
-          
-          error = updateError;
-        } else {
-          // Insert new record
-          const { error: insertError } = await supabase
+            .eq('user_id', session.user.id)
+        : await supabase
             .from('user_tracking_preferences')
             .insert([preferencesData]);
-          
-          error = insertError;
-        }
 
-        if (error) {
-          console.error('Error saving preferences:', error);
-          toast({
-            title: "Error",
-            description: "Failed to save preferences. Please try again.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        toast({
-          title: "Success",
-          description: "Your preferences have been saved.",
-        });
-
-        // Redirect to index page after successful save
-        navigate('/', { replace: true });
-      } catch (error) {
-        console.error('Error in handleNext:', error);
-        toast({
-          title: "Error",
-          description: "An unexpected error occurred. Please try again.",
-          variant: "destructive",
-        });
+      if (error) {
+        throw error;
       }
+
+      toast({
+        title: "Success",
+        description: "Your preferences have been saved.",
+      });
+
+      // Use setTimeout to ensure the state update and toast are processed
+      // before navigation
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 100);
+
+    } catch (error) {
+      console.error('Error saving preferences:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save preferences. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -143,7 +137,7 @@ const Onboarding = () => {
           <Button
             variant="outline"
             onClick={handleBack}
-            disabled={currentStep === 0}
+            disabled={currentStep === 0 || isSubmitting}
           >
             <ChevronLeft className="w-4 h-4 mr-2" />
             Back
@@ -151,10 +145,19 @@ const Onboarding = () => {
 
           <Button
             onClick={handleNext}
-            disabled={isNextDisabled()}
+            disabled={isNextDisabled() || isSubmitting}
           >
-            {currentStep === STEPS.length - 1 ? 'Finish' : 'Next'}
-            <ChevronRight className="w-4 h-4 ml-2" />
+            {currentStep === STEPS.length - 1 ? (
+              <>
+                {isSubmitting ? 'Saving...' : 'Finish'}
+                <ChevronRight className="w-4 h-4 ml-2" />
+              </>
+            ) : (
+              <>
+                Next
+                <ChevronRight className="w-4 h-4 ml-2" />
+              </>
+            )}
           </Button>
         </div>
       </div>
