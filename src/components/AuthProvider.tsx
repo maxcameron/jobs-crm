@@ -100,50 +100,51 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Navigation logic
   useEffect(() => {
-    // Don't navigate while loading or if we don't have a session
-    if (isLoading) {
-      console.log("[AuthProvider] Still loading initial session");
+    // Don't make any navigation decisions until we have both session and preferences loaded
+    const isInitializing = isLoading || (session && preferencesLoading);
+    if (isInitializing) {
+      console.log("[AuthProvider] Still initializing:", {
+        isLoading,
+        hasSession: !!session,
+        preferencesLoading
+      });
       return;
     }
+
+    console.log("[AuthProvider] Ready to handle navigation:", {
+      path: location.pathname,
+      hasSession: !!session,
+      preferences,
+      isAuthPath: location.pathname === '/auth'
+    });
 
     // No session means redirect to auth (unless already there)
-    if (!session && location.pathname !== '/auth') {
-      console.log("[AuthProvider] No session, redirecting to auth");
-      navigate('/auth');
-      return;
-    }
-
-    // If we have a session but are still loading preferences, wait
-    if (session && preferencesLoading) {
-      console.log("[AuthProvider] Session available but still loading preferences");
-      return;
-    }
-
-    // Now we can make navigation decisions based on complete data
-    if (session) {
-      console.log("[AuthProvider] Making navigation decision:", {
-        path: location.pathname,
-        hasCompletedOnboarding: preferences?.has_completed_onboarding,
-      });
-
-      // Handle auth page redirects
-      if (location.pathname === '/auth') {
-        if (preferences?.has_completed_onboarding) {
-          console.log("[AuthProvider] Redirecting to home - onboarding completed");
-          navigate('/', { replace: true });
-        } else {
-          console.log("[AuthProvider] Redirecting to onboarding - not completed");
-          navigate('/onboarding', { replace: true });
-        }
-        return;
+    if (!session) {
+      if (location.pathname !== '/auth') {
+        console.log("[AuthProvider] No session, redirecting to auth");
+        navigate('/auth');
       }
+      return;
+    }
 
-      // Handle onboarding redirect for non-completed users
-      if (!preferences?.has_completed_onboarding && location.pathname !== '/onboarding') {
+    // If we reach here, we have a session and preferences are loaded
+    const hasCompletedOnboarding = preferences?.has_completed_onboarding;
+
+    // User has session but hasn't completed onboarding
+    if (!hasCompletedOnboarding) {
+      if (location.pathname !== '/onboarding') {
         console.log("[AuthProvider] Redirecting to onboarding - not completed");
         navigate('/onboarding', { replace: true });
       }
+      return;
     }
+
+    // User has completed onboarding
+    if (location.pathname === '/auth' || location.pathname === '/onboarding') {
+      console.log("[AuthProvider] Redirecting to home - onboarding completed");
+      navigate('/', { replace: true });
+    }
+
   }, [session, isLoading, preferencesLoading, preferences, location.pathname, navigate]);
 
   const value = {
