@@ -44,8 +44,10 @@ export function CompaniesList({
   selectedStage, 
   searchQuery 
 }: CompaniesListProps) {
-  const formatCurrency = (amount: string | number) => {
+  const formatCurrency = (amount: string | number | null | undefined) => {
+    if (!amount) return 'N/A';
     const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    if (isNaN(numAmount)) return 'N/A';
     return `$${numAmount.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
   };
 
