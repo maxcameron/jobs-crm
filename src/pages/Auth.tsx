@@ -11,7 +11,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,18 +23,6 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const { toast } = useToast();
   const { session } = useAuth();
-  const navigate = useNavigate();
-
-  // Clear any existing sessions on component mount
-  useEffect(() => {
-    const clearSession = async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Error clearing session:', error);
-      }
-    };
-    clearSession();
-  }, []);
 
   // If user is already authenticated, let AuthProvider handle the redirect
   if (session) {
@@ -105,7 +93,6 @@ const Auth = () => {
           title: "Success",
           description: "Account created successfully. Redirecting...",
         });
-        // Remove manual navigation and let AuthProvider handle it
       }
     } catch (error: any) {
       console.error('[Auth] Auth error:', error);
