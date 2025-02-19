@@ -1,4 +1,3 @@
-
 import { Company } from "@/types/company";
 import { 
   Table,
@@ -25,6 +24,11 @@ export function CompaniesTable({ companies, isLoading }: CompaniesTableProps) {
     } catch (error) {
       return url;
     }
+  };
+
+  const formatCurrency = (amount: string | number) => {
+    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    return `$${numAmount.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
   };
 
   if (isLoading) {
@@ -79,7 +83,7 @@ export function CompaniesTable({ companies, isLoading }: CompaniesTableProps) {
                 </div>
               </TableCell>
               <TableCell>{company.funding_date}</TableCell>
-              <TableCell>{company.funding_amount}</TableCell>
+              <TableCell>{formatCurrency(company.funding_amount)}</TableCell>
               <TableCell>
                 {company.website_url ? (
                   <Link 

@@ -1,4 +1,3 @@
-
 import { Loader2 } from "lucide-react";
 import { Company, CompanyDisplay } from "@/types/company";
 import { 
@@ -45,6 +44,11 @@ export function CompaniesList({
   selectedStage, 
   searchQuery 
 }: CompaniesListProps) {
+  const formatCurrency = (amount: string | number) => {
+    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    return `$${numAmount.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+  };
+
   const filteredCompanies = companies.filter((company) => {
     const matchesSector = selectedSector === "All" || company.sector === selectedSector;
     const matchesStage = selectedStage === "All" || company.funding_type === selectedStage;
@@ -109,7 +113,7 @@ export function CompaniesList({
                   </div>
                 </TableCell>
                 <TableCell>{displayCompany.fundingDate}</TableCell>
-                <TableCell>${displayCompany.fundingAmount}</TableCell>
+                <TableCell>{formatCurrency(displayCompany.fundingAmount)}</TableCell>
                 <TableCell>
                   <Link 
                     to={displayCompany.websiteUrl}
