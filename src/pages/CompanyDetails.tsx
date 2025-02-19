@@ -94,10 +94,16 @@ const CompanyDetails = () => {
     );
   }
 
-  // Helper function to format sector name for display
-  const formatSectorName = (sector: string) => {
-    // Format the sector name to be more readable if needed
-    return sector;
+  // Helper function to format currency
+  const formatCurrency = (amount: string) => {
+    // Remove any existing $ signs and commas
+    const cleanAmount = amount.replace(/[$,]/g, '');
+    const numAmount = parseFloat(cleanAmount);
+    return numAmount.toLocaleString('en-US', { 
+      style: 'currency', 
+      currency: 'USD',
+      maximumFractionDigits: 0 
+    });
   };
 
   return (
@@ -112,7 +118,7 @@ const CompanyDetails = () => {
           <div>
             <h1 className="text-4xl font-bold tracking-tight">{company.name}</h1>
             <p className="text-muted-foreground">
-              {formatSectorName(company.sector)} • {company.sub_sector}
+              {company.sector} • {company.sub_sector}
             </p>
           </div>
         </div>
@@ -144,7 +150,7 @@ const CompanyDetails = () => {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Latest Funding</p>
-                    <p className="font-medium">${company.funding_amount} ({company.funding_type})</p>
+                    <p className="font-medium">{formatCurrency(company.funding_amount)} ({company.funding_type})</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Funding Date</p>
