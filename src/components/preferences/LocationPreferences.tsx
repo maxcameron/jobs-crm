@@ -15,27 +15,78 @@ interface LocationStructure {
 }
 
 export function LocationPreferences({ availableLocations, selectedLocations, onChange }: LocationPreferencesProps) {
-  // Group locations by country according to the CompanyLocation type
+  // Group locations by country/state
   const groupedLocations: LocationStructure = {
     "United States": [
-      "New York",
-      "San Francisco",
-      "Boston",
-      "Austin",
-      "Seattle",
-      "Chicago",
-      "Los Angeles",
-      "Miami"
+      "Des Moines, IA",
+      "Kansas City, MO",
+      "Boston, MA",
+      "New York, NY",
+      "Los Angeles, CA",
+      "San Francisco, CA",
+      "Chicago, IL",
+      "Middletown, DE",
+      "Austin, TX",
+      "Seattle, WA",
+      "Washington, DC",
+      "Santa Ana, CA",
+      "Brooklyn, NY",
+      "San Jose, CA",
+      "Redwood City, CA",
+      "Woodstock, GA",
+      "Denver, CO",
+      "Menlo Park, CA",
+      "Charlotte, NC",
+      "Atlanta, GA",
+      "San Mateo, CA",
+      "Lehi, UT",
+      "Fort Collins, CA",
+      "Salt Lake City, UT",
+      "Brookline, MA",
+      "Palo Alto, CA",
+      "Detroit, MI",
+      "Santa Cruz, CA",
+      "Phoenix, AZ",
+      "Newton, CT",
+      "Campbell, CA",
+      "Omaha, NE",
+      "Bend, OR",
+      "Oakland, CA",
+      "San Rafael, CA",
+      "Silver Spring, MD",
+      "North Miami Beach, FL",
+      "Los Altos, CA",
+      "Stamford, CT",
+      "Columbus, OH",
+      "Sunnyvale, CA",
+      "Foster City, CA",
+      "Holmdel, NJ",
+      "Berwyn, PA",
+      "West Palm Beach, Florida",
+      "Lewes, DE",
+      "West Hollywood, CA",
+      "Distributed, United States",
+      "Irvine, CA",
+      "Portland, OR",
+      "Greenwood Village, CO",
+      "Redmond, WA",
+      "Jersey City, NJ",
+      "Miami, FL",
+      "Raleigh, NC",
+      "Arlington, VA",
+      "Youngstown, OH",
+      "Canton, MA"
     ],
-    "United Kingdom": ["London"],
-    "Germany": ["Berlin"],
-    "France": ["Paris"],
-    "Canada": ["Toronto", "Vancouver"],
-    "Netherlands": ["Amsterdam"],
-    "Singapore": ["Singapore"],
-    "Australia": ["Sydney"],
-    "Israel": ["Tel Aviv"],
-    "Japan": ["Tokyo"]
+    "United Kingdom": ["London, UK"],
+    "Germany": ["Munich, Germany", "Berlin, Germany", "Karlsruhe, Germany"],
+    "Israel": ["Tel Aviv, Israel", "Or Yehuda, Israel"],
+    "France": ["Paris, France"],
+    "Canada": ["Toronto, Canada"],
+    "Colombia": ["Medellín, Colombia"],
+    "Sweden": ["Stockholm, Sweden"],
+    "Brazil": ["São Paulo, Brazil"],
+    "UAE": ["Abu Dhabi, UAE"],
+    "Cayman Islands": ["George Town, Cayman Islands"]
   };
 
   const handleCountryChange = (country: string, checked: boolean) => {
@@ -111,7 +162,7 @@ export function LocationPreferences({ availableLocations, selectedLocations, onC
       <CardContent>
         <div className="space-y-4">
           {Object.entries(groupedLocations)
-            .sort(([a], [b]) => a.localeCompare(b)) // Sort countries alphabetically
+            .sort(([a], [b]) => a.localeCompare(b))
             .map(([country, locations]) => renderCountryGroup(country, locations))}
         </div>
       </CardContent>
