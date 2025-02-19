@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { Search } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -198,67 +197,53 @@ export function LocationPreferences({
               );
             }}
           />
-          <Label htmlFor={`location-${location}`}>{location}</Label>
+          <Label htmlFor={`location-${location}`} className="text-sm">
+            {location}
+          </Label>
         </div>
       ))}
     </div>
   );
 
   const renderRegion = (country: string, region: string, locations: CompanyLocation[]) => (
-    <div key={region} className="ml-6 space-y-2">
-      <Collapsible
-        open={expandedRegions.includes(region)}
-        onOpenChange={() => toggleRegion(region)}
-      >
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id={`region-${region}`}
-            checked={isRegionFullySelected(country, region)}
-            className={isRegionPartiallySelected(country, region) ? "bg-primary/50" : ""}
-            onCheckedChange={checked => handleRegionChange(country, region, checked as boolean)}
-          />
-          <CollapsibleTrigger className="flex-1 flex items-center space-x-2">
-            <Label htmlFor={`region-${region}`} className="font-medium cursor-pointer">
-              {region} ({locations.length})
-            </Label>
-          </CollapsibleTrigger>
-        </div>
-        <CollapsibleContent>
-          {renderLocations(locations)}
-        </CollapsibleContent>
-      </Collapsible>
+    <div key={region} className="ml-6">
+      <div className="flex items-center space-x-2 mb-2">
+        <Checkbox
+          id={`region-${region}`}
+          checked={isRegionFullySelected(country, region)}
+          className={isRegionPartiallySelected(country, region) ? "bg-primary/50" : ""}
+          onCheckedChange={checked => handleRegionChange(country, region, checked as boolean)}
+        />
+        <Label htmlFor={`region-${region}`} className="font-medium">
+          {region} ({locations.length})
+        </Label>
+      </div>
+      {renderLocations(locations)}
     </div>
   );
 
   const renderCountry = (country: string, data: typeof COUNTRY_LOCATIONS[string]) => (
     <div key={country} className="space-y-2">
-      <Collapsible
-        open={expandedCountries.includes(country)}
-        onOpenChange={() => toggleCountry(country)}
-      >
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id={`country-${country}`}
-            checked={isCountryFullySelected(country)}
-            className={isCountryPartiallySelected(country) ? "bg-primary/50" : ""}
-            onCheckedChange={checked => handleCountryChange(country, checked as boolean)}
-          />
-          <CollapsibleTrigger className="flex-1 flex items-center space-x-2">
-            <Label htmlFor={`country-${country}`} className="font-medium cursor-pointer">
-              {country}
-            </Label>
-          </CollapsibleTrigger>
-        </div>
-        <CollapsibleContent>
-          {data.regions ? (
-            Object.entries(data.regions).map(([region, locations]) =>
-              renderRegion(country, region, locations)
-            )
-          ) : (
-            data.locations && renderLocations(data.locations)
-          )}
-        </CollapsibleContent>
-      </Collapsible>
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id={`country-${country}`}
+          checked={isCountryFullySelected(country)}
+          className={isCountryPartiallySelected(country) ? "bg-primary/50" : ""}
+          onCheckedChange={checked => handleCountryChange(country, checked as boolean)}
+        />
+        <Label htmlFor={`country-${country}`} className="font-medium">
+          {country}
+        </Label>
+      </div>
+      <div className="ml-6 space-y-4">
+        {data.regions ? (
+          Object.entries(data.regions).map(([region, locations]) =>
+            renderRegion(country, region, locations)
+          )
+        ) : (
+          data.locations && renderLocations(data.locations)
+        )}
+      </div>
     </div>
   );
 
