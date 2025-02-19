@@ -86,16 +86,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log("[AuthProvider] Initial session check:", initialSession?.user?.email || "No session");
       setSession(initialSession);
       setIsLoading(false);
-
-      // Handle initial navigation based on session state
-      if (initialSession?.user) {
-        console.log("[AuthProvider] Session found, checking location:", location.pathname);
-        if (location.pathname === '/auth') {
-          navigate('/onboarding', { replace: true });
-        }
-      } else if (location.pathname !== '/auth') {
-        navigate('/auth');
-      }
     });
 
     const {
@@ -103,24 +93,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } = supabase.auth.onAuthStateChange(async (_event, currentSession) => {
       console.log("[AuthProvider] Auth state changed:", _event, currentSession?.user?.email);
       setSession(currentSession);
-      
-      // Handle navigation on auth state change
-      if (currentSession) {
-        console.log("[AuthProvider] New session detected, checking location:", location.pathname);
-        if (location.pathname === '/auth') {
-          navigate('/onboarding', { replace: true });
-        }
-      } else if (location.pathname !== '/auth') {
-        navigate('/auth');
-      }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate, location.pathname]);
+  }, []);
 
-  // Handle onboarding redirects after confirming auth state and preferences are loaded
+  // Handle navigation after confirming auth state and preferences
   useEffect(() => {
     if (!session || isLoading || preferencesLoading) {
       console.log("[AuthProvider] Still loading:", {
@@ -130,33 +110,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
       return;
     }
-    
-    console.log("[AuthProvider] Checking onboarding status:", {
+
+    console.log("[AuthProvider] Checking navigation state:", {
       path: location.pathname,
-      preferences,
       hasCompletedOnboarding: preferences?.has_completed_onboarding,
-      rawPreferences: preferences,
-      isLoading,
-      preferencesLoading,
-      queryKey: ['preferences', session.user.id],
-      cachedData: queryClient.getQueryData(['preferences', session.user.id])
+      isAuthPath: location.pathname === '/auth'
     });
 
-    // Don't redirect if we're already on the auth or onboarding pages
-    if (location.pathname === '/auth' || location.pathname === '/onboarding') {
-      console.log("[AuthProvider] On auth/onboarding page, skipping redirect");
+    // If we're on the auth page and we have a session, redirect based on onboarding status
+    if (location.pathname === '/auth' && session) {
+      if (preferences?.has_completed_onboarding) {
+        console.log("[AuthProvider] Redirecting to home - onboarding completed");
+        navigate('/', { replace: true });
+      } else {
+        console.log("[AuthProvider] Redirecting to onboarding - not completed");
+        navigate('/onboarding', { replace: true });
+      }
       return;
     }
 
-    // Explicitly check for false value of has_completed_onboarding
-    if (preferences?.has_completed_onboarding === false) {
-      console.log("[AuthProvider] Redirecting to onboarding - not completed");
+    // If we have no session and we're not on the auth page, redirect to auth
+    if (!session && location.pathname !== '/auth') {
+      console.log("[AuthProvider] No session, redirecting to auth");
+      navigate('/auth');
+      return;
+    }
+
+    // If onboarding is not completed and we're not on the onboarding page, redirect to onboarding
+    if (session && !preferences?.has_completed_onboarding && location.pathname !== '/onboarding') {
+      console.log("[AuthProvider] Redirecting to onboarding - not completed yet");
       navigate('/onboarding', { replace: true });
-    } else {
-      console.log("[AuthProvider] No redirect needed:", {
-        hasCompletedOnboarding: preferences?.has_completed_onboarding,
-        preferences
-      });
     }
   }, [session, preferences, isLoading, preferencesLoading, location.pathname, navigate]);
 
