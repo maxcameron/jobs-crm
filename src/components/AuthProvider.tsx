@@ -94,9 +94,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, [navigate, location.pathname]);
 
-  // Handle onboarding redirects after confirming auth state
+  // Handle onboarding redirects after confirming auth state and preferences are loaded
   useEffect(() => {
     if (!session || isLoading || preferencesLoading) return;
+    
     console.log("Checking onboarding status:", {
       path: location.pathname,
       preferences,
@@ -105,12 +106,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     // Don't redirect if we're already on the auth or onboarding pages
-    if (location.pathname === '/auth' || location.pathname.startsWith('/onboarding')) return;
+    if (location.pathname === '/auth' || location.pathname === '/onboarding') return;
 
-    // Only redirect to onboarding if we have confirmed the user hasn't completed it
-    if (preferences === null || preferences?.has_completed_onboarding === false) {
+    // If preferences don't exist or onboarding is not completed, redirect to onboarding
+    if (!preferences?.has_completed_onboarding) {
       console.log("Redirecting to onboarding - preferences:", preferences);
-      navigate('/onboarding');
+      navigate('/onboarding', { replace: true });
     }
   }, [session, preferences, isLoading, preferencesLoading, location.pathname, navigate]);
 
