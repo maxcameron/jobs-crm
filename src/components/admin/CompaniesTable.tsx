@@ -1,3 +1,4 @@
+
 import { Company } from "@/types/company";
 import { 
   Table,
@@ -35,6 +36,11 @@ export function CompaniesTable({ companies, isLoading }: CompaniesTableProps) {
     const numAmount = parseFloat(cleanAmount);
     if (isNaN(numAmount)) return '$0';
     return `$${numAmount.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+  };
+
+  const formatTag = (tag: string) => {
+    // Remove curly braces if present
+    return tag.replace(/[{}]/g, '').trim();
   };
 
   if (isLoading) {
@@ -116,7 +122,7 @@ export function CompaniesTable({ companies, isLoading }: CompaniesTableProps) {
                       variant="secondary" 
                       className="text-xs"
                     >
-                      {tag}
+                      {formatTag(tag)}
                     </Badge>
                   ))}
                 </div>
