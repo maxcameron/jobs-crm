@@ -15,33 +15,33 @@ export interface LocationGroup {
   };
 }
 
-export const US_REGIONS = {
+export const US_REGIONS: { [key: string]: CompanyLocation[] } = {
   "Massachusetts": [
     "Boston",
     "Brookline",
-    "Canton",
+    "Canton"
   ],
   "New York": [
     "New York",
-    "Brooklyn",
+    "Brooklyn"
   ],
   "Florida": [
     "Miami",
     "North Miami Beach",
-    "West Palm Beach",
+    "West Palm Beach"
   ],
   "Georgia": [
     "Atlanta",
-    "Woodstock",
+    "Woodstock"
   ],
   "Illinois": [
-    "Chicago",
+    "Chicago"
   ],
   "Michigan": [
-    "Detroit",
+    "Detroit"
   ],
   "Texas": [
-    "Austin",
+    "Austin"
   ],
   "California": [
     "San Francisco",
@@ -50,113 +50,96 @@ export const US_REGIONS = {
     "Oakland",
     "Palo Alto",
     "Menlo Park",
-    "Redwood City",
-    "Santa Cruz",
     "San Mateo",
     "San Rafael",
     "Los Altos",
     "Sunnyvale",
     "Foster City",
     "Campbell",
-    "Santa Ana",
     "Irvine",
-    "West Hollywood",
-    "Fort Collins",
+    "West Hollywood"
   ],
   "Washington": [
     "Seattle",
-    "Redmond",
+    "Redmond"
   ],
   "Colorado": [
     "Denver",
-    "Greenwood Village",
+    "Greenwood Village"
   ],
   "Connecticut": [
     "Newton",
-    "Stamford",
+    "Stamford"
   ],
   "Delaware": [
-    "Middletown",
-    "Lewes",
-  ],
-  "District of Columbia": [
-    "Washington",
-  ],
-  "Iowa": [
-    "Des Moines",
-  ],
-  "Missouri": [
-    "Kansas City",
-  ],
-  "Nebraska": [
-    "Omaha",
+    "Lewes"
   ],
   "New Jersey": [
     "Holmdel",
-    "Jersey City",
+    "Jersey City"
   ],
   "North Carolina": [
     "Charlotte",
-    "Raleigh",
+    "Raleigh"
   ],
   "Ohio": [
     "Columbus",
-    "Youngstown",
+    "Youngstown"
   ],
   "Oregon": [
     "Portland",
-    "Bend",
+    "Bend"
   ],
   "Pennsylvania": [
-    "Berwyn",
+    "Berwyn"
   ],
   "Utah": [
     "Salt Lake City",
-    "Lehi",
+    "Lehi"
   ],
   "Virginia": [
-    "Arlington",
+    "Arlington"
   ],
   "Maryland": [
-    "Silver Spring",
+    "Silver Spring"
   ],
   "Other": [
-    "Distributed",
-  ],
-};
+    "Distributed"
+  ]
+} as const;
 
 export const COUNTRY_LOCATIONS: LocationGroup = {
   "United States": {
     regions: US_REGIONS,
   },
   "United Kingdom": {
-    locations: ["London"],
+    locations: ["London"]
   },
   "Germany": {
-    locations: ["Berlin"],
+    locations: ["Berlin", "Munich", "Karlsruhe"]
   },
   "Israel": {
-    locations: ["Tel Aviv"],
+    locations: ["Tel Aviv", "Or Yehuda"]
   },
   "France": {
-    locations: ["Paris"],
+    locations: ["Paris"]
   },
   "Canada": {
-    locations: ["Toronto"],
+    locations: ["Toronto"]
   },
   "Colombia": {
-    locations: ["Medellín"],
+    locations: ["Medellín"]
   },
   "Sweden": {
-    locations: ["Stockholm"],
+    locations: ["Stockholm"]
   },
   "Brazil": {
-    locations: ["São Paulo"],
+    locations: ["São Paulo"]
   },
   "UAE": {
-    locations: ["Abu Dhabi"],
+    locations: ["Abu Dhabi"]
   },
   "Cayman Islands": {
-    locations: ["George Town"],
-  },
-};
+    locations: ["George Town"]
+  }
+} as const;
