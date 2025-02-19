@@ -220,6 +220,7 @@ export type Database = {
           created_at: string
           has_completed_onboarding: boolean | null
           id: string
+          locations: Database["public"]["Enums"]["company_location"][] | null
           office_preferences:
             | Database["public"]["Enums"]["office_preference"][]
             | null
@@ -231,6 +232,7 @@ export type Database = {
           created_at?: string
           has_completed_onboarding?: boolean | null
           id?: string
+          locations?: Database["public"]["Enums"]["company_location"][] | null
           office_preferences?:
             | Database["public"]["Enums"]["office_preference"][]
             | null
@@ -242,6 +244,7 @@ export type Database = {
           created_at?: string
           has_completed_onboarding?: boolean | null
           id?: string
+          locations?: Database["public"]["Enums"]["company_location"][] | null
           office_preferences?:
             | Database["public"]["Enums"]["office_preference"][]
             | null
