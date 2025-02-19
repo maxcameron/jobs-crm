@@ -36,13 +36,11 @@ const Auth = () => {
     clearSession();
   }, []);
 
-  // If user is already authenticated, redirect to onboarding
-  useEffect(() => {
-    if (session) {
-      console.log("[Auth] Session detected, redirecting to onboarding");
-      navigate('/onboarding', { replace: true });
-    }
-  }, [session, navigate]);
+  // If user is already authenticated, let AuthProvider handle the redirect
+  if (session) {
+    console.log("[Auth] Session detected, letting AuthProvider handle redirect");
+    return null;
+  }
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,12 +103,9 @@ const Auth = () => {
         console.log('[Auth] Sign up successful, user:', data.user);
         toast({
           title: "Success",
-          description: "Account created successfully. Redirecting to onboarding...",
+          description: "Account created successfully. Redirecting...",
         });
-        // Wait for the toast to be visible
-        setTimeout(() => {
-          navigate('/onboarding', { replace: true });
-        }, 1000);
+        // Remove manual navigation and let AuthProvider handle it
       }
     } catch (error: any) {
       console.error('[Auth] Auth error:', error);

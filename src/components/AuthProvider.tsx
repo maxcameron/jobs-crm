@@ -34,6 +34,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const queryClient = useQueryClient();
 
+  // Query for user preferences
   const { data: preferences, isLoading: preferencesLoading } = useQuery({
     queryKey: ['preferences', session?.user.id],
     queryFn: async () => {
@@ -43,10 +44,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       
       console.log("[AuthProvider] Fetching preferences for user:", session.user.id);
-      console.log("[AuthProvider] Current cache state:", 
-        queryClient.getQueryData(['preferences', session.user.id])
-      );
-
+      
       const { data, error } = await supabase
         .from('user_tracking_preferences')
         .select('*')
@@ -63,7 +61,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     },
     enabled: !!session?.user.id,
     staleTime: 1000,
-    refetchOnMount: true,
     retry: 2,
   });
 
@@ -81,6 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // Initial session check and auth state change subscription
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
       console.log("[AuthProvider] Initial session check:", initialSession?.user?.email || "No session");
@@ -100,48 +98,53 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  // Handle navigation after confirming auth state and preferences
+  // Navigation logic
   useEffect(() => {
-    if (!session || isLoading || preferencesLoading) {
-      console.log("[AuthProvider] Still loading:", {
-        hasSession: !!session,
-        isLoading,
-        preferencesLoading
-      });
+    // Don't navigate while loading or if we don't have a session
+    if (isLoading) {
+      console.log("[AuthProvider] Still loading initial session");
       return;
     }
 
-    console.log("[AuthProvider] Checking navigation state:", {
-      path: location.pathname,
-      hasCompletedOnboarding: preferences?.has_completed_onboarding,
-      isAuthPath: location.pathname === '/auth'
-    });
-
-    // If we're on the auth page and we have a session, redirect based on onboarding status
-    if (location.pathname === '/auth' && session) {
-      if (preferences?.has_completed_onboarding) {
-        console.log("[AuthProvider] Redirecting to home - onboarding completed");
-        navigate('/', { replace: true });
-      } else {
-        console.log("[AuthProvider] Redirecting to onboarding - not completed");
-        navigate('/onboarding', { replace: true });
-      }
-      return;
-    }
-
-    // If we have no session and we're not on the auth page, redirect to auth
+    // No session means redirect to auth (unless already there)
     if (!session && location.pathname !== '/auth') {
       console.log("[AuthProvider] No session, redirecting to auth");
       navigate('/auth');
       return;
     }
 
-    // If onboarding is not completed and we're not on the onboarding page, redirect to onboarding
-    if (session && !preferences?.has_completed_onboarding && location.pathname !== '/onboarding') {
-      console.log("[AuthProvider] Redirecting to onboarding - not completed yet");
-      navigate('/onboarding', { replace: true });
+    // If we have a session but are still loading preferences, wait
+    if (session && preferencesLoading) {
+      console.log("[AuthProvider] Session available but still loading preferences");
+      return;
     }
-  }, [session, preferences, isLoading, preferencesLoading, location.pathname, navigate]);
+
+    // Now we can make navigation decisions based on complete data
+    if (session) {
+      console.log("[AuthProvider] Making navigation decision:", {
+        path: location.pathname,
+        hasCompletedOnboarding: preferences?.has_completed_onboarding,
+      });
+
+      // Handle auth page redirects
+      if (location.pathname === '/auth') {
+        if (preferences?.has_completed_onboarding) {
+          console.log("[AuthProvider] Redirecting to home - onboarding completed");
+          navigate('/', { replace: true });
+        } else {
+          console.log("[AuthProvider] Redirecting to onboarding - not completed");
+          navigate('/onboarding', { replace: true });
+        }
+        return;
+      }
+
+      // Handle onboarding redirect for non-completed users
+      if (!preferences?.has_completed_onboarding && location.pathname !== '/onboarding') {
+        console.log("[AuthProvider] Redirecting to onboarding - not completed");
+        navigate('/onboarding', { replace: true });
+      }
+    }
+  }, [session, isLoading, preferencesLoading, preferences, location.pathname, navigate]);
 
   const value = {
     session,
@@ -150,6 +153,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     handleSignOut,
   };
 
+  // Only render children when we're not loading
   return (
     <AuthContext.Provider value={value}>
       {!isLoading && !preferencesLoading && children}
