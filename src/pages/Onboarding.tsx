@@ -35,11 +35,6 @@ const Onboarding = () => {
   const currentStepData = STEPS[currentStep];
 
   const isNextDisabled = () => {
-    console.log('Checking next disabled:', {
-      component: currentStepData.component,
-      preferences: preferences
-    });
-    
     switch (currentStepData.component) {
       case "stages":
         return preferences.stages.length === 0;
@@ -48,7 +43,6 @@ const Onboarding = () => {
       case "locations":
         return preferences.locations.length === 0;
       case "office":
-        console.log('Office preferences length:', preferences.office_preferences.length);
         return preferences.office_preferences.length === 0;
       default:
         return false;
@@ -69,18 +63,20 @@ const Onboarding = () => {
           .single();
 
         let error;
+        const preferencesData = {
+          stages: preferences.stages,
+          sectors: preferences.sectors,
+          locations: preferences.locations,
+          office_preferences: preferences.office_preferences,
+          has_completed_onboarding: true,
+          user_id: session.user.id
+        };
         
         if (existingPreferences) {
           // Update existing record
           const { error: updateError } = await supabase
             .from('user_tracking_preferences')
-            .update({
-              stages: preferences.stages,
-              sectors: preferences.sectors,
-              locations: preferences.locations,
-              office_preferences: preferences.office_preferences,
-              has_completed_onboarding: true
-            })
+            .update(preferencesData)
             .eq('user_id', session.user.id);
           
           error = updateError;
@@ -88,11 +84,7 @@ const Onboarding = () => {
           // Insert new record
           const { error: insertError } = await supabase
             .from('user_tracking_preferences')
-            .insert([{
-              user_id: session.user.id,
-              ...preferences,
-              has_completed_onboarding: true
-            }]);
+            .insert([preferencesData]);
           
           error = insertError;
         }
@@ -107,8 +99,13 @@ const Onboarding = () => {
           return;
         }
 
+        toast({
+          title: "Success",
+          description: "Your preferences have been saved.",
+        });
+
         // Redirect to index page after successful save
-        navigate('/');
+        navigate('/', { replace: true });
       } catch (error) {
         console.error('Error in handleNext:', error);
         toast({
