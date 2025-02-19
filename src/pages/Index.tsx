@@ -10,6 +10,7 @@ import { useCompanies } from "@/hooks/useCompanies";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useCompanyFilters } from "@/hooks/useCompanyFilters";
 import { useEffect } from "react";
+import { useAdminCheck } from "@/hooks/useAdminCheck";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,6 +18,7 @@ const Index = () => {
   
   const { companies, isLoading, fetchCompanies } = useCompanies();
   const { userSectors, userStages, fetchUserPreferences } = useUserPreferences();
+  const { data: isAdmin } = useAdminCheck();
   const { 
     selectedSector,
     setSelectedSector,
@@ -43,10 +45,12 @@ const Index = () => {
               Track and filter companies by sector and funding stage.
             </p>
           </div>
-          <Button onClick={() => setIsAddCompanyOpen(true)} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Add Company
-          </Button>
+          {isAdmin && (
+            <Button onClick={() => setIsAddCompanyOpen(true)} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add Company
+            </Button>
+          )}
         </div>
 
         <div className="space-y-6">
@@ -81,10 +85,12 @@ const Index = () => {
         </div>
       </div>
       
-      <AddCompanyDialog 
-        open={isAddCompanyOpen}
-        onOpenChange={setIsAddCompanyOpen}
-      />
+      {isAdmin && (
+        <AddCompanyDialog 
+          open={isAddCompanyOpen}
+          onOpenChange={setIsAddCompanyOpen}
+        />
+      )}
     </div>
   );
 };
