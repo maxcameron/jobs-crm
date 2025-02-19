@@ -36,9 +36,13 @@ const Auth = () => {
     clearSession();
   }, []);
 
-  if (session) {
-    return <Navigate to="/onboarding" replace />;
-  }
+  // If user is already authenticated, redirect to onboarding
+  useEffect(() => {
+    if (session) {
+      console.log("[Auth] Session detected, redirecting to onboarding");
+      navigate('/onboarding', { replace: true });
+    }
+  }, [session, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +54,7 @@ const Auth = () => {
       });
 
       if (error) {
-        console.error('Sign in error:', error);
+        console.error('[Auth] Sign in error:', error);
         let errorMessage = error.message;
         if (error.message.includes('Invalid refresh token')) {
           errorMessage = "Session expired. Please sign in again.";
@@ -61,14 +65,13 @@ const Auth = () => {
           variant: "destructive",
         });
       } else if (data.user) {
-        // Successful login
         toast({
           title: "Success",
           description: "Successfully signed in",
         });
       }
     } catch (error: any) {
-      console.error('Auth error:', error);
+      console.error('[Auth] Auth error:', error);
       toast({
         title: "Error",
         description: "Failed to sign in. Please try again.",
@@ -92,20 +95,25 @@ const Auth = () => {
       });
 
       if (error) {
-        console.error('Sign up error:', error);
+        console.error('[Auth] Sign up error:', error);
         toast({
           title: "Error signing up",
           description: error.message,
           variant: "destructive",
         });
-      } else {
+      } else if (data.user) {
+        console.log('[Auth] Sign up successful, user:', data.user);
         toast({
           title: "Success",
-          description: "Check your email to confirm your account.",
+          description: "Account created successfully. Redirecting to onboarding...",
         });
+        // Wait for the toast to be visible
+        setTimeout(() => {
+          navigate('/onboarding', { replace: true });
+        }, 1000);
       }
     } catch (error: any) {
-      console.error('Auth error:', error);
+      console.error('[Auth] Auth error:', error);
       toast({
         title: "Error",
         description: "Failed to sign up. Please try again.",

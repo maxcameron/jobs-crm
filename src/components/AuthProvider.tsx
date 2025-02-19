@@ -74,6 +74,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.error("[AuthProvider] Error signing out:", error);
       }
       setSession(null);
+      queryClient.clear(); // Clear the query cache on signout
       navigate('/auth');
     } catch (error) {
       console.error("[AuthProvider] Error in handleSignOut:", error);
@@ -83,12 +84,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
       console.log("[AuthProvider] Initial session check:", initialSession?.user?.email || "No session");
+      setSession(initialSession);
+      setIsLoading(false);
+
+      // Handle initial navigation based on session state
       if (initialSession?.user) {
-        setSession(initialSession);
+        console.log("[AuthProvider] Session found, checking location:", location.pathname);
+        if (location.pathname === '/auth') {
+          navigate('/onboarding', { replace: true });
+        }
       } else if (location.pathname !== '/auth') {
         navigate('/auth');
       }
-      setIsLoading(false);
     });
 
     const {
@@ -97,7 +104,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log("[AuthProvider] Auth state changed:", _event, currentSession?.user?.email);
       setSession(currentSession);
       
-      if (!currentSession && location.pathname !== '/auth') {
+      // Handle navigation on auth state change
+      if (currentSession) {
+        console.log("[AuthProvider] New session detected, checking location:", location.pathname);
+        if (location.pathname === '/auth') {
+          navigate('/onboarding', { replace: true });
+        }
+      } else if (location.pathname !== '/auth') {
         navigate('/auth');
       }
     });
