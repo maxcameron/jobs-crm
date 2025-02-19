@@ -1,16 +1,11 @@
-
 export type CompanyStage =
-  | "Pre-seed"
+  | "Pre-Seed"
   | "Seed"
   | "Series A"
   | "Series B"
   | "Series C"
   | "Series D"
-  | "Series E"
-  | "Series F"
-  | "Growth"
-  | "Public"
-  | "Acquired";
+  | "Venture";
 
 export type CompanySector =
   | "AI & Machine Learning"
@@ -153,17 +148,13 @@ export type TrackingPreferences = {
 };
 
 export const COMPANY_STAGES: CompanyStage[] = [
-  "Pre-seed",
+  "Pre-Seed",
   "Seed",
   "Series A",
   "Series B",
   "Series C",
   "Series D",
-  "Series E",
-  "Series F",
-  "Growth",
-  "Public",
-  "Acquired",
+  "Venture"
 ];
 
 export const OFFICE_PREFERENCES: OfficePreference[] = [
