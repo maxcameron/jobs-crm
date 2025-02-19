@@ -130,8 +130,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // If we reach here, we have a session and preferences are loaded
     const hasCompletedOnboarding = preferences?.has_completed_onboarding;
 
-    // User has session but hasn't completed onboarding
-    if (!hasCompletedOnboarding) {
+    // Only redirect to onboarding if we explicitly have has_completed_onboarding = false
+    if (hasCompletedOnboarding === false) {
       if (location.pathname !== '/onboarding') {
         console.log("[AuthProvider] Redirecting to onboarding - not completed");
         navigate('/onboarding', { replace: true });
@@ -139,8 +139,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
-    // User has completed onboarding
-    if (location.pathname === '/auth' || location.pathname === '/onboarding') {
+    // User has completed onboarding or we're not sure yet (loading)
+    if (hasCompletedOnboarding === true && (location.pathname === '/auth' || location.pathname === '/onboarding')) {
       console.log("[AuthProvider] Redirecting to home - onboarding completed");
       navigate('/', { replace: true });
     }

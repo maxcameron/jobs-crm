@@ -1,3 +1,4 @@
+
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { useState } from "react";
@@ -112,26 +113,18 @@ const Onboarding = () => {
         throw new Error("Failed to verify preferences were saved");
       }
 
-      // Invalidate the preferences query to force a fresh fetch
-      console.log("[Onboarding] Invalidating preferences cache");
+      // First navigate to home
+      console.log("[Onboarding] Navigating to home...");
+      navigate('/', { replace: true });
+
+      // Then update the cache after navigation
+      console.log("[Onboarding] Updating cache...");
       await queryClient.invalidateQueries({ queryKey: ['preferences', session.user.id] });
-
-      // Force an immediate refetch
-      await queryClient.refetchQueries({ queryKey: ['preferences', session.user.id] });
-
-      console.log("[Onboarding] Cache invalidated and refetched");
 
       toast({
         title: "Success",
         description: "Your preferences have been saved.",
       });
-
-      // Use a short delay to ensure the database update is processed
-      console.log("[Onboarding] Preparing for navigation...");
-      setTimeout(() => {
-        console.log("[Onboarding] Navigating to home...");
-        navigate('/', { replace: true });
-      }, 1000);
 
     } catch (error) {
       console.error("[Onboarding] Error saving preferences:", error);
