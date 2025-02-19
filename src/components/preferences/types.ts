@@ -79,7 +79,7 @@ export type CompanyLocation =
   | "Toronto"
   | "Vancouver"
   | "Brooklyn"
-  | "San Jose"
+  | "San Jose"  // Fixed casing to match database
   | "Woodstock"
   | "Denver"
   | "Menlo Park"
