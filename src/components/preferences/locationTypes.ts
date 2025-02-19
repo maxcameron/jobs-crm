@@ -133,10 +133,10 @@ export const COUNTRY_LOCATIONS: LocationGroup = {
     locations: ["London"],
   },
   "Germany": {
-    locations: ["Berlin", "Munich", "Karlsruhe"],
+    locations: ["Berlin"],
   },
   "Israel": {
-    locations: ["Tel Aviv", "Or Yehuda"],
+    locations: ["Tel Aviv"],
   },
   "France": {
     locations: ["Paris"],
@@ -145,13 +145,13 @@ export const COUNTRY_LOCATIONS: LocationGroup = {
     locations: ["Toronto"],
   },
   "Colombia": {
-    locations: ["San Francisco"],
+    locations: ["Medellín"],
   },
   "Sweden": {
     locations: ["Stockholm"],
   },
   "Brazil": {
-    locations: ["San Francisco"],
+    locations: ["São Paulo"],
   },
   "UAE": {
     locations: ["Abu Dhabi"],
