@@ -9,7 +9,7 @@ import { StepContent } from "./onboarding/StepContent";
 import { CompanyStage, CompanySector, CompanyLocation, OfficePreference } from "@/components/preferences/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from "react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Onboarding = () => {
   const { session } = useAuth();
