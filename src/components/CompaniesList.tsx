@@ -28,7 +28,7 @@ const mapToDisplayCompany = (company: Company): CompanyDisplay & { id: string } 
   subSector: company.sub_sector,
   fundingType: company.funding_type,
   fundingDate: company.funding_date,
-  fundingAmount: company.funding_amount,
+  fundingAmount: company.funding_amount || '0',
   websiteUrl: company.website_url,
   headquarterLocation: company.headquarter_location,
   description: company.description,
@@ -45,9 +45,13 @@ export function CompaniesList({
   searchQuery 
 }: CompaniesListProps) {
   const formatCurrency = (amount: string | number | null | undefined) => {
-    if (!amount) return 'N/A';
-    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-    if (isNaN(numAmount)) return 'N/A';
+    if (!amount) return '$0';
+    const cleanAmount = typeof amount === 'string' ? 
+      amount.replace(/[$,]/g, '') : 
+      amount.toString();
+    
+    const numAmount = parseFloat(cleanAmount);
+    if (isNaN(numAmount)) return '$0';
     return `$${numAmount.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
   };
 
