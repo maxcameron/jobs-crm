@@ -1,3 +1,4 @@
+
 export type CompanyStage =
   | "Pre-Seed"
   | "Seed"
@@ -137,8 +138,7 @@ export type CompanyLocation =
 export type OfficePreference =
   | "Remote"
   | "Hybrid"
-  | "In-office"
-  | "Remote-friendly";
+  | "In-Office";
 
 export type TrackingPreferences = {
   stages: CompanyStage[];
@@ -160,6 +160,5 @@ export const COMPANY_STAGES: CompanyStage[] = [
 export const OFFICE_PREFERENCES: OfficePreference[] = [
   "Remote",
   "Hybrid",
-  "In-office",
-  "Remote-friendly",
+  "In-Office"
 ];
