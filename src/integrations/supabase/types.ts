@@ -221,6 +221,7 @@ export type Database = {
           office_preferences:
             | Database["public"]["Enums"]["office_preference"][]
             | null
+          sectors: Database["public"]["Enums"]["company_sector"][] | null
           stages: Database["public"]["Enums"]["company_stage"][] | null
           user_id: string
         }
@@ -232,6 +233,7 @@ export type Database = {
           office_preferences?:
             | Database["public"]["Enums"]["office_preference"][]
             | null
+          sectors?: Database["public"]["Enums"]["company_sector"][] | null
           stages?: Database["public"]["Enums"]["company_stage"][] | null
           user_id: string
         }
@@ -243,6 +245,7 @@ export type Database = {
           office_preferences?:
             | Database["public"]["Enums"]["office_preference"][]
             | null
+          sectors?: Database["public"]["Enums"]["company_sector"][] | null
           stages?: Database["public"]["Enums"]["company_stage"][] | null
           user_id?: string
         }
