@@ -1,3 +1,4 @@
+
 import { Loader2 } from "lucide-react";
 import { Company, CompanyDisplay } from "@/types/company";
 import { 
@@ -10,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
+import { formatWebsiteUrl, getDisplayUrl } from "@/lib/url-utils";
 
 interface CompaniesListProps {
   companies: Company[];
@@ -93,6 +95,7 @@ export function CompaniesList({
         <TableBody>
           {filteredCompanies.map((company) => {
             const displayCompany = mapToDisplayCompany(company);
+            const websiteUrl = formatWebsiteUrl(displayCompany.websiteUrl);
             return (
               <TableRow key={company.id}>
                 <TableCell>
@@ -121,14 +124,16 @@ export function CompaniesList({
                 <TableCell>{displayCompany.fundingDate}</TableCell>
                 <TableCell>{formatCurrency(displayCompany.fundingAmount)}</TableCell>
                 <TableCell>
-                  <Link 
-                    to={displayCompany.websiteUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    {new URL(displayCompany.websiteUrl).hostname}
-                  </Link>
+                  {displayCompany.websiteUrl && (
+                    <a 
+                      href={websiteUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline"
+                    >
+                      {getDisplayUrl(displayCompany.websiteUrl)}
+                    </a>
+                  )}
                 </TableCell>
                 <TableCell>{displayCompany.headquarterLocation}</TableCell>
                 <TableCell className="max-w-xl whitespace-normal">
