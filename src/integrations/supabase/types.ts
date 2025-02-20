@@ -248,6 +248,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      clean_tag: {
+        Args: {
+          tag: string
+        }
+        Returns: string
+      }
       gtrgm_compress: {
         Args: {
           "": unknown
