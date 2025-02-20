@@ -15,6 +15,7 @@ import { useAdminCheck } from "@/hooks/useAdminCheck";
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddCompanyOpen, setIsAddCompanyOpen] = useState(false);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   
   const { companies, isLoading, fetchCompanies } = useCompanies();
   const { userSectors, userStages, fetchUserPreferences } = useUserPreferences();
@@ -67,8 +68,10 @@ const Index = () => {
           <Filters
             selectedSector={selectedSector}
             selectedStage={selectedStage}
+            selectedTag={selectedTag}
             onSectorChange={setSelectedSector}
             onStageChange={setSelectedStage}
+            onTagChange={setSelectedTag}
             availableSectors={uniqueSectors}
             availableStages={uniqueStages}
           />
@@ -80,6 +83,7 @@ const Index = () => {
             userStages={userStages}
             selectedSector={selectedSector}
             selectedStage={selectedStage}
+            selectedTag={selectedTag}
             searchQuery={searchQuery}
           />
         </div>

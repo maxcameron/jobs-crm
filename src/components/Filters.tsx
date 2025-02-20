@@ -2,12 +2,15 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
+import { TagFilter } from "./TagFilter";
 
 interface FiltersProps {
   selectedSector: string;
   selectedStage: string;
+  selectedTag: string | null;
   onSectorChange: (sector: string) => void;
   onStageChange: (stage: string) => void;
+  onTagChange: (tag: string | null) => void;
   availableSectors: string[];
   availableStages: string[];
 }
@@ -15,8 +18,10 @@ interface FiltersProps {
 export const Filters = ({
   selectedSector,
   selectedStage,
+  selectedTag,
   onSectorChange,
   onStageChange,
+  onTagChange,
   availableSectors,
   availableStages,
 }: FiltersProps) => {
@@ -62,6 +67,7 @@ export const Filters = ({
             ))}
           </div>
         </div>
+        <TagFilter selectedTag={selectedTag} onTagChange={onTagChange} />
       </div>
     </div>
   );

@@ -20,6 +20,7 @@ interface CompaniesListProps {
   userStages: string[];
   selectedSector: string;
   selectedStage: string;
+  selectedTag: string | null;
   searchQuery: string;
 }
 
@@ -43,7 +44,8 @@ export function CompaniesList({
   userSectors, 
   userStages, 
   selectedSector, 
-  selectedStage, 
+  selectedStage,
+  selectedTag,
   searchQuery 
 }: CompaniesListProps) {
   const formatCurrency = (amount: string | number | null | undefined) => {
@@ -60,11 +62,12 @@ export function CompaniesList({
   const filteredCompanies = companies.filter((company) => {
     const matchesSector = selectedSector === "All" || company.sector === selectedSector;
     const matchesStage = selectedStage === "All" || company.funding_type === selectedStage;
+    const matchesTag = !selectedTag || (company.tags && company.tags.includes(selectedTag));
     const matchesSearch = company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          company.description.toLowerCase().includes(searchQuery.toLowerCase());
     const isInUserSectors = userSectors.includes(company.sector);
     const isInUserStages = userStages.includes(company.funding_type);
-    return matchesSector && matchesStage && matchesSearch && isInUserSectors && isInUserStages;
+    return matchesSector && matchesStage && matchesTag && matchesSearch && isInUserSectors && isInUserStages;
   });
 
   if (isLoading) {
