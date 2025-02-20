@@ -11,16 +11,21 @@ export function useCompanies() {
 
   const fetchCompanies = async () => {
     try {
+      console.log('[useCompanies] Fetching companies...');
       const { data, error } = await supabase
         .from('companies')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('[useCompanies] Error fetching companies:', error);
+        throw error;
+      }
 
-      setCompanies(data);
+      console.log('[useCompanies] Fetched companies:', data);
+      setCompanies(data || []);
     } catch (error) {
-      console.error('Error fetching companies:', error);
+      console.error('[useCompanies] Error in fetchCompanies:', error);
       toast({
         title: "Error",
         description: "Failed to fetch companies. Please refresh the page.",
@@ -30,6 +35,10 @@ export function useCompanies() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchCompanies();
+  }, []);
 
   return {
     companies,

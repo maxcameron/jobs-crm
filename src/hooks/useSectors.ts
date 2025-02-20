@@ -10,18 +10,22 @@ export function useSectors() {
   useEffect(() => {
     const fetchSectors = async () => {
       try {
+        console.log('[useSectors] Fetching sectors...');
         const { data, error } = await supabase
           .from('companies')
-          .select('sector')
-          .not('sector', 'is', null);
+          .select('sector');
 
-        if (error) throw error;
+        if (error) {
+          console.error('[useSectors] Error fetching sectors:', error);
+          throw error;
+        }
 
         // Get unique sectors
         const uniqueSectors = Array.from(new Set(data.map(item => item.sector))) as CompanySector[];
+        console.log('[useSectors] Fetched unique sectors:', uniqueSectors);
         setSectors(uniqueSectors.sort());
       } catch (error) {
-        console.error('Error fetching sectors:', error);
+        console.error('[useSectors] Error in fetchSectors:', error);
       } finally {
         setIsLoading(false);
       }
