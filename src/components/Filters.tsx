@@ -8,6 +8,9 @@ interface FiltersProps {
   selectedSector: string;
   selectedStage: string;
   selectedTag: string | null;
+  searchQuery: string;
+  userSectors: string[];
+  userStages: string[];
   onSectorChange: (sector: string) => void;
   onStageChange: (stage: string) => void;
   onTagChange: (tag: string | null) => void;
@@ -19,6 +22,9 @@ export const Filters = ({
   selectedSector,
   selectedStage,
   selectedTag,
+  searchQuery,
+  userSectors,
+  userStages,
   onSectorChange,
   onStageChange,
   onTagChange,
@@ -67,7 +73,15 @@ export const Filters = ({
             ))}
           </div>
         </div>
-        <TagFilter selectedTag={selectedTag} onTagChange={onTagChange} />
+        <TagFilter 
+          selectedTag={selectedTag} 
+          onTagChange={onTagChange}
+          selectedSector={selectedSector}
+          selectedStage={selectedStage}
+          searchQuery={searchQuery}
+          userSectors={userSectors}
+          userStages={userStages}
+        />
       </div>
     </div>
   );

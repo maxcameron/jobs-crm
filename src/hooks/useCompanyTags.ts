@@ -7,20 +7,47 @@ export interface TagFilter {
   count: number;
 }
 
-export function useCompanyTags() {
+export interface UseCompanyTagsProps {
+  selectedSector: string;
+  selectedStage: string;
+  searchQuery: string;
+  userSectors: string[];
+  userStages: string[];
+}
+
+export function useCompanyTags({ 
+  selectedSector, 
+  selectedStage, 
+  searchQuery, 
+  userSectors, 
+  userStages 
+}: UseCompanyTagsProps) {
   return useQuery({
-    queryKey: ["company-tags"],
+    queryKey: ["company-tags", selectedSector, selectedStage, searchQuery, userSectors, userStages],
     queryFn: async (): Promise<TagFilter[]> => {
       const { data: companies, error } = await supabase
         .from("companies")
-        .select("tags");
+        .select("*");
 
       if (error) throw error;
 
-      // Create a map to count tag occurrences
+      // Filter companies based on all criteria
+      const filteredCompanies = companies.filter(company => {
+        const matchesSector = selectedSector === "All" || company.sector === selectedSector;
+        const matchesStage = selectedStage === "All" || company.funding_type === selectedStage;
+        const matchesSearch = !searchQuery || 
+          company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          company.description.toLowerCase().includes(searchQuery.toLowerCase());
+        const isInUserSectors = userSectors.includes(company.sector);
+        const isInUserStages = userStages.includes(company.funding_type);
+        
+        return matchesSector && matchesStage && matchesSearch && isInUserSectors && isInUserStages;
+      });
+
+      // Create a map to count tag occurrences only from filtered companies
       const tagCountMap = new Map<string, number>();
       
-      companies.forEach(company => {
+      filteredCompanies.forEach(company => {
         if (company.tags) {
           company.tags
             .filter(tag => tag && tag.trim() !== '')
@@ -36,7 +63,7 @@ export function useCompanyTags() {
           value: tag,
           count
         }))
-        .sort((a, b) => b.count - a.count); // Sort by count descending
+        .sort((a, b) => b.count - a.count);
     }
   });
 }

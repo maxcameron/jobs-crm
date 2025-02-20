@@ -12,10 +12,29 @@ import { Loader2 } from "lucide-react";
 interface TagFilterProps {
   selectedTag: string | null;
   onTagChange: (tag: string | null) => void;
+  selectedSector: string;
+  selectedStage: string;
+  searchQuery: string;
+  userSectors: string[];
+  userStages: string[];
 }
 
-export function TagFilter({ selectedTag, onTagChange }: TagFilterProps) {
-  const { data: tags, isLoading } = useCompanyTags();
+export function TagFilter({ 
+  selectedTag, 
+  onTagChange,
+  selectedSector,
+  selectedStage,
+  searchQuery,
+  userSectors,
+  userStages,
+}: TagFilterProps) {
+  const { data: tags, isLoading } = useCompanyTags({
+    selectedSector,
+    selectedStage,
+    searchQuery,
+    userSectors,
+    userStages,
+  });
 
   if (isLoading) {
     return (

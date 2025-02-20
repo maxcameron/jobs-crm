@@ -69,6 +69,9 @@ const Index = () => {
             selectedSector={selectedSector}
             selectedStage={selectedStage}
             selectedTag={selectedTag}
+            searchQuery={searchQuery}
+            userSectors={userSectors}
+            userStages={userStages}
             onSectorChange={setSelectedSector}
             onStageChange={setSelectedStage}
             onTagChange={setSelectedTag}
