@@ -6,8 +6,7 @@ export type CompanyStage =
   | "Series B"
   | "Series C"
   | "Series D"
-  | "Series E"
-  | "Growth";
+  | "Venture";
 
 export type CompanySector =
   | "Advertising Technology"
@@ -158,8 +157,7 @@ export const COMPANY_STAGES: CompanyStage[] = [
   "Series B",
   "Series C",
   "Series D",
-  "Series E",
-  "Growth"
+  "Venture"
 ];
 
 export const OFFICE_PREFERENCES: OfficePreference[] = [
