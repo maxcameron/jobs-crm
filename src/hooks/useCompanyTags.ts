@@ -22,9 +22,11 @@ export function useCompanyTags() {
       
       companies.forEach(company => {
         if (company.tags) {
-          company.tags.forEach((tag: string) => {
-            tagCountMap.set(tag, (tagCountMap.get(tag) || 0) + 1);
-          });
+          company.tags
+            .filter(tag => tag && tag.trim() !== '')
+            .forEach((tag: string) => {
+              tagCountMap.set(tag, (tagCountMap.get(tag) || 0) + 1);
+            });
         }
       });
 

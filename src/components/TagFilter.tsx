@@ -30,14 +30,14 @@ export function TagFilter({ selectedTag, onTagChange }: TagFilterProps) {
     <div className="space-y-2">
       <label className="text-xs text-muted-foreground">Tag</label>
       <Select
-        value={selectedTag || ""}
-        onValueChange={(value) => onTagChange(value || null)}
+        value={selectedTag || "_all"}
+        onValueChange={(value) => onTagChange(value === "_all" ? null : value)}
       >
         <SelectTrigger className="w-[200px]">
           <SelectValue placeholder="Select a tag" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">All Tags</SelectItem>
+          <SelectItem value="_all">All Tags</SelectItem>
           {tags?.map((tag) => (
             <SelectItem key={tag.value} value={tag.value}>
               {tag.value} ({tag.count})
