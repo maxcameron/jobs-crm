@@ -446,12 +446,14 @@ export type Database = {
         | "Cyber Security"
         | "Aerospace and Defense"
       company_stage:
+        | "Pre-Seed"
         | "Seed"
         | "Series A"
         | "Series B"
         | "Series C"
         | "Series D"
-        | "Series E and above"
+        | "Series E"
+        | "Growth"
       office_preference: "Full-time Office" | "Hybrid" | "Remote"
       sector_status: "active" | "merged"
     }
