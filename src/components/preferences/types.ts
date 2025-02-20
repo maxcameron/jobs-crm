@@ -10,6 +10,7 @@ export type CompanyStage =
 
 export type CompanySector =
   | "Advertising Technology"
+  | "Aerospace and Defense"
   | "AgTech"
   | "AI"
   | "Automotive"
