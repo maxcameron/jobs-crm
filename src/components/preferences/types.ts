@@ -1,3 +1,4 @@
+
 export type CompanyStage =
   | "Pre-Seed"
   | "Seed"
@@ -20,6 +21,7 @@ export type CompanySector =
   | "Construction Technology"
   | "Customer Experience Technology"
   | "Customer Support Technology"
+  | "Cyber Security"
   | "Data Infrastructure"
   | "Developer Tools"
   | "E-Commerce"
@@ -162,3 +164,4 @@ export const OFFICE_PREFERENCES: OfficePreference[] = [
   "Hybrid",
   "In-Office"
 ];
+

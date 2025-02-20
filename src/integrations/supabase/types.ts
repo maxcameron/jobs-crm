@@ -443,6 +443,7 @@ export type Database = {
         | "Sustainability Technology"
         | "Travel Technology"
         | "Climate Technology"
+        | "Cyber Security"
       company_stage:
         | "Seed"
         | "Series A"
