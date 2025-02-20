@@ -55,7 +55,6 @@ export type Database = {
           headquarter_location: string
           id: string
           name: string
-          sector: Database["public"]["Enums"]["company_sector"] | null
           sub_sector: string
           tags: string[] | null
           website_url: string
@@ -70,7 +69,6 @@ export type Database = {
           headquarter_location: string
           id?: string
           name: string
-          sector?: Database["public"]["Enums"]["company_sector"] | null
           sub_sector: string
           tags?: string[] | null
           website_url: string
@@ -85,7 +83,6 @@ export type Database = {
           headquarter_location?: string
           id?: string
           name?: string
-          sector?: Database["public"]["Enums"]["company_sector"] | null
           sub_sector?: string
           tags?: string[] | null
           website_url?: string
@@ -224,7 +221,6 @@ export type Database = {
           office_preferences:
             | Database["public"]["Enums"]["office_preference"][]
             | null
-          sectors: Database["public"]["Enums"]["company_sector"][] | null
           stages: Database["public"]["Enums"]["company_stage"][] | null
           user_id: string
         }
@@ -236,7 +232,6 @@ export type Database = {
           office_preferences?:
             | Database["public"]["Enums"]["office_preference"][]
             | null
-          sectors?: Database["public"]["Enums"]["company_sector"][] | null
           stages?: Database["public"]["Enums"]["company_stage"][] | null
           user_id: string
         }
@@ -248,7 +243,6 @@ export type Database = {
           office_preferences?:
             | Database["public"]["Enums"]["office_preference"][]
             | null
-          sectors?: Database["public"]["Enums"]["company_sector"][] | null
           stages?: Database["public"]["Enums"]["company_stage"][] | null
           user_id?: string
         }
@@ -401,52 +395,53 @@ export type Database = {
         | "Woodstock"
         | "Youngstown"
       company_sector:
-        | "Marketing Technology"
-        | "Business and Productivity Software"
-        | "Procurement Tech"
-        | "Marketplace"
-        | "Fintech"
-        | "Logistics"
+        | "Advertising Technology"
+        | "AgTech"
         | "AI"
-        | "PropTech"
-        | "SaaS"
         | "Automotive"
-        | "Energy"
+        | "Blockchain"
+        | "Business and Productivity Software"
+        | "Business Intelligence"
+        | "Childcare Services"
+        | "Communication Software"
         | "Construction Technology"
+        | "Customer Experience Technology"
+        | "Customer Support Technology"
+        | "Data Infrastructure"
+        | "Developer Tools"
+        | "E-Commerce"
+        | "EdTech"
+        | "Energy"
+        | "Entertainment Software"
+        | "Event Technology"
+        | "Fintech"
+        | "FoodTech"
+        | "Government Technology"
         | "HealthTech"
         | "Home Services"
-        | "Communication Software"
-        | "Industrial Technology"
-        | "Medical Technology"
         | "HR Tech"
-        | "Sales Tech"
-        | "Event Technology"
-        | "Legal Tech"
-        | "E-Commerce"
-        | "Media and Information Services"
-        | "Advertising Technology"
-        | "Travel Technology"
-        | "Data Infrastructure"
-        | "Recreation Tech"
+        | "Industrial Technology"
         | "InsurTech"
-        | "FoodTech"
-        | "AgTech"
-        | "Market Intelligence"
+        | "Legal Tech"
+        | "Logistics"
         | "Manufacturing"
-        | "Customer Experience Technology"
-        | "Recruitment Technology"
-        | "Retail Technology"
-        | "Professional Training and Coaching"
-        | "Government Technology"
-        | "Sustainability Technology"
-        | "Childcare Services"
-        | "Business Intelligence"
-        | "Entertainment Software"
-        | "EdTech"
-        | "Customer Support Technology"
+        | "Market Intelligence"
+        | "Marketing Technology"
+        | "Marketplace"
+        | "Media and Information Services"
+        | "Medical Technology"
         | "Mobility"
         | "Nonprofit Tech"
-        | "Blockchain"
+        | "Procurement Tech"
+        | "Professional Training and Coaching"
+        | "PropTech"
+        | "Recruitment Technology"
+        | "Retail Technology"
+        | "SaaS"
+        | "Sales Tech"
+        | "Sustainability Technology"
+        | "Travel Technology"
+        | "Climate Technology"
       company_stage:
         | "Seed"
         | "Series A"
