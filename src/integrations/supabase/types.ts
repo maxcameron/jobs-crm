@@ -444,6 +444,7 @@ export type Database = {
         | "Travel Technology"
         | "Climate Technology"
         | "Cyber Security"
+        | "Aerospace and Defense"
       company_stage:
         | "Seed"
         | "Series A"
