@@ -29,16 +29,29 @@ export default defineConfig(({ command, mode }) => {
         sourcemap: false,
         minify: 'terser',
         chunkSizeWarningLimit: 1000,
+        rollupOptions: {
+          output: {
+            manualChunks: {
+              'react-vendor': ['react', 'react-dom'],
+              'supabase-vendor': ['@supabase/supabase-js'],
+            }
+          }
+        },
+        terserOptions: {
+          compress: {
+            drop_console: true,
+            drop_debugger: true
+          }
+        },
+        reportCompressedSize: true
       }),
       // Development-specific build options
       ...(mode === 'development' && {
         sourcemap: 'inline',
         minify: false,
-      }),
-    },
-    // Define environment variables
-    define: {
-      __APP_ENV__: JSON.stringify(env.VITE_APP_ENV),
+        watch: {}
+      })
     }
   };
 });
+
