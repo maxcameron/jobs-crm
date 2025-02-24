@@ -19,6 +19,7 @@ export const US_REGIONS: { [key: string]: CompanyLocation[] } = {
   "Massachusetts": [
     "Boston",
     "Brookline",
+    "Cambridge",
     "Canton"
   ],
   "New York": [
@@ -32,6 +33,7 @@ export const US_REGIONS: { [key: string]: CompanyLocation[] } = {
   ],
   "Georgia": [
     "Atlanta",
+    "Norcross",
     "Woodstock"
   ],
   "Illinois": [
@@ -44,6 +46,11 @@ export const US_REGIONS: { [key: string]: CompanyLocation[] } = {
     "Austin"
   ],
   "California": [
+    "Mill Valley",
+    "Newport Beach",
+    "El Segundo",
+    "Mountain View",
+    "Costa Mesa",
     "San Francisco",
     "Los Angeles",
     "San Jose",
@@ -84,21 +91,25 @@ export const US_REGIONS: { [key: string]: CompanyLocation[] } = {
   ],
   "Ohio": [
     "Columbus",
-    "Youngstown"
+    "Youngstown",
+    "Newbury"
   ],
   "Oregon": [
     "Portland",
     "Bend"
   ],
   "Pennsylvania": [
-    "Berwyn"
+    "Berwyn",
+    "Pittsburg"
   ],
   "Utah": [
     "Salt Lake City",
     "Lehi"
   ],
   "Virginia": [
-    "Arlington"
+    "Arlington",
+    "McLean",
+    "Herndon"
   ],
   "Maryland": [
     "Silver Spring"
@@ -116,16 +127,16 @@ export const COUNTRY_LOCATIONS: LocationGroup = {
     locations: ["London"]
   },
   "Germany": {
-    locations: ["Berlin", "Munich", "Karlsruhe"]
+    locations: ["Berlin", "Munich", "Karlsruhe", "Cologne"]
   },
   "Israel": {
     locations: ["Tel Aviv", "Or Yehuda"]
   },
   "France": {
-    locations: ["Paris"]
+    locations: ["Paris", "Rennes"]
   },
   "Canada": {
-    locations: ["Toronto"]
+    locations: ["Toronto", "Burnaby", "Vancouver"]
   },
   "Colombia": {
     locations: ["Medellín"]
@@ -141,5 +152,20 @@ export const COUNTRY_LOCATIONS: LocationGroup = {
   },
   "Cayman Islands": {
     locations: ["George Town"]
+  },
+  "India": {
+    locations: ["Mumbai", "Gurugram", "Jaipur", "Bengaluru"]
+  },
+  "Belgium": {
+    locations: ["Louvain-la-Neuve"]
+  },
+  "Indonesia": {
+    locations: ["Jakarta"]
+  },
+  "Italy": {
+    locations: ["Pesaro"]
+  },
+  "Singapore": {
+    locations: ["Singapore"]
   }
 } as const;
