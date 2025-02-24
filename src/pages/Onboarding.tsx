@@ -1,4 +1,3 @@
-
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { useState } from "react";
@@ -94,10 +93,7 @@ const Onboarding = () => {
 
       const { data, error } = await supabase
         .from('user_tracking_preferences')
-        .upsert(preferencesData, { 
-          onConflict: 'user_id',
-          ignoreDuplicates: false 
-        })
+        .upsert(preferencesData)
         .select();
 
       if (error) throw error;
@@ -126,7 +122,7 @@ const Onboarding = () => {
         description: "Your preferences have been saved.",
       });
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("[Onboarding] Error saving preferences:", error);
       toast({
         title: "Error",
